@@ -1,0 +1,11 @@
+*.retry
+**/__pycache__
+releases
+work
+.DS_Store
+
+# Python virtual env
+venv/
+
+# Vagrant config is auto generated.
+.vagrant
