@@ -1,0 +1,38 @@
+---
+# TODO sort out where vars are defined
+
+- name: Set services for stroom_services
+  hosts: stroom_services_stack
+  vars_files:
+    - ./variables.yml
+    - ../global_variables.yml
+    - ../config/user_settings.yml
+  vars:
+    services_to_run: nginx stroom-auth-service stroom-auth-ui stroom-log-sender
+  roles:
+    - roles/stack/set_active_services
+
+
+- name: Set services for stroom_and_proxy_stack
+  hosts: stroom_and_proxy_stack
+  vars_files:
+    - ./variables.yml
+    - ../global_variables.yml
+    - ../config/user_settings.yml
+  vars:
+    services_to_run: stroom stroom-proxy-local stroom-log-sender
+  roles:
+    - roles/stack/set_active_services
+
+
+- name: Set services for stroom_dbs_stack
+  hosts: stroom_dbs_stack
+  vars_files:
+    - ./variables.yml
+    - ../global_variables.yml
+    - ../config/user_settings.yml
+  vars:
+    services_to_run: stroom-all-dbs
+  roles:
+    - roles/stack/set_active_services
+

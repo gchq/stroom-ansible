@@ -1,0 +1,38 @@
+---
+
+_java_yum_parent_dir: "/usr/lib/jvm"
+
+#_java_yum_package:
+  #8:
+    #jre: "java-1.8.0-openjdk"
+    #jdk: "java-1.8.0-openjdk-devel"
+
+_java:
+  8:
+    jre: "java-1.8.0-openjdk"
+    jdk: "java-1.8.0-openjdk-devel"
+    home_dir: "{{ _java_yum_parent_dir }}/java-1.8.0"
+  12:
+    targz: "openjdk-12+32_linux-x64_bin.tar.gz"
+    url: "https://download.java.net/openjdk/jdk12/ri/openjdk-12+32_linux-x64_bin.tar.gz"
+    directory: "jdk-12"
+    home_dir: "{{ java_unarchive_dest }}/jdk-12"
+  13:
+    targz: "openjdk-13.0.1_linux-x64_bin.tar.gz"
+    url: "https://download.java.net/java/GA/jdk13.0.1/cec27d702aa74d5a8630c65ae61e4305/9/GPL/openjdk-13.0.1_linux-x64_bin.tar.gz"
+    directory: "jdk-13.0.1"
+    home_dir: "{{ java_unarchive_dest }}/jdk-13.0.1"
+
+
+# Java 6,7,8,11 stuff
+java_yum_package: "{{ _java[java_version | int].jre | default([]) }}"
+java_jdk_yum_package: "{{ _java[java_version | int].jdk | default([]) }}"
+
+# Java 12 stuff
+java_archive_filename: "{{ _java[java_version | int].targz | default([]) }}"
+java_archive_url: "{{ _java[java_version | int].url | default([]) }}"
+java_archive_directory: "{{ _java[java_version | int].directory | default([]) }}"
+java_archive_sha256_url: "{{ java_archive_url }}.sha256"
+java_archive_sha256_value: "{{ lookup('url', java_archive_sha256_url) | default([]) }}"
+java_home_dir: "{{ _java[java_version | int].home_dir | default([]) }}"
+java_bin_dir: "{{ java_home_dir }}/bin"

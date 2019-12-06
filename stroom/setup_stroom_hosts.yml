@@ -1,0 +1,36 @@
+---
+# TODO sort out where vars are defined
+
+- name: Setup all hosts with common packages, and a yum update
+  hosts: all
+  vars_files:
+    - ./variables.yml
+  roles:
+    - roles/setup/common
+
+- name: Setup hosts with docker and docker-compose
+  become: yes
+  hosts:
+    - ~.*_stack$
+  roles:
+    - roles/setup/docker
+  vars:
+    docker_user: "{{ stroom_user }}"
+
+- name: Setup hosts with java
+  become: yes
+  hosts:
+    - stroom_and_proxy
+  roles:
+    - roles/setup/java
+  vars:
+    # Set java_version based on the stroom version
+    java_version: '{{ 8 if stroom_version is search("^v6\.") else 12 }}'
+
+- name: Setup hosts with mysql
+  hosts:
+    - stroom_database
+  tasks:
+    - import_role:
+        name: roles/setup/mysql
+

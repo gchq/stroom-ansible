@@ -1,0 +1,14 @@
+---
+# defaults file for build_stroom_source
+
+stroom_source_archive_file: "{{ release_version }}.tar.gz"
+downloads_dir: "/tmp/downloads"
+#unpack_dir: "~/{{ release_version }}"
+unpack_dir: "~/"
+stroom_config_dir: "~/.stroom"
+source_dir: "{{ unpack_dir }}/{{ repo_name }}-{{ release_version | regex_replace('^v', '') }}"
+gradle_args: "clean build -x test -x integrationTest -x gwtCompile"
+java_version: 8
+
+# java_info is set as a fact in the java role
+gradle_java_home_path: "{{ java_info[java_version].java_home_dir }}"

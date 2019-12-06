@@ -1,0 +1,36 @@
+---
+- name: "Do a YUM update on all installed packages"
+  become: true
+  yum:
+    name: "*"
+    state: latest
+  tags:
+    - never # Task won't run unless one of the other tags is set
+    - yum_update
+
+# The next three tasks will ONLY run if you supply the allow_reboot tag
+- name: restart system to reboot to newest kernel
+  become: true
+  shell: "sleep 5 && reboot"
+  async: 1
+  poll: 0
+  tags:
+    - never
+    - allow_reboot
+
+- name: wait for 10 seconds
+  pause:
+    seconds: 10
+  tags:
+    - never
+    - allow_reboot
+
+- name: wait for the system to reboot
+  wait_for_connection:
+    connect_timeout: 20
+    sleep: 3
+    delay: 0
+    timeout: 120
+  tags:
+    - never
+    - allow_reboot

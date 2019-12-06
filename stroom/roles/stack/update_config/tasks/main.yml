@@ -1,0 +1,16 @@
+- name: Get absolute path 
+  command: "realpath {{ local_config_dir }}"
+  register: absolute_path
+
+# Services config
+
+- name: Update the local env file from the inventory
+  command: "python3 ./scripts/update_env_file.py {{ absolute_path.stdout }}/{{ stack_name }}"
+
+- name: Update the local upstream files from the inventory
+  command: "python3 ./scripts/update_upstream_files.py {{ absolute_path.stdout }}/{{ stack_name }}"
+  
+- name: Update the local server.conf file from the inventory
+  command: "python3 ./scripts/update_server_conf.py {{ absolute_path.stdout }}/{{ stack_name }}"
+
+

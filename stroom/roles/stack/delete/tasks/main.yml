@@ -1,0 +1,33 @@
+---
+
+- name: Stop any running containers
+  shell: "if [ -n \"$(docker ps --quiet)\" ]; then docker stop $(docker ps --quiet); else echo \"NO CHANGE\"; fi"
+  register: result
+  changed_when: "'NO CHANGE' not in result.stdout"
+
+- name: Kill any running containers
+  shell: "if [ -n \"$(docker ps --quiet)\" ]; then docker kill $(docker ps --quiet); else echo \"NO CHANGE\"; fi"
+  register: result
+  changed_when: "'NO CHANGE' not in result.stdout"
+
+- name: Delete all containers
+  shell: "if [ -n \"$(docker ps --all --quiet)\" ]; then docker rm -v $(docker ps --all --quiet); else echo \"NO CHANGE\"; fi"
+  register: result
+  changed_when: "'NO CHANGE' not in result.stdout"
+
+  # TODO Not sure we want to do this as it takes so long to download the images
+#- name: Delete Docker images
+  #shell: "if [ -n \"$(docker ps --all --quiet)\" ]; then docker rmi $(docker ps --all --quiet); else echo \"NO CHANGE\"; fi"
+  #register: result
+  #changed_when: "'NO CHANGE' not in result.stdout"
+
+- name: Delete Docker volumes
+  shell: "if [ -n \"$(docker volume ls -qf dangling=true)\" ]; then docker volume rm $(docker volume ls -qf dangling=true); else echo \"NO CHANGE\"; fi"
+  register: result
+  changed_when: "'NO CHANGE' not in result.stdout"
+  
+- name: Ensure '{{ stack_install_root_dir }}/{{ stack_name }}' is absent
+  become: yes
+  file:
+    path: "{{ stack_install_root_dir }}/{{ stack_name }}"
+    state: absent

@@ -1,0 +1,103 @@
+---
+- name: 'Check mandatory variables are defined'
+  assert:
+    that:
+      - java_version is defined
+
+- debug:
+    msg:
+      - "java_version: {{ java_version }}"
+      - "java_bin_dir: {{ java_bin_dir }}"
+    verbosity: 2
+
+
+# Java 6,7,8,11 Yum install
+
+- name: Install Java JVM and JDK (<=8) with package manager
+  block:
+
+    - debug:
+        msg:
+          - "java_yum_package: {{ java_yum_package }}"
+          - "java_jdk_yum_package: {{ java_jdk_yum_package }}"
+        verbosity: 2
+
+    - name: Yum install java
+      become: true
+      yum:
+        name: "{{ packages }}"
+        state: latest
+      vars:
+        packages:
+          - "{{ java_yum_package }}"
+          - "{{ java_jdk_yum_package }}"
+
+  when: java_version | int <= 8
+
+# Java 13+ archive download
+
+- name: Install Java JVM and JDK from an archive file
+  block:
+
+    - debug:
+        msg:
+          - "java_archive_filename: {{ java_archive_filename }}"
+          - "java_archive_url: {{ java_archive_url }}"
+          - "java_archive_sha256_url: {{ java_archive_sha256_url }}"
+          - "java_archive_sha256_value: {{ java_archive_sha256_value }}"
+        verbosity: 2
+
+    - name: Ensure directory exists
+      file:
+        path: "{{ downloads_dir }}"
+        state: directory
+
+    - name: Download tar.gz
+      get_url:
+        #url: "{{ java_archive[java_version].url }}"
+        url: "{{ java_archive_url }}"
+        #dest: "{{ downloads_dir }}/{{ java_archive[java_version].targz }}"
+        dest: "{{ downloads_dir }}/{{ java_archive_filename }}"
+        #checksum: "sha256:{{ sha256sum }}"
+        checksum: "sha256:{{ java_archive_sha256_value }}"
+
+    - name: Extract tar.gz
+      become: true
+      unarchive:
+        src: "{{ downloads_dir }}/{{ java_archive_filename }}"
+        #src: "{{ downloads_dir }}/{{ java_archive[java_version].targz }}"
+        dest:  "{{ java_unarchive_dest }}"
+        remote_src: yes
+
+  vars:
+    #sha256_url: "{{ java_archive[java_version].url }}.sha256"
+    # Need to do a lookup as the sha256 url just contains the hash, not hash + filename
+    #sha256sum: "{{ lookup('url', sha256_url) }}"
+  when: java_version | int >= 12
+
+- stat:
+    path: "{{ java_bin_dir }}/java"
+  register: java_binary_info
+
+- name: "Check java binary {{ java_bin_dir }}/java exists"
+  assert:
+    that:
+      - java_binary_info.stat.exists == true
+
+- name: "Set java_info_tmp fact"
+  set_fact: 
+    java_info_tmp: "{{ { java_version: { 'java_home_dir': java_home_dir } } }}"
+
+- debug: 
+    var: java_info_tmp
+    verbosity: 2
+
+  # We want to set a fact for the location of the java_home(s) so other roles can access them
+  # See https://stackoverflow.com/questions/37043746/how-to-update-nested-variables-in-ansible
+- name: "Merge java_info_tmp fact with java_info"
+  set_fact: 
+    java_info: "{{ java_info | default({}) | combine(java_info_tmp, recursive=True) }}"
+
+- debug: 
+    var: java_info
+    verbosity: 2

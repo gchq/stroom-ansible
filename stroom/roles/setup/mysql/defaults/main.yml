@@ -1,0 +1,30 @@
+mysql_repo_version: "80"
+mysql_repo_target_version: "56"
+mysql_repo_rpm_file: "mysql{{ mysql_repo_version }}-community-release-el7-3.noarch.rpm"
+mysql_repo_local_install: "/etc/yum.repos.d/mysql-community.repo"
+mysql_port: "3306"
+
+stroom_db_user_suffix: "user"
+stroom_db_root_password: "my-secret-pw"
+stroom_db_user_password: "stroompassword1"
+
+stroom_databases:
+
+  - name: stroom
+    user: stroomuser
+    password: stroompassword1
+    privs: "stroom.*:ALL"
+    host: "%"
+
+  - name: stats
+    user: statsuser
+    password: stroompassword1
+    privs: "stats.*:ALL"
+    host: "%"
+
+  - name: auth
+    user: authuser
+    password: stroompassword1
+    privs: "auth.*:ALL"
+    host: "%"
+

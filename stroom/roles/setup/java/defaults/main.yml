@@ -1,0 +1,11 @@
+---
+# The version of java to install
+java_version: 8
+
+# Temporary location where the archive files are downloaded to.
+# They will not be deleted to save downloding again.
+downloads_dir: "/tmp/downloads"
+
+# The path where the java distribution will be extracted to
+java_unarchive_dest: "/opt"
+

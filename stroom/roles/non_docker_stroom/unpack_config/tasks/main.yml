@@ -1,0 +1,52 @@
+---
+- name: 'Check mandatory variables are defined'
+  assert:
+    that:
+      - downloads_dir is defined
+      - stroom_archive_filename is defined
+      - stroom_url is defined
+
+- debug:
+    msg:
+      - "downloads_dir: {{ downloads_dir }}"
+      - "stroom_archive_filename: {{ stroom_archive_filename }}"
+      - "stroom_url: {{ stroom_url }}"
+      - "stack_config_path: {{ stack_config_path }}"
+    verbosity: 2
+
+- name: "Create temporary directory"
+  tempfile:
+    state: directory
+    suffix: ".stroom"
+  register: stroom_unpack_temp_dir
+
+- debug:
+    msg: 
+      - "{{ stroom_unpack_temp_dir.path}}"
+    verbosity: 2
+
+#- name: "Unpack Stroom's distribution zip to {{ stroom_unpack_temp_dir }}" 
+- name: "Unpack Stroom's distribution zip to " 
+  unarchive:
+    src: "{{ downloads_dir }}/{{ stroom_archive_filename }}"
+    dest:  "{{ stroom_unpack_temp_dir.path }}"
+    remote_src: yes
+
+- name: "Ensure directory {{ stroom_config_path }} exists"
+  file:
+    path: "{{ stroom_config_path }}"
+    state: directory
+
+- name: "Copy proxy config dir from temp dir to releases area" 
+  copy:
+    src: "{{ stroom_unpack_temp_dir.path }}/config"
+    dest:  "{{ stroom_release_path }}/"
+    remote_src: yes
+
+- name: Create a symlink for latest
+  file:
+    state: link
+    force: yes
+    src: "{{ stroom_version }}"
+    dest: "{{ stroom_releases_path }}/latest"
+

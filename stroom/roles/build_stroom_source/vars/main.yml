@@ -1,0 +1,12 @@
+---
+# vars file for build_stroom_source
+
+stroom_conf_filename: "stroom.conf"
+stroom_conf_file: "{{ stroom_config_dir }}/{{ stroom_conf_filename }}"
+stroom_conf_script_filename: "stroom.conf.sh"
+stroom_conf_script_file: "{{ source_dir }}/{{ stroom_conf_script_filename }}"
+
+local_yaml_filename: "local.yml"
+local_yaml_file: "{{ source_dir }}/{{ local_yaml_filename }}"
+local_yaml_script_filename: "local.yml.sh"
+local_yaml_script_file: "{{ source_dir }}/{{ local_yaml_script_filename }}"

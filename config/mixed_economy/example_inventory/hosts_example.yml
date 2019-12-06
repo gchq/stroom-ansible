@@ -1,0 +1,13 @@
+---
+all:
+  children:
+    stroom_and_proxy:
+      hosts:
+        stroom-and-proxy-host-1
+        stroom-and-proxy-host-2
+    stroom-services-stack:
+      hosts:
+        stroom-services-stack-host
+    stroom-database:
+      hosts:
+        stroom-database-host

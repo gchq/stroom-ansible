@@ -1,0 +1,24 @@
+---
+ansible_connection: ssh
+
+# The user that ansible will connect as, must have sudo rights to 'sudo su -'.
+# The user should have passwordless sudo and an ssh key pair that has already
+# been set up on the remote host(s). The ssh key to use can be set on the command line
+# using '--private-key=~/.ssh/my_private_key_id_rsa'
+ansible_user: "vagrant"
+
+stroom_version: "v6.0.27"
+
+# The local directory where the stack configuration is kept. This configuration
+# will be pushed out to the proxy hosts. This directory should be under source
+# control. 
+# IMPORTANT: This is relative to the playbook being run.
+local_config_dir: "../config/mixed_economy"
+
+# The user that stroom-proxy will run as
+stroom_user: "stroomuser"
+
+# The directory where stroom-proxy will be installed on the remote host
+stack_install_root_dir: "/home/{{ stroom_user }}"
+
+# vim: set filetype=yaml shiftwidth=2 tabstop=2 expandtab:

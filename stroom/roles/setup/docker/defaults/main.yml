@@ -1,0 +1,5 @@
+---
+# The user that will be added to the docker group so they can run docker without sudo
+docker_user: "centos"
+docker_compose_version: "1.24.1"
+

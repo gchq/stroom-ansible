@@ -1,0 +1,12 @@
+---
+- name: Ensure directory exists
+  file:
+    path: "{{ stroom_proxy_downloads_path }}"
+    state: directory
+
+- name: Download stroom-proxy distribution
+  get_url:
+    url: "{{ stroom_proxy_url }}"
+    dest: "{{ stroom_proxy_downloads_path }}/{{ stroom_proxy_archive_filename }}"
+    # Commented out until 6.0.19 is released, due to bug in the hash file
+    # checksum: "sha256:{{ stroom_url }}.sha256"

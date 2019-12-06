@@ -1,0 +1,6 @@
+---
+stack_install_root_dir: "~"
+stack_dir: "{{ stack_install_root_dir }}/{{ stack_name }}/{{ stack_name }}-{{stack_version }}"
+op: "{{ state | regex_replace('started','start.sh -q -m') | regex_replace('stopped','stop.sh -m') | regex_replace('restarted','restart.sh -q -m') }}"
+retry_count: 60
+delay_secs: 2

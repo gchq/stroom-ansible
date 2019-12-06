@@ -1,0 +1,7 @@
+---
+
+# The version of the stack to deploy
+stack_version: "{{ stroom_version }}-2"
+
+# Use the same stack for services 
+stack_name: "stroom_services"

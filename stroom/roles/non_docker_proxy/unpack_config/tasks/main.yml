@@ -1,0 +1,38 @@
+---
+- name: "Create temporary directory"
+  tempfile:
+    state: directory
+    suffix: ".stroom-proxy"
+  register: stroom_proxy_unpack_temp_dir
+
+- debug:
+    msg: 
+      - "{{ stroom_proxy_downloads_path }}/{{ stroom_proxy_archive_filename }}"
+      - "{{ stroom_proxy_unpack_temp_dir.path}}"
+      - "{{ stroom_proxy_config_path}}"
+    verbosity: 2
+
+#- name: "Unpack Stroom's distribution zip to {{ stroom_proxy_unpack_temp_dir }}" 
+- name: "Unpack Stroom's distribution zip to " 
+  unarchive:
+    src: "{{ stroom_proxy_downloads_path }}/{{ stroom_proxy_archive_filename }}"
+    dest:  "{{ stroom_proxy_unpack_temp_dir.path }}"
+    remote_src: yes
+
+- name: "Ensure directory {{ stroom_proxy_config_path }} exists"
+  file:
+    path: "{{ stroom_proxy_config_path }}"
+    state: directory
+
+- name: "Copy proxy config dir from temp dir to releases area" 
+  copy:
+    src: "{{ stroom_proxy_unpack_temp_dir.path }}/config"
+    dest:  "{{ stroom_proxy_release_path }}/"
+    remote_src: yes
+
+- name: Create a symlink for latest
+  file:
+    state: link
+    force: yes
+    src: "{{ stroom_proxy_version }}"
+    dest: "{{ stroom_proxy_releases_path }}/latest"

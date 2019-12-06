@@ -1,0 +1,8 @@
+---
+- name: Perform a YUM update then reboot
+  hosts: all
+  become: yes
+  tasks:
+
+  - import_role:
+      name: setup/yum_update

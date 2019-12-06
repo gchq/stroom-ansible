@@ -1,0 +1,24 @@
+
+
+- name: Copy the config files to the host
+  copy:
+    src: "{{stroom_releases_path}}/latest/config/stroom.conf"
+    dest: "{{home}}/stroom/latest/config/stroom.conf"
+
+# NOTE: Yaml requires escaping backslashes in double quotes but not in single quotes
+- name: "Set the stroom node name"
+  lineinfile:
+    path:  "{{home}}/stroom/latest/config/stroom.conf"
+    regexp: '^(stroom.node=).*$'
+    # line: "\\1{{ inventory_hostname }}"
+    # line: "\\1{{ ansible_host }}"
+    line: "\\1{{ inventory_hostname_short }}"
+    backrefs: yes
+
+# NOTE: Yaml requires escaping backslashes in double quotes but not in single quotes
+- name: "Set the stroom HTML title to {{ environment_name }}"
+  lineinfile:
+    path:  "{{home}}/stroom/latest/config/stroom.conf"
+    regexp: '^(stroom.htmlTitle=).*$'
+    line: "\\1{{ environment_name }}"
+    backrefs: yes

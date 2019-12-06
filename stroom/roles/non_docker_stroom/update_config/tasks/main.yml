@@ -1,0 +1,26 @@
+---
+#
+# Stroom config
+
+# Needed for calling python, TODO use script module
+- name: Get absolute path 
+  command: "realpath {{ local_config_dir }}"
+  register: absolute_path
+
+# TODO rewrite with lineinfile, replace et al.
+- name: Update the local stroom.conf file from the inventory
+  command: "python3 ./scripts/update_stroom_conf_file.py {{ absolute_path.stdout }}/stroom"
+
+- name: Enable content pack import
+  lineinfile:
+    path: "{{ stroom_conf_file }}"
+    regexp: '^\s*#?\s*(stroom\.contentPackImportEnabled)=false\s*$'
+    line: '\1=true'
+    backrefs: yes
+
+- name: Un-comment internal stat entries to disable stroom-stats internal stats
+  replace:
+    path: "{{ stroom_conf_file }}"
+    regexp: '^\s*#\s*(stroom\.internalstatistics\..*)$'
+    replace: '\1'
+

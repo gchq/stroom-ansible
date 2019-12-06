@@ -1,0 +1,10 @@
+- name: Download stroom release on remote host
+  include_role:
+    name: non_docker_stroom/download
+  vars:
+    download_path: "{{ home }}/stroom"
+
+- name: Ensure stroom temp dir exists
+  file:
+    path: "/tmp/stroom"
+    state: directory

@@ -1,0 +1,179 @@
+---
+- hosts:
+    - all
+  gather_facts: false
+  vars:
+    - java_version_from: "{{ stroom_6_java_version }}"
+    - java_version_to: "{{ stroom_7_java_version }}"
+    - migration_dir: "~/migration-{{ stroom_version_from }}-{{ stroom_version_to }}"
+    - stack_name: "stroom_core_test"
+    - stroom_6_java_version: "8"
+    - stroom_7_java_version: "12"
+    - stroom_config_dir: "~/.stroom"
+    - stroom_temp_dir: "/tmp/stroom"
+    - stroom_user: "centos"
+    - stroom_version_from: "v6.0.26"
+    - stroom_version_to: "v7.0-beta.11"
+      # Normally we would deploy a stack on top of another but if we do that we
+      # can't go back as the config is different
+    - stack_dir_from: "{{ migration_dir }}/stack-{{ stroom_version_from }}"
+    - stack_dir_to: "{{ migration_dir }}/stack-{{ stroom_version_to }}"
+  tasks:
+
+    ################### SETUP HOST ###################
+
+    - import_role:
+        name: setup/common
+
+    - import_role:
+        name: setup/docker
+
+    # The JDKs will be installed as a dep of build_stroom_source
+
+    #- import_role:
+        #name: setup/java
+      #vars:
+        #java_version: "{{ java_version_from }}"
+
+    #- import_role:
+        #name: setup/java
+      #vars:
+        #java_version:  "{{ java_version_to }}"
+
+    - import_role:
+        name: stack/open_ports
+
+    ################### TEAR DOWN ###################
+
+
+      # Remove the from stack dir
+    - name: Ensure '{{ stack_dir_from }}' is absent
+      file:
+        path: "{{ stack_dir_from }}"
+        state: absent
+      tags:
+        - teardown
+
+      # Remove the to stack dir
+    - name: Ensure '{{ stack_dir_to }}' is absent
+      file:
+        path: "{{ stack_dir_to }}"
+        state: absent
+      tags:
+        - teardown
+
+      # Remove the whole migration dir only if we want to remove the compiled source
+      # as it takes so long to compile
+    - name: Ensure '{{ migration_dir}}' is absent
+      file:
+        path: "{{ migration_dir }}"
+        state: absent
+      tags:
+        - never
+        - clean_compiled
+        - teardown
+
+      # Remove the stroom temp dir that contains the stream store
+    - name: Ensure '{{ stroom_temp_dir }}' is absent
+      file:
+        path: "{{ stroom_temp_dir }}"
+        state: absent
+      tags:
+        - teardown
+
+    - import_role:
+        name: stack/delete
+      vars:
+        stack_version: "{{ stroom_version_from }}"
+        stack_install_root_dir: "{{ stack_dir_from }}"
+      tags:
+        - teardown
+
+    - import_role:
+        name: stack/delete
+      vars:
+        stack_version: "{{ stroom_version_to }}"
+        stack_install_root_dir: "{{ stack_dir_to }}"
+      tags:
+        - teardown
+
+    ################### SET UP & RUN FROM VERSION ###################
+
+    - import_role:
+        name: stack/download
+      vars:
+        stack_version: "{{ stroom_version_from }}"
+        stack_install_root_dir: "{{ stack_dir_from }}"
+
+      # Set the stack to run just the db so we can run a v6 schema into it
+      # TODO make it not run if it doesn't need to
+    - import_role:
+        name: stack/set_active_services
+      vars:
+        services_to_run: "nginx stroom-all-dbs stroom-auth-service stroom-auth-ui"
+        stack_install_root_dir: "{{ stack_dir_from }}"
+        stack_version: "{{ stroom_version_from }}"
+
+      # Start up the DB
+    - import_role:
+        name: stack/ensure_state
+      vars:
+        stack_install_root_dir: "{{ stack_dir_from }}"
+        stack_version: "{{ stroom_version_from }}"
+        state: "started"
+
+      # Download, build and run setup sample data to build and populate the db
+    - import_role:
+        name: build_stroom_source
+      vars:
+        repo_name: "stroom"
+        release_version: "{{ stroom_version_from }}"
+        java_version:  "{{ java_version_from }}"
+        gradle_args: "build -x test -x integrationTest -x gwtCompile setupSampleData"
+        unpack_dir: "{{ migration_dir }}"
+
+      # Stop the DB
+    - import_role:
+        name: stack/ensure_state
+      vars:
+        stack_install_root_dir: "{{ stack_dir_from }}"
+        stack_version: "{{ stroom_version_from }}"
+        state: "stopped"
+      #tags:
+        #- never
+        #- clean
+
+
+    ################### SET UP & RUN TO VERSION ###################
+
+    - import_role:
+        name: stack/download
+      vars:
+        stack_version: "{{ stroom_version_to }}"
+        stack_install_root_dir: "{{ stack_dir_to }}"
+
+      # Change the new stack to be just the services
+    - import_role:
+        name: stack/set_active_services
+      vars:
+        services_to_run: "nginx stroom-all-dbs stroom-auth-service stroom-ui"
+        stack_install_root_dir: "{{ stack_dir_to }}"
+        stack_version: "{{ stroom_version_to }}"
+
+      # Start up all the services in the new stack
+    - import_role:
+        name: stack/ensure_state
+      vars:
+        stack_install_root_dir: "{{ stack_dir_to }}"
+        stack_version: "{{ stroom_version_to }}"
+        state: "started"
+
+      # Download, build and run the from stroom release
+    - import_role:
+        name: build_stroom_source
+      vars:
+        repo_name: "stroom"
+        release_version: "{{ stroom_version_to }}"
+        java_version:  "{{ java_version_to }}"
+        gradle_args: "build -x test -x gwtCompile run"
+        unpack_dir: "{{ migration_dir }}"

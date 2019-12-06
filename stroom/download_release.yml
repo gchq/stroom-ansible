@@ -1,0 +1,19 @@
+- name: Downloads, unpacks, and links in a stack
+  hosts: localhost
+  vars_files:
+    - ./variables.yml
+    - ../global_variables.yml
+    - ../config/user_settings.yml
+  vars:
+    #- stroom_stack_archive_filename: "{{ stack_name }}-{{ stack_version}}.tar.gz"
+    #- stroom_stack_url: "https://github.com/gchq/stroom-resources/releases/download/stroom-stacks-{{ stack_version }}/{{ stroom_stack_archive_filename }}"
+    #- stroom_archive_filename: "stroom-app-{{ stroom_version }}.zip"
+    #- stroom_url: "https://github.com/gchq/stroom/releases/download/{{ stroom_version }}/{{ stroom_archive_filename }}"
+  roles:
+    #- role: stack/download
+    - role: non_docker_stroom/download
+    - role: non_docker_stroom/unpack_config
+    #download_path: "{{ stroom_downloads_path }}"
+    - role: non_docker_proxy/download
+    - role: non_docker_proxy/unpack_config
+

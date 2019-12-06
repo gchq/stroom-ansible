@@ -1,0 +1,39 @@
+- name: Terminate all instances
+  hosts: localhost
+  connection: localhost
+  gather_facts: false
+  vars_files:
+    - vars/aws_vault.yml
+    - vars/aws.yml
+  tasks:
+    - include_role:
+        name: roles/ec2/instance/terminate
+      vars:
+        instance_tag_name: stroom_services_stack_1
+        instance_tag_type: stroom_services_stack
+
+    - include_role:
+        name: roles/ec2/instance/terminate
+      vars:
+        instance_tag_name: stroom_services_stack_2
+        instance_tag_type: stroom_services_stack
+
+    - include_role:
+        name: roles/ec2/instance/terminate
+      vars:
+        instance_tag_name: stroom_and_proxy_stack_1
+        ec2_instance_type: t2.medium
+        instance_tag_type: stroom_and_proxy_stack
+
+    - include_role:
+        name: roles/ec2/instance/terminate
+      vars:
+        instance_tag_name: stroom_and_proxy_stack_2 
+        ec2_instance_type: t2.medium
+        instance_tag_type: stroom_and_proxy_stack
+
+    - include_role:
+        name: roles/ec2/instance/terminate
+      vars:
+        instance_tag_name: stroom_dbs_stack_1
+        instance_tag_type: stroom_dbs_stack

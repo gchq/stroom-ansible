@@ -1,0 +1,110 @@
+---
+
+########### LOCALHOST  ###########
+
+- hosts:
+    - localhost
+  gather_facts: false
+  vars:
+    - stack_install_root_dir: "{{ local_config_dir }}"
+  tags:
+    - local_config
+  tasks:
+    ########### DOWNLOAD RELEASE TO LOCAL CONFIG DIR ###########
+
+    - name: 'Check mandatory variables are defined'
+      assert:
+        that:
+          - local_config_dir is defined
+
+    - debug:
+        msg:
+          - "local_config_dir: {{ local_config_dir }}"
+        verbosity: 2
+
+    - stat:
+        path: "{{ local_config_dir }}"
+      register: local_config_dir_info
+
+    - name: "Check local_config_dir {{ local_config_dir }} exists"
+      fail:
+        msg: "local_config_dir {{ local_config_dir }} doesn't exist"
+      when: |
+        (local_config_dir.stat.isDir is defined and local_config_dir.stat.isDir==true) or 
+        (local_config_dir.stat.isLnk is defined and local_config_dir.stat.isLnk==true)
+
+    - name: "Download stack {{stack_name }} {{ stack_version }} to {{ local_config_dir }}"
+      import_role:
+        name: stack/download
+      vars:
+        stack_install_root_dir: "{{ local_config_dir }}"
+
+    ########### SETUP LOCAL CONFIGURATION  ###########
+
+    # This is either a mandrolic process to configure things such as certs
+    # and nginx config, or do it in ansible.
+
+    # Could do the env file mods with ansible and do the volumes dir mods
+    # externally.
+
+
+
+
+
+########### 'stroom_remote_proxy_stack' HOSTS  ###########
+
+- hosts:
+    - stroom_remote_proxy_stack
+  gather_facts: true # Needed for yum stuff
+  tasks:
+
+    - name: 'Check mandatory variables are defined'
+      assert:
+        that:
+          - local_config_dir is defined
+          - stack_install_root_dir is defined
+          - stack_name is defined
+          - stack_version is defined
+          - stroom_user is defined
+
+    ################### SETUP HOST ###################
+
+    - import_role:
+        name: setup/common
+      tags:
+        - setup
+
+    - import_role:
+        name: setup/docker
+      vars:
+        docker_user: "{{ stroom_user }}" 
+      tags:
+        - setup
+
+    - name: "Block of tasks to run as {{ stroom_user }}"
+      become: yes
+      become_user: "{{ stroom_user }}"
+      block:
+
+    ########### DEPLOY REMOTE PROXY STACK  ###########
+
+        - import_role:
+            name: stack/download
+          tags:
+            - deploy
+
+    ########### UPDATE REMOTE STACK CONFIG  ###########
+
+        - import_role:
+            name: stack/send_config
+          vars:
+            source_stack_root_dir: "{{ local_config_dir }}"
+            dest_stack_root_dir: "{{ stack_install_root_dir }}"
+          tags:
+            - deploy
+
+        - import_role:
+            name: proxy/update_config
+          tags:
+            - deploy
+

@@ -1,0 +1,18 @@
+- name: Copy stack to remote
+  copy:
+    src: "{{stack_releases_path}}/{{stack_name}}-{{stack_version}}"
+    dest: "{{home}}/{{stack_name}}"
+    mode: preserve # 'preserve' keeps the file permissions, i.e. it keeps .sh files executable
+
+- name: Create a symlink to a predictable location
+  file:
+    state: link
+    src: "{{stack_name}}-{{stack_version}}"
+    dest: "{{home}}/{{stack_name}}/latest"
+
+#- name: Copy volumes to remote
+#  become: yes # We need to escalate because volumes become owned by root, because docker
+#  copy:
+#    src: "{{stack_releases_path}}/volumes"
+#    dest: "{{home}}/{{stack_name}}"
+#    mode: preserve # 'preserve' keeps the file permissions, i.e. it keeps .sh files executable

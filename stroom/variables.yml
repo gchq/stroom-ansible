@@ -1,0 +1,49 @@
+# This is where we store generated files
+authorized_keys_path: "{{ local_config_dir }}/authorized_keys"
+# IDEA: we could define a 'previous_version' when we're migrating, and if it exists we could stop and delete
+# before doing an install.
+
+# stroom_user: "stroomuser"
+# docker_user: "{{ stroom_user }}"
+
+# We define a {{home}} variable because:
+#  1. If we use '~/' then if we're elevating we'll install things in /root/ instead
+#  2. We might want to change the user, in which case we'll only want to change it in one place.
+# TODO should probably rename to stroom_home
+home: "/home/{{ stroom_user }}"
+stroom_user_home: "/home/{{ stroom_user }}"
+
+stack_install_root_dir: "{{ stroom_user_home }}"
+stroom_install_root_dir: "{{ stroom_user_home }}"
+
+# This is where we download stack releases to
+stack_releases_path: "{{ local_config_dir }}/{{ stack_name }}"
+stroom_releases_path: "{{ local_config_dir }}/stroom"
+stroom_proxy_releases_path: "{{ local_config_dir }}/stroom-proxy"
+
+stack_release_path: "{{ stack_releases_path }}/{{ stack_version }}"
+stroom_release_path: "{{ stroom_releases_path }}/{{ stroom_version }}"
+stroom_proxy_release_path: "{{ stroom_proxy_releases_path }}/{{ stroom_proxy_version }}"
+
+stack_config_path: "{{ stroom_release_path }}/config"
+stroom_config_path: "{{ stroom_release_path }}/config"
+stroom_proxy_config_path: "{{ stroom_proxy_release_path }}/config"
+
+# Where we download zip/tar.gz files to
+downloads_path: "{{ local_config_dir }}/downloads"
+
+stack_downloads_path: "{{ downloads_path }}"
+stroom_downloads_path: "{{ downloads_path }}/stroom"
+# In v6 this is the same file as stroom, will change in v7
+stroom_proxy_downloads_path: "{{ stroom_downloads_path }}"
+
+stroom_stack_archive_filename: "{{ stack_name }}-{{ stack_version }}.tar.gz"
+stroom_stack_url: "https://github.com/gchq/stroom-resources/releases/download/stroom-stacks-{{ stack_version }}/{{ stroom_stack_archive_filename }}"
+
+stroom_archive_filename: "stroom-app-{{ stroom_version }}.zip"
+stroom_url: "https://github.com/gchq/stroom/releases/download/{{ stroom_version }}/{{ stroom_archive_filename }}"
+
+# In v6 this is the same as stroom, will change in v7
+stroom_proxy_archive_filename: "{{ stroom_archive_filename }}"
+stroom_proxy_url: "{{ stroom_url }}"
+

@@ -1,0 +1,27 @@
+---
+
+# TODO need to open ports based on which services are active
+
+- name: Open port for MySQL
+  become: true
+  firewalld:
+    port: 3307/tcp # TODO use variable for port, or get from the stack env
+    zone: public
+    permanent: yes
+    state: enabled
+
+- name: Open public http
+  become: true
+  firewalld:
+    service: http
+    zone: public
+    permanent: yes
+    state: enabled
+
+- name: Open public https
+  become: true
+  firewalld:
+    service: https
+    zone: public
+    permanent: yes
+    state: enabled

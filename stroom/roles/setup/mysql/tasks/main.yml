@@ -1,0 +1,117 @@
+---
+# tasks file for roles/mysql
+
+# See https://serverfault.com/questions/824975/failed-to-get-d-bus-connection-operation-not-permitted
+# for running this role in docker with molecule
+
+- name: Download mysql repo rpm
+  get_url: 
+    url: "https://dev.mysql.com/get/{{ mysql_repo_rpm_file }}"
+    dest: "/tmp/{{ mysql_repo_rpm_file }}"
+
+- name: Install mysql repo package
+  become: yes
+  yum:
+     name:  "/tmp/{{ mysql_repo_rpm_file }}"
+     state: present
+
+- name: Disable default/latest MySQL repository
+  become: yes
+  ini_file:
+    dest: "{{ mysql_repo_local_install }}"
+    section: "mysql{{ mysql_repo_version }}-community"
+    option: enabled
+    value: "0"
+
+- name: Enable target MySQL repository
+  become: yes
+  ini_file:
+    dest: "{{ mysql_repo_local_install }}"
+    section: "mysql{{ mysql_repo_target_version }}-community"
+    option: enabled
+    value: "1"
+
+- name: Install MySQL
+  become: yes
+  yum: 
+    name: "{{ packages }}" 
+    state: present
+  vars:
+    packages:
+    - mysql
+    - mysql-server
+    - gcc-c++ # needed for MySQLdb python api
+    - MySQL-python # needed for MySQLdb python api
+
+- name: Copy my.cnf
+  become: yes
+  copy:
+    src: my.cnf
+    dest: /etc/my.cnf
+  notify: Restart mysql
+
+- name: Run MySQL
+  become: yes
+  service: 
+    name: mysqld 
+    state: started 
+    enabled: yes
+
+# Harden mysql - see:
+# https://dba.stackexchange.com/questions/102066/ansible-how-to-change-mysql-server-root-password-by-reprovisioning-the-server/102100
+
+# Need to do this for idempotency, see
+# http://ansible.cc/docs/modules.html#mysql-user
+- name: update mysql root password for all root accounts
+  mysql_user: 
+    name: root 
+    host: localhost 
+    password: "{{ stroom_db_root_password }}"
+
+- name: copy .my.cnf file with root password credentials
+  template: 
+    src: templates/my.cnf.j2
+    dest: /root/.my.cnf 
+    owner: root 
+    mode: 0600
+
+- name: update mysql root password for all root accounts
+  mysql_user: 
+    name: root 
+    host: "{{ item }}" 
+    password: "{{ stroom_db_root_password }}"
+  with_items:
+    - "{{ ansible_hostname }}"
+    - 127.0.0.1
+    - ::1
+
+- name: ensure anonymous users are not in the database
+  mysql_user: 
+    name: '' 
+    host: "{{ item }}" 
+    state: absent
+  with_items:
+    - localhost
+    - "{{ inventory_hostname }}"
+
+- name: remove the test database
+  mysql_db: 
+    name: test 
+    state: absent
+
+# Create the stroom databases
+- name: create mysql database
+  mysql_db: 
+    name: "{{ item.name }}" 
+    state: present
+  with_items:
+    - "{{ stroom_databases }}"
+
+- name: Setup MySQL users
+  mysql_user:
+    name: "{{ item.user }}"
+    password: "{{ item.password }}"
+    host: "{{ item.host }}"
+    priv: "{{ item.privs }}"
+  with_items:
+    - "{{ stroom_databases }}"

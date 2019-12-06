@@ -1,0 +1,45 @@
+---
+- name: Stop everything first
+  hosts: all
+  vars_prompt:
+    - name: Ask if they want to continue
+      prompt: This will remove all traces of Stroom from your hosts. Are you sure you want to continue? It will not remove yum dependencies we've already installed. Press ctrl-c to cancel, enter to continue
+
+
+##############################################################
+# Run remove.sh -y on everything                             #
+##############################################################
+
+- name: Stop and remove all containers for stroom_and_proxy_stack
+  hosts:
+    - ~.*_stack$
+  vars_files:
+    - ./variables.yml
+    - ../global_variables.yml
+    - ../config/user_settings.yml
+  vars:
+    # TODO is this needed
+    # stack_type: stroom_and_proxy_stack
+    op: remove.sh -y
+  roles:
+    - roles/stack/op
+
+
+##############################################################
+# Delete the folders containing our releases from everything #
+##############################################################
+
+- name: Delete the stack
+  vars_files:
+    - ./variables.yml
+    - ../global_variables.yml
+    - ../config/user_settings.yml
+  vars:
+    # TODO is this needed
+    # stack_type: stroom_and_proxy_stack
+  become: yes
+  hosts:
+    - ~.*_stack$
+  roles:
+    - roles/stack/delete
+    

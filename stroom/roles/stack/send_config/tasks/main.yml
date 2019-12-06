@@ -1,0 +1,24 @@
+---
+
+- name: 'Check mandatory variables are defined'
+  assert:
+    that:
+      - source_stack_root_dir is defined
+      - dest_stack_root_dir is defined
+
+  # Difficult to make this show no change if it has already been run as the env file
+  # will always be different on the remote host as we update it with host specific info
+  # i.e. HOST_IP
+- name: Copy the .env and .yml files to the remote host
+  copy:
+    src: "{{ item }}"
+    dest: "{{ dest_stack_root_dir }}/{{ stack_name }}/{{ stack_name }}-{{ stack_version }}/config/"
+  with_fileglob:
+    -  "{{ source_stack_root_dir }}/{{ stack_name }}/{{ stack_name }}-{{ stack_version }}/config/{{ stack_name }}.*"
+
+- name: Copy the volumes configuration to remote
+  copy:
+    src: "{{ source_stack_root_dir }}/{{ stack_name }}/volumes"
+    dest: "{{ dest_stack_root_dir }}/{{ stack_name }}/"
+    mode: preserve
+

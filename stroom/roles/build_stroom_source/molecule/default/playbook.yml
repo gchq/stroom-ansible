@@ -1,0 +1,9 @@
+---
+- name: Converge
+  hosts: all
+  vars:
+    - stroom_version: "v6.0.19"
+    - repo_name: "stroom"
+  roles:
+    - role: build_stroom_source
+

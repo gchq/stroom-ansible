@@ -1,0 +1,2 @@
+stroom_conf_file: "{{ local_config_dir }}/stroom/{{ stroom_version }}/config/stroom.conf"
+
