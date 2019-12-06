@@ -1,0 +1,15 @@
+---
+
+- name: 'Check mandatory variables are defined'
+  assert:
+    that:
+      - stack_env_var_file is defined
+      - inventory_hostname is defined
+
+- name: "Setting HOST_IP=\"{{ inventory_hostname }}\" in {{ stack_env_var_file }}"
+  lineinfile:
+    path: "{{ stack_env_var_file }}"
+    regexp: '^\s*#?\s*HOST_IP=.*'
+    line: "HOST_IP=\"{{ inventory_hostname }}\""
+
+

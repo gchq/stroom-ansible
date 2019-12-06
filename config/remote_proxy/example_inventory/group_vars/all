@@ -25,4 +25,54 @@ stroom_user: "stroomuser"
 # The directory where stroom-proxy will be installed on the remote host
 stack_install_root_dir: "/home/{{ stroom_user }}"
 
+proxy_forward_url: "https://downstream-proxy.some.domain/stroom/datafeed"
+
+# SSL Configuration
+server_certificate_filename: "dummy.server.cert"
+server_certificate_key_filename: "dummy.server.key"
+server_certificate_authority_filename: "dummy.ca.key"
+
+client_keystore_filename: "ddddd"
+client_keystore_password: "some password"
+
+client_truststore_filename: "eeeee"
+client_truststore_password: "some password"
+
+# name/value pairs to set in the stack env file
+# These will replace existing values in the env file or add a new line
+# if the name doesn't already exist
+stack_env_vars:
+  - name: "STROOM_PROXY_REMOTE_FORWARD_URL"
+    value: "xxx   https://downstream-proxy.some.domain/stroom/datafeed"
+  - name: "NGINX_SSL_CERTIFICATE_KEY"
+    value: "{{ server_certificate_key_filename }}"
+  - name: "NGINX_SSL_CERTIFICATE"
+    value: "{{ server_certificate_filename }}"
+  - name: "NGINX_SSL_CLIENT_CERTIFICATE"
+    value: "{{ server_certificate_authority_filename }}"
+  - name: "STROOM_NGINX_DOCKER_REPO"
+    value: "xxx   gchq/stroom-nginx"
+  - name: "STROOM_PROXY_DOCKER_REPO"
+    value: "xxx   gchq/stroom-proxy"
+  - name: "STROOM_PROXY_REMOTE_CLIENT_KEYSTORE_PASSWORD"
+    value: "xxx   password"
+  - name: "STROOM_PROXY_REMOTE_CLIENT_KEYSTORE_PATH"
+    value: "xxx   /stroom-proxy/certs/client.jks"
+  - name: "STROOM_PROXY_REMOTE_CLIENT_TRUSTSTORE_PASSWORD"
+    value: "xxx   password"
+  - name: "STROOM_PROXY_REMOTE_CLIENT_TRUSTSTORE_PATH"
+    value: "xxx   /stroom-proxy/certs/ca.jks"
+  - name: "STROOM_PROXY_REMOTE_FEED_STATUS_API_KEY"
+    value: "xxx   xxx some token xxx"
+  - name: "STROOM_PROXY_REMOTE_FEED_STATUS_URL"
+    value: "https://downstream-stroom-or-proxy.some.domain/api/proxy/feedStatus/v1"
+  - name: "STROOM_PROXY_REMOTE_FORWARDING_KEYSTORE_PASSWORD"
+    value: "xxx   password"
+  - name: "STROOM_PROXY_REMOTE_FORWARDING_KEYSTORE_PATH"
+    value: "xxx   /stroom-proxy/certs/client.jks"
+  - name: "STROOM_PROXY_REMOTE_FORWARDING_TRUSTSTORE_PASSWORD"
+    value: "xxx   password"
+  - name: "STROOM_PROXY_REMOTE_FORWARDING_TRUSTSTORE_PATH"
+    value: "xxx   /stroom-proxy/certs/ca.jks"
+
 # vim: set filetype=yaml shiftwidth=2 tabstop=2 expandtab:

@@ -1,0 +1,22 @@
+---
+
+- name: 'Check mandatory variables are defined'
+  assert:
+    that:
+      - stack_env_var_file is defined
+      - stack_env_vars is defined
+
+- debug:
+    var: env_vars
+    verbosity: 2
+
+  # Expecting env_vars to look like
+  # env_vars:
+  #   - name: SOME_ENV_VAR
+  #     value: some value
+  #   - name: ANOTHER_ENV_VAR
+  #     value: some value
+- name: "Setting multiple env vars in {{ stack_env_var_file }}"
+  include_tasks: set_env_var.yml
+  loop: "{{ stack_env_vars }}"
+

@@ -2,42 +2,42 @@
 
 ########### LOCALHOST  ###########
 
-- hosts:
-    - localhost
-  gather_facts: false
-  vars:
-    - stack_install_root_dir: "{{ local_config_dir }}"
-  tags:
-    - local_config
-  tasks:
-    ########### DOWNLOAD RELEASE TO LOCAL CONFIG DIR ###########
+#- hosts:
+    #- localhost
+  #gather_facts: false
+  #vars:
+    #- stack_install_root_dir: "{{ local_config_dir }}"
+  #tags:
+    #- local_config
+  #tasks:
+    ############ DOWNLOAD RELEASE TO LOCAL CONFIG DIR ###########
 
-    - name: 'Check mandatory variables are defined'
-      assert:
-        that:
-          - local_config_dir is defined
+    #- name: 'Check mandatory variables are defined'
+      #assert:
+        #that:
+          #- local_config_dir is defined
 
-    - debug:
-        msg:
-          - "local_config_dir: {{ local_config_dir }}"
-        verbosity: 2
+    #- debug:
+        #msg:
+          #- "local_config_dir: {{ local_config_dir }}"
+        #verbosity: 2
 
-    - stat:
-        path: "{{ local_config_dir }}"
-      register: local_config_dir_info
+    #- stat:
+        #path: "{{ local_config_dir }}"
+      #register: local_config_dir_info
 
-    - name: "Check local_config_dir {{ local_config_dir }} exists"
-      fail:
-        msg: "local_config_dir {{ local_config_dir }} doesn't exist"
-      when: |
-        (local_config_dir.stat.isDir is defined and local_config_dir.stat.isDir==true) or 
-        (local_config_dir.stat.isLnk is defined and local_config_dir.stat.isLnk==true)
+    #- name: "Check local_config_dir {{ local_config_dir }} exists"
+      #fail:
+        #msg: "local_config_dir {{ local_config_dir }} doesn't exist"
+      #when: |
+        #(local_config_dir.stat.isDir is defined and local_config_dir.stat.isDir==true) or 
+        #(local_config_dir.stat.isLnk is defined and local_config_dir.stat.isLnk==true)
 
-    - name: "Download stack {{stack_name }} {{ stack_version }} to {{ local_config_dir }}"
-      import_role:
-        name: stack/download
-      vars:
-        stack_install_root_dir: "{{ local_config_dir }}"
+    #- name: "Download stack {{stack_name }} {{ stack_version }} to {{ local_config_dir }}"
+      #import_role:
+        #name: stack/download
+      #vars:
+        #stack_install_root_dir: "{{ local_config_dir }}"
 
     ########### SETUP LOCAL CONFIGURATION  ###########
 
@@ -56,16 +56,30 @@
 - hosts:
     - stroom_remote_proxy_stack
   gather_facts: true # Needed for yum stuff
+  vars:
+    stack_bin_dir: "{{ stack_install_root_dir }}/{{ stack_name }}/{{ stack_name }}-{{ stack_version }}"
+    stack_config_dir: "{{ stack_install_root_dir }}/{{ stack_name }}/{{ stack_name }}-{{ stack_version }}/config"
+    stack_volumes_dir: "{{ stack_install_root_dir }}/{{ stack_name }}/volumes"
+    stack_env_var_file: "{{ stack_config_dir }}/{{ stack_name }}.env"
   tasks:
 
     - name: 'Check mandatory variables are defined'
       assert:
         that:
           - local_config_dir is defined
+          - proxy_forward_url is defined
+          - stack_env_vars is defined
           - stack_install_root_dir is defined
           - stack_name is defined
           - stack_version is defined
           - stroom_user is defined
+
+    - debug:
+        msg:
+          - "Deploying/configuring stroom-proxy in {{ stack_bin_dir }} as user {{ stroom_user }}"
+      tags:
+        - deploy
+        - configure
 
     ################### SETUP HOST ###################
 
@@ -96,15 +110,20 @@
     ########### UPDATE REMOTE STACK CONFIG  ###########
 
         - import_role:
-            name: stack/send_config
-          vars:
-            source_stack_root_dir: "{{ local_config_dir }}"
-            dest_stack_root_dir: "{{ stack_install_root_dir }}"
+            name: stack/set_host_ip
           tags:
             - deploy
+            - configure
 
+        # NOTE: It is debatable if we configure the file like this or use a jinja template file
+        # If we use templates then we need to maintain the template in this repo.
+        # For real deployments where a clone/fork of this repo is used, jinja templates
+        # would probably make more sense, and be a load faster.
+
+          # Set all the env vars in the stack env file
         - import_role:
-            name: proxy/update_config
+            name: stack/set_env_vars_values
           tags:
             - deploy
+            - configure
 

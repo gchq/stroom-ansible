@@ -1,5 +1,0 @@
----
-
-_stack_bin_dir: "{{ stack_install_root_dir }}/{{ stack_name }}/{{ stack_name }}-{{ stack_version }}"
-
-_stack_env_file: "{{ _stack_bin_dir }}/config/{{ stack_name }}.env"

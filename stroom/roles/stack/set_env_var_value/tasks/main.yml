@@ -1,0 +1,14 @@
+---
+
+- name: 'Check mandatory variables are defined'
+  assert:
+    that:
+      - env_var_file is defined
+      - env_var_name is defined
+      - env_var_value is defined
+
+- name: "Setting {{ env_var_name }}=\"{{ env_var_value }}\" in {{ env_var_file }}"
+  lineinfile:
+    path: "{{ env_var_file }}"
+    regexp: '^\s*#?\s*export\s+{{ env_var_name }}=.*'
+    line: "export {{ env_var_name }}=\"{{ env_var_value }}\""
