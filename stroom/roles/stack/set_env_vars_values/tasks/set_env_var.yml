@@ -1,8 +1,8 @@
 ---
 
-- name: "Setting {{ item.name }}=\"{{ item.value }}\" in {{ stack_env_var_file }}"
+- name: "Setting {{ item.key }}=\"{{ item.value }}\" in {{ stack_env_var_file }}"
   lineinfile:
     path: "{{ stack_env_var_file }}"
-    regexp: '^\s*#?\s*export\s+{{ item.name }}=.*'
-    line: "export {{ item.name }}=\"{{ item.value }}\""
+    regexp: '^\s*#?\s*export\s+{{ item.key }}=.*'
+    line: "export {{ item.key }}=\"{{ item.value }}\""
 

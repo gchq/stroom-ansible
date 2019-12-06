@@ -18,5 +18,5 @@
   #     value: some value
 - name: "Setting multiple env vars in {{ stack_env_var_file }}"
   include_tasks: set_env_var.yml
-  loop: "{{ stack_env_vars }}"
+  loop: "{{ stack_env_vars | dict2items }}"
 
