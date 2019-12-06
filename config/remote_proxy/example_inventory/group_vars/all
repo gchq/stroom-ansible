@@ -13,6 +13,8 @@ stack_name: "stroom_proxy"
 # The version of the stack to deploy
 stack_version: "v6.0.27"
 
+# TODO Add var to set url base for downloading stack archive
+
 # The local directory where the stack configuration is kept. This configuration
 # will be pushed out to the proxy hosts. This directory should be under source
 # control.
@@ -29,36 +31,38 @@ proxy_forward_url: "https://downstream-proxy.some.domain/stroom/datafeed"
 
 # SSL Configuration
 # The files must exist the files/ dir in the ansible inventory directory
-server_certificate_filename: "dummy.server.cert"
-server_certificate_key_filename: "dummy.server.key"
-server_certificate_authority_filename: "dummy.ca.key"
+nginx_certs:
+  server_certificate_filename: "dummy.server.cert"
+  server_certificate_key_filename: "dummy.server.key"
+  server_certificate_authority_filename: "dummy.ca.cert"
 
-client_keystore_filename: "dummy.client.keystore.jks"
+proxy_keystores:
+  client_keystore_filename: "dummy.client.keystore.jks"
+  client_truststore_filename: "dummy.client.truststore.jks"
+
 client_keystore_password: "some password"
-
-client_truststore_filename: "dummy.client.truststore.jks"
 client_truststore_password: "some password"
-
 
 # Key/value pairs to set in the stack env file
 # These will replace existing values in the env file or add a new line
 # if the name doesn't already exist
 stack_env_vars:
   STROOM_PROXY_REMOTE_FORWARD_URL: "xxx   https://downstream-proxy.some.domain/stroom/datafeed"
-  NGINX_SSL_CERTIFICATE_KEY: "{{ server_certificate_key_filename }}"
-  NGINX_SSL_CERTIFICATE: "{{ server_certificate_filename }}"
-  NGINX_SSL_CLIENT_CERTIFICATE: "{{ server_certificate_authority_filename }}"
+  NGINX_SSL_CERTIFICATE_KEY: "{{ nginx_certs.server_certificate_key_filename }}"
+  NGINX_SSL_CERTIFICATE: "{{ nginx_certs.server_certificate_filename }}"
+  NGINX_SSL_CLIENT_CERTIFICATE: "{{ nginx_certs.server_certificate_authority_filename }}"
   STROOM_NGINX_DOCKER_REPO: "xxx   gchq/stroom-nginx"
   STROOM_PROXY_DOCKER_REPO: "xxx   gchq/stroom-proxy"
   STROOM_PROXY_REMOTE_CLIENT_KEYSTORE_PASSWORD: "xxx   password"
-  STROOM_PROXY_REMOTE_CLIENT_KEYSTORE_PATH: "xxx   /stroom-proxy/certs/{{ client_keystore_filename }}"
+  STROOM_PROXY_REMOTE_CLIENT_KEYSTORE_PATH: "xxx   /stroom-proxy/certs/{{ proxy_keystores.client_keystore_filename }}"
   STROOM_PROXY_REMOTE_CLIENT_TRUSTSTORE_PASSWORD: "xxx   password"
-  STROOM_PROXY_REMOTE_CLIENT_TRUSTSTORE_PATH: "xxx   /stroom-proxy/certs/{{ client_truststore_filename }}"
+  STROOM_PROXY_REMOTE_CLIENT_TRUSTSTORE_PATH: "xxx   /stroom-proxy/certs/{{ proxy_keystores.client_truststore_filename }}"
   STROOM_PROXY_REMOTE_FEED_STATUS_API_KEY: "xxx   xxx some token xxx"
   STROOM_PROXY_REMOTE_FEED_STATUS_URL: "https://downstream-stroom-or-proxy.some.domain/api/proxy/feedStatus/v1"
+  # Use same (key|trust)store for client and forwarding
   STROOM_PROXY_REMOTE_FORWARDING_KEYSTORE_PASSWORD: "xxx   password"
-  STROOM_PROXY_REMOTE_FORWARDING_KEYSTORE_PATH: "xxx   /stroom-proxy/certs/{{ client_keystore_filename }}"
+  STROOM_PROXY_REMOTE_FORWARDING_KEYSTORE_PATH: "xxx   /stroom-proxy/certs/{{ proxy_keystores.client_keystore_filename }}"
   STROOM_PROXY_REMOTE_FORWARDING_TRUSTSTORE_PASSWORD: "xxx   password"
-  STROOM_PROXY_REMOTE_FORWARDING_TRUSTSTORE_PATH: "xxx   /stroom-proxy/certs/{{ client_truststore_filename }}"
+  STROOM_PROXY_REMOTE_FORWARDING_TRUSTSTORE_PATH: "xxx   /stroom-proxy/certs/{{ proxy_keystores.client_truststore_filename }}"
 
 # vim: set filetype=yaml shiftwidth=2 tabstop=2 expandtab:

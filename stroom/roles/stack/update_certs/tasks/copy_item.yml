@@ -1,0 +1,6 @@
+---
+
+- name: "Copying {{ item.key }} - {{ item.value }}"
+  copy:
+    src: "{{ inventory_dir }}/files/{{ item.value }}"
+    dest: "{{ nginx_certs_dir }}/"

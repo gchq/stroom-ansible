@@ -127,3 +127,22 @@
             - deploy
             - configure
 
+        #- import_role:
+            #name: stack/update_certs
+          #tags:
+            #- deploy
+            #- configure
+
+          # TODO Not sure what implications this has on the docker bind mounted files.
+          # See unsafe_writes in ansible docs
+          # This approach does at least mean we don't have to specify what files need to
+          # be copied, we just add them in the appropriate place.
+        - name: "Copy 'volumes' configuration from {{ inventory_dir }}/files/volumes/ to {{ stack_volumes_dir }}/"
+          copy:
+            src: "{{ inventory_dir }}/files/volumes/"
+            dest: " {{ stack_volumes_dir }}/"
+          tags:
+            - deploy
+            - configure
+            
+

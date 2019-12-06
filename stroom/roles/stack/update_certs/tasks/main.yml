@@ -1,3 +1,18 @@
 ---
 
+- name: 'Check mandatory variables are defined'
+  assert:
+    that:
+      - stack_volumes_dir is defined
+      - nginx_certs is defined
+
+  # nginx_certs should look something like
+  #
+  # nginx_certs:
+  #   server_certificate_filename: "dummy.server.cert"
+  #   server_certificate_key_filename: "dummy.server.key"
+  #   server_certificate_authority_filename: "dummy.ca.key"
+- name: "Copying nginx SSL certificates to {{ nginx_certs_dir }}"
+  include_tasks: copy_item.yml
+  loop: "{{ nginx_certs | dict2items }}"
 

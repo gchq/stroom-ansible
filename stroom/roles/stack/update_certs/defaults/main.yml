@@ -1,0 +1,3 @@
+---
+
+nginx_certs_dir: "{{ stack_volumes_dir }}/nginx/certs"
