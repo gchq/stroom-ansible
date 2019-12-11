@@ -2,4 +2,4 @@
 
 # Temporary location where the archive files are downloaded to.
 # They will not be deleted to save downloding again.
-downloads_dir: "/tmp/downloads"
+downloads_dir: "/tmp/stroom_downloads"

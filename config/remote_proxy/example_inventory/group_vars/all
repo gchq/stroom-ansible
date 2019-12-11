@@ -19,7 +19,7 @@ stack_version: "v6.0.27"
 # will be pushed out to the proxy hosts. This directory should be under source
 # control.
 # IMPORTANT: This is relative to the playbook being run.
-local_config_dir: "../config/remote_proxy"
+local_config_dir: "../config/remote_proxy/example_inventory"
 
 # The user that stroom-proxy will run as
 stroom_user: "stroomuser"

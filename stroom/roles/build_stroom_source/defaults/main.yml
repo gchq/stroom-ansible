@@ -2,7 +2,7 @@
 # defaults file for build_stroom_source
 
 stroom_source_archive_file: "{{ release_version }}.tar.gz"
-downloads_dir: "/tmp/downloads"
+downloads_dir: "/tmp/stroom_downloads"
 #unpack_dir: "~/{{ release_version }}"
 unpack_dir: "~/"
 stroom_config_dir: "~/.stroom"

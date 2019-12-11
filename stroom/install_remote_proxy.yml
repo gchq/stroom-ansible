@@ -2,53 +2,22 @@
 
 ########### LOCALHOST  ###########
 
-#- hosts:
-    #- localhost
-  #gather_facts: false
-  #vars:
-    #- stack_install_root_dir: "{{ local_config_dir }}"
-  #tags:
-    #- local_config
-  #tasks:
-    ############ DOWNLOAD RELEASE TO LOCAL CONFIG DIR ###########
+- hosts:
+    - localhost
+  gather_facts: false
+  vars:
+  tasks:
 
-    #- name: 'Check mandatory variables are defined'
-      #assert:
-        #that:
-          #- local_config_dir is defined
+    - name: 'Check mandatory variables are defined'
+      assert:
+        that:
+          - local_config_dir is defined
 
-    #- debug:
-        #msg:
-          #- "local_config_dir: {{ local_config_dir }}"
-        #verbosity: 2
-
-    #- stat:
-        #path: "{{ local_config_dir }}"
-      #register: local_config_dir_info
-
-    #- name: "Check local_config_dir {{ local_config_dir }} exists"
-      #fail:
-        #msg: "local_config_dir {{ local_config_dir }} doesn't exist"
-      #when: |
-        #(local_config_dir.stat.isDir is defined and local_config_dir.stat.isDir==true) or 
-        #(local_config_dir.stat.isLnk is defined and local_config_dir.stat.isLnk==true)
-
-    #- name: "Download stack {{stack_name }} {{ stack_version }} to {{ local_config_dir }}"
-      #import_role:
-        #name: stack/download
-      #vars:
-        #stack_install_root_dir: "{{ local_config_dir }}"
-
-    ########### SETUP LOCAL CONFIGURATION  ###########
-
-    # This is either a mandrolic process to configure things such as certs
-    # and nginx config, or do it in ansible.
-
-    # Could do the env file mods with ansible and do the volumes dir mods
-    # externally.
-
-
-
+    - debug:
+        msg:
+          - "local_config_dir: {{ local_config_dir }}"
+      tags:
+        - all
 
 
 ########### 'stroom_remote_proxy_stack' HOSTS  ###########
@@ -61,6 +30,9 @@
     stack_config_dir: "{{ stack_install_root_dir }}/{{ stack_name }}/{{ stack_name }}-{{ stack_version }}/config"
     stack_volumes_dir: "{{ stack_install_root_dir }}/{{ stack_name }}/volumes"
     stack_env_var_file: "{{ stack_config_dir }}/{{ stack_name }}.env"
+    config_static_files_dir: "{{ local_config_dir }}/files/volumes"
+    config_templates_dir: "{{ local_config_dir }}/templates/volumes"
+    tmp: "/tmp"
   tasks:
 
     - name: 'Check mandatory variables are defined'
@@ -100,7 +72,7 @@
       become_user: "{{ stroom_user }}"
       block:
 
-    ########### DEPLOY REMOTE PROXY STACK  ###########
+    ########### DEPLOY VANILLA REMOTE PROXY STACK  ###########
 
         - import_role:
             name: stack/download
@@ -126,23 +98,35 @@
           tags:
             - deploy
             - configure
-
-        #- import_role:
-            #name: stack/update_certs
-          #tags:
-            #- deploy
-            #- configure
+        - debug:
+            msg:
+              - "config_static_files_dir: {{ config_static_files_dir }}"
+              - "config_templates_dir: {{ config_templates_dir }}"
+            verbosity: 2
+          tags:
+            - deploy
+            - configure
 
           # TODO Not sure what implications this has on the docker bind mounted files.
           # See unsafe_writes in ansible docs
           # This approach does at least mean we don't have to specify what files need to
           # be copied, we just add them in the appropriate place.
-        - name: "Copy 'volumes' configuration from {{ inventory_dir }}/files/volumes/ to {{ stack_volumes_dir }}/"
+        - name: "Copy static files from {{ config_static_files_dir }}/ to {{ stack_volumes_dir }}/"
           copy:
-            src: "{{ inventory_dir }}/files/volumes/"
+            src: "{{ config_static_files_dir }}/"
             dest: " {{ stack_volumes_dir }}/"
+          #when: config_static_files_dir is directory
+          #when: "tmp is directory"
           tags:
             - deploy
             - configure
             
-
+              #TODO can we template all templates in a dir recursively?
+        #- name: "Copy templated files from {{ config_templates_dir }}/ to {{ stack_volumes_dir }}/"
+          #template:
+            #src: "{{ config_templates_dir }}/"
+            #dest: " {{ stack_volumes_dir }}/"
+          ##when: config_templates_dir is exists
+          #tags:
+            #- deploy
+            #- configure
