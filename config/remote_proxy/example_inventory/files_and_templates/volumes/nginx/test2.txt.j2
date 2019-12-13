@@ -1,0 +1,6 @@
+
+Test of templating list of host group host names, e.g. for nginx upstream
+
+{% for host in groups['stroom_remote_proxy_stack'] %}
+{{ hostvars[host]['inventory_hostname'] }}
+{% endfor %}

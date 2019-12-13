@@ -8,10 +8,8 @@
   # TODO this ensures all cert/key files are absent even if the service 
   # is not in the stack. Could make it aware of which services are present
 - name: "Deleting certs for {{ nginx_certs }}"
-  include_tasks: delete_server_certs.yml
+  include_tasks: delete_certs.yml
   loop: "{{ service_dev_cert_names }}"
   loop_control:
     loop_var: _service_dev_certs
-
-
-      
+    label: "{{ _service_dev_certs.service }}"

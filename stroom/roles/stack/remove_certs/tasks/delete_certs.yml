@@ -7,4 +7,5 @@
   loop: "{{ _service_dev_certs.files }}"
   loop_control:
     loop_var: _cert_file_name
+    label: "{{ _service_dev_certs.service }} - {{ _cert_file_name }}"
 

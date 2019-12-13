@@ -77,6 +77,10 @@
           tags:
             - deploy
 
+
+
+    # TODO move the updaty stuff into stack/update or similar role
+
     ########### UPDATE REMOTE STACK CONFIG  ###########
 
           # Remove the development certificates
@@ -114,7 +118,7 @@
             - deploy
             - configure
 
-        - name: "Check if {{ config_files_and_templates_dir }} exists"
+        - name: "Check if {{ config_files_and_templates_dir }} exists on the Ansible controller"
           local_action: stat path={{ config_files_and_templates_dir }}
           become: false
           register: _config_files_and_templates_dir_info
@@ -122,6 +126,8 @@
             - deploy
             - configure
 
+          # Copies any files (except *.j2 files) as they are to the remote
+          # Mirrors the directory structure
           # Will only add/update files on the remote, not delete
           # To make deletion happen we would need to have all of the volumes dir
           # locally
@@ -130,19 +136,24 @@
             src: "{{ item.src }}/"
             dest: "{{ stack_volumes_dir }}/{{ item.path }}"
           with_filetree: "{{ config_files_and_templates_dir }}/"
+          loop_control:
+            label: "{{ item.path }}"
           when: _config_files_and_templates_dir_info.stat.exists and item.state == 'file' and item.path is not match ".*\.j2$"
           tags:
-            - xxx
             - deploy
             - configure
 
+          # Copies and templates any *.j2 files found in the tree, removing the .j2 extension
+          # Mirrors the directory structure
+          # Will only add/update files on the remote, not delete
         - name: "Copy/template templated files from {{ config_files_and_templates_dir }}/ to {{ stack_volumes_dir }}/"
           template:
             src: "{{ item.src }}/"
             dest: "{{ stack_volumes_dir }}/{{ item.path | regex_replace('.j2$','') }}"
           with_filetree: "{{ config_files_and_templates_dir }}/"
+          loop_control:
+            label: "{{ item.path }}"
           when: _config_files_and_templates_dir_info.stat.exists and item.state == 'file' and item.path is match ".*\.j2$"
           tags:
-            - xxx
             - deploy
             - configure
