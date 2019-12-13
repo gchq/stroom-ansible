@@ -77,9 +77,6 @@
 
     # --END OF BLOCK--
 
-#- name: "Ensure stack volumes dir {{ stack_volumes_dir }} is present" 
-  #when: _stack_volumes_dir_info.exists == false
-  #block:
 
   # Relying on the archive having been downloaded above
   # We may have a volumes dir from a previous release that we want to keep

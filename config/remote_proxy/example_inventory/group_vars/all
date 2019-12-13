@@ -13,7 +13,8 @@ stack_name: "stroom_proxy"
 # The version of the stack to deploy
 stack_version: "v6.0.27"
 
-# TODO Add var to set url base for downloading stack archive
+# The path on a file server where the stack archive file can be found
+stroom_stack_archive_url_base: "https://github.com/gchq/stroom-resources/releases/download/stroom-stacks-{{ stack_version }}"
 
 # The local directory where the stack configuration is kept. This configuration
 # will be pushed out to the proxy hosts. This directory should be under source
@@ -27,6 +28,7 @@ stroom_user: "stroomuser"
 # The directory where stroom-proxy will be installed on the remote host
 stack_install_root_dir: "/home/{{ stroom_user }}"
 
+# The downstream stroom or stroom-proxy that this proxy will forward to
 proxy_forward_url: "https://downstream-proxy.some.domain/stroom/datafeed"
 
 # SSL Configuration

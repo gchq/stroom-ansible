@@ -98,35 +98,55 @@
           tags:
             - deploy
             - configure
+
         - debug:
             msg:
               - "config_static_files_dir: {{ config_static_files_dir }}"
               - "config_templates_dir: {{ config_templates_dir }}"
             verbosity: 2
+          when: config_static_files_dir is directory
           tags:
             - deploy
             - configure
 
-          # TODO Not sure what implications this has on the docker bind mounted files.
-          # See unsafe_writes in ansible docs
-          # This approach does at least mean we don't have to specify what files need to
-          # be copied, we just add them in the appropriate place.
-        - name: "Copy static files from {{ config_static_files_dir }}/ to {{ stack_volumes_dir }}/"
-          copy:
-            src: "{{ config_static_files_dir }}/"
-            dest: " {{ stack_volumes_dir }}/"
-          #when: config_static_files_dir is directory
-          #when: "tmp is directory"
+        - name: "Check if {{ config_static_files_dir }} exists"
+          local_action: stat path={{ config_static_files_dir }}
+          become: false
+          register: _config_static_files_dir_info
           tags:
             - deploy
             - configure
-            
-              #TODO can we template all templates in a dir recursively?
-        #- name: "Copy templated files from {{ config_templates_dir }}/ to {{ stack_volumes_dir }}/"
-          #template:
-            #src: "{{ config_templates_dir }}/"
-            #dest: " {{ stack_volumes_dir }}/"
-          ##when: config_templates_dir is exists
-          #tags:
-            #- deploy
-            #- configure
+
+          # Rsync any files in config_static_files_dir onto the remote
+          # Will only add/update files on the remote, not delete
+          # To make deletion happen we would need to have all of the volumes dir
+          # locally
+        - name: "Copy static files from {{ config_static_files_dir }}/ to {{ stack_volumes_dir }}/"
+          copy:
+            src: "{{ item.src }}/"
+            dest: "{{ stack_volumes_dir }}/"
+          with_filetree: "{{ config_static_files_dir }}/"
+          when: _config_static_files_dir_info.stat.exists and item.state == 'file' and item.path is not match ".*\.j2$"
+          tags:
+            - xxx
+            - deploy
+            - configure
+
+        - name: "Check if {{ config_templates_dir }} exists"
+          local_action: stat path={{ config_templates_dir }}
+          become: false
+          register: _config_templates_dir_info
+          tags:
+            - deploy
+            - configure
+
+        - name: "Copy templated files from {{ config_templates_dir }}/ to {{ stack_volumes_dir }}/"
+          template:
+            src: "{{ item.src }}/"
+            dest: "{{ stack_volumes_dir }}/"
+          with_filetree: "{{ config_templates_dir }}/"
+          when: _config_templates_dir_info.stat.exists and item.state == 'file' and item.path is match ".*\.j2$"
+          tags:
+            - xxx
+            - deploy
+            - configure
