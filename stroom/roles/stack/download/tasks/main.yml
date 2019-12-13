@@ -72,11 +72,10 @@
         path: "{{ _downloaded_archive_info.dest }}"
         state: absent
       tags:
-        - never
+        - never # TODO this doesn't seem to be working
         - delete_download
 
     # --END OF BLOCK--
-
 
   # Relying on the archive having been downloaded above
   # We may have a volumes dir from a previous release that we want to keep
@@ -103,3 +102,12 @@
     force: yes
     src: "{{ stack_name }}-{{ stack_version }}" # relative to dest
     dest: "{{ _stack_install_latest_link }}" # absolute
+
+- debug:
+    var: _stack_unpack_tmp_dir_info | default('undefined')
+
+- name: "Delete temporary directory"
+  file:
+    path: "{{ _stack_unpack_tmp_dir_info.path }}"
+    state: absent
+  when: _stack_volumes_dir_info.stat.exists == false or _stack_bin_dir_info.stat.exists == false and _stack_unpack_tmp_dir_info is defined

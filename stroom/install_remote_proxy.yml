@@ -30,9 +30,7 @@
     stack_config_dir: "{{ stack_install_root_dir }}/{{ stack_name }}/{{ stack_name }}-{{ stack_version }}/config"
     stack_volumes_dir: "{{ stack_install_root_dir }}/{{ stack_name }}/volumes"
     stack_env_var_file: "{{ stack_config_dir }}/{{ stack_name }}.env"
-    config_static_files_dir: "{{ local_config_dir }}/files/volumes"
-    config_templates_dir: "{{ local_config_dir }}/templates/volumes"
-    tmp: "/tmp"
+    config_files_and_templates_dir: "{{ local_config_dir }}/files_and_templates/volumes"
   tasks:
 
     - name: 'Check mandatory variables are defined'
@@ -81,6 +79,15 @@
 
     ########### UPDATE REMOTE STACK CONFIG  ###########
 
+          # Remove the development certificates
+        - import_role:
+            name: stack/remove_certs
+          tags:
+            - remove_dev_certs
+            - deploy
+            - configure
+
+          # Set the HOST_IP variable to the inventory hostname
         - import_role:
             name: stack/set_host_ip
           tags:
@@ -101,51 +108,40 @@
 
         - debug:
             msg:
-              - "config_static_files_dir: {{ config_static_files_dir }}"
-              - "config_templates_dir: {{ config_templates_dir }}"
+              - "config_files_and_templates_dir: {{ config_files_and_templates_dir }}"
             verbosity: 2
-          when: config_static_files_dir is directory
           tags:
             - deploy
             - configure
 
-        - name: "Check if {{ config_static_files_dir }} exists"
-          local_action: stat path={{ config_static_files_dir }}
+        - name: "Check if {{ config_files_and_templates_dir }} exists"
+          local_action: stat path={{ config_files_and_templates_dir }}
           become: false
-          register: _config_static_files_dir_info
+          register: _config_files_and_templates_dir_info
           tags:
             - deploy
             - configure
 
-          # Rsync any files in config_static_files_dir onto the remote
           # Will only add/update files on the remote, not delete
           # To make deletion happen we would need to have all of the volumes dir
           # locally
-        - name: "Copy static files from {{ config_static_files_dir }}/ to {{ stack_volumes_dir }}/"
+        - name: "Copy static files from {{ config_files_and_templates_dir }}/ to {{ stack_volumes_dir }}/"
           copy:
             src: "{{ item.src }}/"
-            dest: "{{ stack_volumes_dir }}/"
-          with_filetree: "{{ config_static_files_dir }}/"
-          when: _config_static_files_dir_info.stat.exists and item.state == 'file' and item.path is not match ".*\.j2$"
+            dest: "{{ stack_volumes_dir }}/{{ item.path }}"
+          with_filetree: "{{ config_files_and_templates_dir }}/"
+          when: _config_files_and_templates_dir_info.stat.exists and item.state == 'file' and item.path is not match ".*\.j2$"
           tags:
             - xxx
             - deploy
             - configure
 
-        - name: "Check if {{ config_templates_dir }} exists"
-          local_action: stat path={{ config_templates_dir }}
-          become: false
-          register: _config_templates_dir_info
-          tags:
-            - deploy
-            - configure
-
-        - name: "Copy templated files from {{ config_templates_dir }}/ to {{ stack_volumes_dir }}/"
+        - name: "Copy/template templated files from {{ config_files_and_templates_dir }}/ to {{ stack_volumes_dir }}/"
           template:
             src: "{{ item.src }}/"
-            dest: "{{ stack_volumes_dir }}/"
-          with_filetree: "{{ config_templates_dir }}/"
-          when: _config_templates_dir_info.stat.exists and item.state == 'file' and item.path is match ".*\.j2$"
+            dest: "{{ stack_volumes_dir }}/{{ item.path | regex_replace('.j2$','') }}"
+          with_filetree: "{{ config_files_and_templates_dir }}/"
+          when: _config_files_and_templates_dir_info.stat.exists and item.state == 'file' and item.path is match ".*\.j2$"
           tags:
             - xxx
             - deploy

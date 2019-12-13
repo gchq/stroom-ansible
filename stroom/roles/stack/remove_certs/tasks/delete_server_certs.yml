@@ -1,0 +1,10 @@
+---
+
+- name: "Deleting server certs for serivce {{ _service_dev_certs.service }}"
+  file:
+    path: "{{ stack_volumes_dir }}/{{ _service_dev_certs.service }}/certs/{{ _cert_file_name }}"
+    state: absent
+  loop: "{{ _service_dev_certs.files }}"
+  loop_control:
+    loop_var: _cert_file_name
+

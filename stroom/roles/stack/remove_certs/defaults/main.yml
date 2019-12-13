@@ -1,0 +1,32 @@
+---
+
+server_cert_files:
+  - "server.pem.crt"
+  - "server.unencrypted.key"
+  - "ca.pem.crt"
+
+client_cert_files:
+  - "client.pem.crt"
+  - "client.unencrypted.key"
+  - "ca.pem.crt"
+
+client_keystore_files:
+  - "client.jks"
+  - "ca.jks"
+
+service_dev_cert_names:
+  - service: stroom
+    files: "{{ client_keystore_files }}"
+  - service: stroom-log-sender
+    files: "{{ client_cert_files }}"
+  - service: stroom-proxy-local
+    files: "{{ client_keystore_files }}"
+  - service: stroom-proxy-remote
+    files: "{{ client_keystore_files }}"
+  - service: stroom-auth-service
+    files: "{{ client_keystore_files }}"
+  - service: stroom-auth-ui
+    files: "{{ client_keystore_files }}"
+  - service: nginx
+    files: "{{ server_cert_files }}"
+
