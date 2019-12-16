@@ -11,6 +11,8 @@
 - name: Ensure install directory exists
   file:
     path: "{{ stack_install_root_dir }}/{{ stack_name }}"
+    owner: "{{ stroom_user }}"
+    mode: "u=rwX,g=,o="
     state: directory
 
 - name: "See if {{ stack_volumes_dir }} exists"
@@ -56,7 +58,7 @@
 
       # FIXME: I can't get the unarchive module to work on macOS or Ubuntu. Ansible complains about /bin/tar not being able
       # to handle the archive. It untars manually without problems, so I'l just do that.
-    - name: Unpack Stroom's distribution tar
+    - name: "Unpack Stroom's distribution tar into {{ _stack_unpack_tmp_dir_info.path }}"
       command: "tar -xvf {{ _downloaded_archive_info.dest }} --directory {{ _stack_unpack_tmp_dir_info.path }}/"
       args:
         creates: "{{ stack_bin_dir }}" # Stop the task being re-run if we have downloaded it
@@ -67,7 +69,7 @@
         #dest:  "{{ downloads_dir }}"
         #remote_src: yes
 
-    - name: Delete the archive
+    - name: "Delete archive {{ _downloaded_archive_info.dest }}"
       file:
         path: "{{ _downloaded_archive_info.dest }}"
         state: absent
@@ -87,6 +89,14 @@
     force: false # Don't copy if it is already there
   when: _stack_volumes_dir_info.stat.exists == false
 
+- name: Change permissions for {{ stack_volumes_dir }}
+  file:
+    path: "{{ stack_volumes_dir }}"
+    owner: "{{ stroom_user }}"
+    mode: "u=rwX,g=,o="
+    recurse: true
+  when: _stack_volumes_dir_info.stat.exists == false
+
   # Relying on the archive having been downloaded above
 - name: "Copy stack bin dir to {{ stack_bin_dir }}" 
   copy:
@@ -94,6 +104,14 @@
     dest: "{{ stack_install_root_dir }}/{{ stack_name }}/"
     remote_src: true
     force: false # Don't copy if it is already there
+  when: _stack_bin_dir_info.stat.exists == false
+
+- name: Change permissions for {{ stack_bin_dir }}
+  file:
+    path: "{{ stack_bin_dir }}"
+    owner: "{{ stroom_user }}"
+    mode: "u=rwX,g=,o="
+    recurse: true
   when: _stack_bin_dir_info.stat.exists == false
 
 - name: Create a symlink for 'latest'

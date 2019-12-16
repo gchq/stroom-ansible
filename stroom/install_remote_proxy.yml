@@ -1,5 +1,4 @@
 ---
-
 ########### LOCALHOST  ###########
 
 - hosts:
@@ -77,8 +76,6 @@
           tags:
             - deploy
 
-
-
     # TODO move the updaty stuff into stack/update or similar role
 
     ########### UPDATE REMOTE STACK CONFIG  ###########
@@ -131,14 +128,18 @@
           # Will only add/update files on the remote, not delete
           # To make deletion happen we would need to have all of the volumes dir
           # locally
-        - name: "Copy static files from {{ config_files_and_templates_dir }}/ to {{ stack_volumes_dir }}/"
+        - name: Copy static files from {{ config_files_and_templates_dir }}/
+                to {{ stack_volumes_dir }}/
           copy:
             src: "{{ item.src }}/"
             dest: "{{ stack_volumes_dir }}/{{ item.path }}"
+            mode: "u=rwX,g=,o="
           with_filetree: "{{ config_files_and_templates_dir }}/"
           loop_control:
             label: "{{ item.path }}"
-          when: _config_files_and_templates_dir_info.stat.exists and item.state == 'file' and item.path is not match ".*\.j2$"
+          when: _config_files_and_templates_dir_info.stat.exists 
+                and item.state == 'file' 
+                and item.path is not match ".*\.j2$"
           tags:
             - deploy
             - configure
@@ -146,14 +147,18 @@
           # Copies and templates any *.j2 files found in the tree, removing the .j2 extension
           # Mirrors the directory structure
           # Will only add/update files on the remote, not delete
-        - name: "Copy/template templated files from {{ config_files_and_templates_dir }}/ to {{ stack_volumes_dir }}/"
+        - name: Copy and template .j2 files from {{ config_files_and_templates_dir }}/
+                to {{ stack_volumes_dir }}/
           template:
             src: "{{ item.src }}/"
             dest: "{{ stack_volumes_dir }}/{{ item.path | regex_replace('.j2$','') }}"
+            mode: "u=rwX,g=,o="
           with_filetree: "{{ config_files_and_templates_dir }}/"
           loop_control:
             label: "{{ item.path }}"
-          when: _config_files_and_templates_dir_info.stat.exists and item.state == 'file' and item.path is match ".*\.j2$"
+          when: _config_files_and_templates_dir_info.stat.exists 
+                and item.state == 'file' 
+                and item.path is match ".*\.j2$"
           tags:
             - deploy
             - configure

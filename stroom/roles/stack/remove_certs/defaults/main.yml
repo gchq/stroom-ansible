@@ -14,7 +14,7 @@ client_keystore_files:
   - "client.jks"
   - "ca.jks"
 
-service_dev_cert_names:
+service_dev_certs:
   - service: stroom
     files: "{{ client_keystore_files }}"
   - service: stroom-log-sender
