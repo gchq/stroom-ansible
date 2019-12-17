@@ -6,7 +6,7 @@
 #  stroom.rack=rack1
 #  stroom.temp=/tmp/stroom/
 
-- name: "Setting {{ item.key }}={{ item.value }} in {{ stroom_conf_file }}"
+- name: "Setting {{ item.key }}={{ item.value }}"
   lineinfile:
     path: "{{ stroom_conf_file }}"
     regexp: '^\s*#?\s*{{ item.key }}=.*'

@@ -75,6 +75,7 @@
         - remove_dev_certs
         - deploy
         - configure
+      when: remove_development_certificates | default(false) == true
 
     - import_role:
         name: stack/update_config

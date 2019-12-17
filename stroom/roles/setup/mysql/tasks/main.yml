@@ -122,7 +122,7 @@
     name: "{{ item.user }}"
     password: "{{ item.password | default('stroompassword1') }}"
     host: "{{ item.host | default('%') }}"
-    priv: "{{ item.privs | default('{{ item.user }}.*:ALL') }}"
+    priv: "{{ item.privs | default(item.name + '.*:ALL') }}"
   loop: "{{ stroom_databases | flatten(levels=1) }}"
   loop_control:
     label: "{{ item.name }}, {{ item.user }}, {{ item.host | default('%') }}, {{ item.privs | default(item.name + '.*:ALL') }}"

@@ -37,9 +37,17 @@
   become: yes
   hosts:
     - stroom_database
-  tasks:
-    - import_role:
-        name: roles/setup/mysql
   tags:
     - install_mysql
+  tasks:
 
+    - import_role:
+        name: roles/setup/mysql
+
+    - name: Open port for MySQL
+      firewalld:
+        service: mysql
+        #port: "{{ db_port | default(3306) }}/tcp"
+        zone: public
+        permanent: yes
+        state: enabled

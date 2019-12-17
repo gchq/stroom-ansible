@@ -28,6 +28,9 @@ stroom_user: "stroomuser"
 # The directory where stroom-proxy will be installed on the remote host
 stack_install_root_dir: "/home/{{ stroom_user }}"
 
+# Set to true to delete all the self signed development certificates
+remove_development_certificates: false
+
 # The hostname of the nginx API gateway
 nginx_advertised_host: "{{ hostvars[groups['stroom_remote_proxy_stack'][0]]['inventory_hostname'] }}"
 

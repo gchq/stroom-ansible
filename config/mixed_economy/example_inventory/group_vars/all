@@ -43,12 +43,16 @@ stroom_proxy_install_root_dir: "/home/{{ stroom_user }}"
 
 stroom_temp_dir: "/tmp/stroom"
 
+# Set to true to delete all the self signed development certificates
+remove_development_certificates: false
+
 # The hostname of the nginx API gateway. This could be a DNS name in front of
 # multiple nginx instances.
 nginx_advertised_host: "{{ hostvars[groups['stroom_services_stack'][0]]['inventory_hostname'] }}"
 
 # The hostname of the database server
 db_host: "{{ hostvars[groups['stroom_database'][0]]['inventory_hostname'] }}"
+db_port: 3306
 
 # Database credentials
 stroom_db_root_password: "my-secret-pw"
@@ -79,6 +83,7 @@ stack_env_vars:
 
   DB_HOST_IP: "{{ db_host }}"
   STROOM_AUTH_DB_HOST: "{{ db_host }}"
+  STROOM_AUTH_DB_PORT: "{{ db_port }}"
 
   NGINX_ADVERTISED_HOST: "{{ nginx_advertised_host }}"
 
@@ -109,6 +114,7 @@ stack_env_vars:
 
 # TODO move to the appropriate host group vars file
 # Values for the stroom.conf file
+# These could be acheived with a jinja template
 stroom_conf_values:
 
   - key: stroom.temp
@@ -121,16 +127,40 @@ stroom_conf_values:
     value: "{{ environment_name }}"
 
   - key: stroom.jdbcDriverUrl
-    value: jdbc:mysql://{{ db_host }}:3307/stroom?useUnicode=yes&characterEncoding=UTF-8
+    value: jdbc:mysql://{{ db_host }}:{{ db_port }}/stroom?useUnicode=yes&characterEncoding=UTF-8
 
   - key: stroom.statistics.sql.jdbcDriverUrl
-    value: jdbc:mysql://{{ db_host }}:3307/stats?useUnicode=yes&characterEncoding=UTF-8
+    value: jdbc:mysql://{{ db_host }}:{{ db_port }}/stats?useUnicode=yes&characterEncoding=UTF-8
 
   - key: stroom.serviceDiscovery.simpleLookup.basePath
     value: http://{{ inventory_hostname }}:8080
 
-    # Not using kafka yet
+    # Not using kafka yet, so set to blank to stop it trying to connect
   - key: stroom.connectors.kafka.default.bootstrap.servers
     value: ""
+
+    # Settings these stops stroom trying to send internal stats to stroom-stats
+  - key: stroom.internalstatistics.benchmarkCluster.docRefs
+    value: docRef(StatisticStore,946a88c6-a59a-11e6-bdc4-0242ac110002,Benchmark-Cluster Test)
+  - key: stroom.internalstatistics.pipelineStreamProcessor.docRefs
+    value: docRef(StatisticStore,946a80fc-a59a-11e6-bdc4-0242ac110002,PipelineStreamProcessor)
+  - key: stroom.internalstatistics.metaDataStreamSize.docRefs
+    value: docRef(StatisticStore,946a8814-a59a-11e6-bdc4-0242ac110002,Meta Data-Stream Size)
+  - key: stroom.internalstatistics.eventsPerSecond.docRefs
+    value: docRef(StatisticStore,a9936548-2572-448b-9d5b-8543052c4d92,EPS)
+  - key: stroom.internalstatistics.cpu.docRefs
+    value: docRef(StatisticStore,af08c4a7-ee7c-44e4-8f5e-e9c6be280434,CPU)
+  - key: stroom.internalstatistics.metaDataStreamsReceived.docRefs
+    value: docRef(StatisticStore,946a87bc-a59a-11e6-bdc4-0242ac110002,Meta Data-Streams Received)
+  - key: stroom.internalstatistics.streamTaskQueueSize.docRefs
+    value: docRef(StatisticStore,946a7f0f-a59a-11e6-bdc4-0242ac110002,Stream Task Queue Size)
+  - key: stroom.internalstatistics.volumes.docRefs
+    value: docRef(StatisticStore,ac4d8d10-6f75-4946-9708-18b8cb42a5a3,Volumes)
+  - key: stroom.internalstatistics.memory.docRefs
+    value: docRef(StatisticStore,77c09ccb-e251-4ca5-bca0-56a842654397,Memory)
+  - key: stroom.internalstatistics.heapHistogramInstances.docRefs
+    value: docRef(StatisticStore,e4f243b8-2c70-4d6e-9d5a-16466bf8764f,Heap Histogram Instances)
+  - key: stroom.internalstatistics.heapHistogramBytes.docRefs
+    value: docRef(StatisticStore,934a1600-b456-49bf-9aea-f1e84025febd,Heap Histogram Bytes)
 
 # vim: set filetype=yaml shiftwidth=2 tabstop=2 expandtab:

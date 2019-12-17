@@ -56,6 +56,7 @@
     src: "{{ item.src }}/"
     dest: "{{ stack_volumes_dir }}/{{ item.path }}"
     mode: "u=rw,g=,o="
+    backup: true
   with_filetree: "{{ config_files_and_templates_dir }}/"
   loop_control:
     label: "{{ item.path }}"
@@ -75,6 +76,7 @@
     src: "{{ item.src }}/"
     dest: "{{ stack_volumes_dir }}/{{ item.path | regex_replace('.j2$','') }}"
     mode: "u=rw,g=,o="
+    backup: true
   with_filetree: "{{ config_files_and_templates_dir }}/"
   loop_control:
     label: "{{ item.path }}"
