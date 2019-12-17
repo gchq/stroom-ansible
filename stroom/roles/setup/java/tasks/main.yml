@@ -22,7 +22,7 @@
           - "java_jdk_yum_package: {{ java_jdk_yum_package }}"
         verbosity: 2
 
-    - name: Yum install java
+    - name: Yum install java {{ java_version }}
       become: true
       yum:
         name: "{{ packages }}"
@@ -34,9 +34,9 @@
 
   when: java_version | int <= 8
 
-# Java 13+ archive download
+# Java 12+ archive download
 
-- name: Install Java JVM and JDK from an archive file
+- name: Install Java {{ java_version }} JVM and JDK from an archive file
   block:
 
     - debug:
@@ -52,7 +52,7 @@
         path: "{{ downloads_dir }}"
         state: directory
 
-    - name: Download tar.gz
+    - name: Download java .tar.gz from {{ java_archive_url | default('N/A')}}
       get_url:
         #url: "{{ java_archive[java_version].url }}"
         url: "{{ java_archive_url }}"

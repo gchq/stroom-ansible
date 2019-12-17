@@ -4,9 +4,7 @@ mysql_repo_rpm_file: "mysql{{ mysql_repo_version }}-community-release-el7-3.noar
 mysql_repo_local_install: "/etc/yum.repos.d/mysql-community.repo"
 mysql_port: "3306"
 
-stroom_db_user_suffix: "user"
 stroom_db_root_password: "my-secret-pw"
-stroom_db_user_password: "stroompassword1"
 
 stroom_databases:
 

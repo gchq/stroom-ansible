@@ -1,0 +1,22 @@
+---
+
+- name: 'Check mandatory variables are defined'
+  assert:
+    that:
+      - stroom_conf_file is defined
+      - stroom_conf_values is defined
+
+- debug:
+    var: stroom_conf_values
+    verbosity: 2
+
+  # Expecting env_vars to look like
+  #   stroom_conf_values:
+  #     - key: stroom.temp
+  #       value: /tmp/stroom/
+  #     - key: stroom.node
+  #       value: node1a
+- name: "Setting multiple stroom.conf values in {{ stroom_conf_file }}"
+  include_tasks: set_key_value.yml
+  loop: "{{ stroom_conf_values }}"
+

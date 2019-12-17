@@ -4,12 +4,13 @@
 # See https://serverfault.com/questions/824975/failed-to-get-d-bus-connection-operation-not-permitted
 # for running this role in docker with molecule
 
-- name: Download mysql repo rpm
+- name: Download mysql repo rpm {{ mysql_repo_rpm_file }}
+  become: yes
   get_url: 
     url: "https://dev.mysql.com/get/{{ mysql_repo_rpm_file }}"
     dest: "/tmp/{{ mysql_repo_rpm_file }}"
 
-- name: Install mysql repo package
+- name: Install mysql repo package {{ mysql_repo_rpm_file }}
   become: yes
   yum:
      name:  "/tmp/{{ mysql_repo_rpm_file }}"
@@ -31,7 +32,7 @@
     option: enabled
     value: "1"
 
-- name: Install MySQL
+- name: Install MySQL and related YUM packages
   become: yes
   yum: 
     name: "{{ packages }}" 
@@ -43,14 +44,14 @@
     - gcc-c++ # needed for MySQLdb python api
     - MySQL-python # needed for MySQLdb python api
 
-- name: Copy my.cnf
+- name: Copy my.cnf to /etc/my.cnf
   become: yes
   copy:
     src: my.cnf
     dest: /etc/my.cnf
   notify: Restart mysql
 
-- name: Run MySQL
+- name: Ensure mysqld service is running
   become: yes
   service: 
     name: mysqld 
@@ -60,58 +61,68 @@
 # Harden mysql - see:
 # https://dba.stackexchange.com/questions/102066/ansible-how-to-change-mysql-server-root-password-by-reprovisioning-the-server/102100
 
-# Need to do this for idempotency, see
-# http://ansible.cc/docs/modules.html#mysql-user
-- name: update mysql root password for all root accounts
+# On first run of this task on a fresh host it will log in to root
+# with no password (see check_implicit_admin), then will update the
+# root user. On subsequent runs it will log in with the new password.
+- name: Update mysql root password for localhost
+  become: yes
   mysql_user: 
     name: root 
     host: localhost 
+    priv: "*.*:ALL,GRANT"
     password: "{{ stroom_db_root_password }}"
+    login_host: localhost
+    login_password: "{{ stroom_db_root_password }}"
+    state: present
+    check_implicit_admin: true
 
-- name: copy .my.cnf file with root password credentials
+- name: Copy .my.cnf file with root password credentials
+  become: yes
   template: 
     src: templates/my.cnf.j2
     dest: /root/.my.cnf 
     owner: root 
     mode: 0600
 
-- name: update mysql root password for all root accounts
+- name: Update mysql root password for all other root accounts
+  become: yes
   mysql_user: 
     name: root 
     host: "{{ item }}" 
     password: "{{ stroom_db_root_password }}"
-  with_items:
+  loop:
     - "{{ ansible_hostname }}"
     - 127.0.0.1
     - ::1
 
-- name: ensure anonymous users are not in the database
+- name: Ensure anonymous users are not in the database
   mysql_user: 
     name: '' 
     host: "{{ item }}" 
     state: absent
-  with_items:
+  loop:
     - localhost
     - "{{ inventory_hostname }}"
 
-- name: remove the test database
+- name: Remove the test database
   mysql_db: 
     name: test 
     state: absent
 
-# Create the stroom databases
-- name: create mysql database
+- name: Create mysql databases
   mysql_db: 
     name: "{{ item.name }}" 
     state: present
-  with_items:
-    - "{{ stroom_databases }}"
+  loop: "{{ stroom_databases | flatten(levels=1) }}"
+  loop_control:
+      label: "{{ item.name }}"
 
 - name: Setup MySQL users
   mysql_user:
     name: "{{ item.user }}"
-    password: "{{ item.password }}"
-    host: "{{ item.host }}"
-    priv: "{{ item.privs }}"
-  with_items:
-    - "{{ stroom_databases }}"
+    password: "{{ item.password | default('stroompassword1') }}"
+    host: "{{ item.host | default('%') }}"
+    priv: "{{ item.privs | default('{{ item.user }}.*:ALL') }}"
+  loop: "{{ stroom_databases | flatten(levels=1) }}"
+  loop_control:
+    label: "{{ item.name }}, {{ item.user }}, {{ item.host | default('%') }}, {{ item.privs | default(item.name + '.*:ALL') }}"

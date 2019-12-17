@@ -1,0 +1,9 @@
+# Define the upstream host(s) that are running stroom-auth-ui
+
+# TODO We need to split out the host and port from the url before we can use ansible host groups to template this
+server <<<AUTH_UI_URL>>>;
+
+#{% for host in groups['stroom_services_stack'] %}
+#server {{ hostvars[host]['inventory_hostname'] }}:<<<AUTH_UI_PORT>>>;
+#{% endfor %}
+

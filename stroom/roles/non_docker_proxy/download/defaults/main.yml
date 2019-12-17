@@ -1,0 +1,6 @@
+---
+
+downloads_dir: "/tmp/stroom_downloads"
+
+stroom_proxy_archive_filename: "stroom-app-{{ stroom_version }}.zip"
+stroom_proxy_url: "https://github.com/gchq/stroom/releases/download/{{ stroom_version }}/{{ stroom_archive_filename }}"

@@ -7,6 +7,8 @@
     - ./variables.yml
   roles:
     - roles/setup/common
+  tags:
+    - common
 
 - name: Setup hosts with docker and docker-compose
   become: yes
@@ -16,6 +18,8 @@
     - roles/setup/docker
   vars:
     docker_user: "{{ stroom_user }}"
+  tags:
+    - install_docker
 
 - name: Setup hosts with java
   become: yes
@@ -26,11 +30,16 @@
   vars:
     # Set java_version based on the stroom version
     java_version: '{{ 8 if stroom_version is search("^v6\.") else 12 }}'
+  tags:
+    - install_java
 
 - name: Setup hosts with mysql
+  become: yes
   hosts:
     - stroom_database
   tasks:
     - import_role:
         name: roles/setup/mysql
+  tags:
+    - install_mysql
 

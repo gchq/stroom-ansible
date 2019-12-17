@@ -1,12 +1,62 @@
 ---
-- name: Ensure directory exists
-  file:
-    path: "{{ stroom_proxy_downloads_path }}"
-    state: directory
+- name: 'Check mandatory variables are defined'
+  assert:
+    that:
+      - downloads_dir is defined
+      - stroom_proxy_archive_filename is defined
+      - stroom_proxy_install_root_dir is defined
+      - stroom_proxy_url is defined
 
-- name: Download stroom-proxy distribution
-  get_url:
-    url: "{{ stroom_proxy_url }}"
-    dest: "{{ stroom_proxy_downloads_path }}/{{ stroom_proxy_archive_filename }}"
-    # Commented out until 6.0.19 is released, due to bug in the hash file
-    # checksum: "sha256:{{ stroom_url }}.sha256"
+- debug:
+    msg:
+      - "downloads_dir: {{ downloads_dir }}"
+      - "stroom_proxy_archive_filename: {{ stroom_proxy_archive_filename }}"
+      - "stroom_proxy_url: {{ stroom_proxy_url }}"
+    verbosity: 2
+
+- name: "See if {{ stroom_proxy_bin_dir }} exists"
+  stat:
+    path: "{{ stroom_proxy_bin_dir }}"
+  register: _stroom_proxy_bin_dir_info
+
+- name: "Download archive {{ _stroom_proxy_stack_archive_url }}" 
+  when: _stroom_proxy_bin_dir_info.stat.exists == false
+  block:
+
+    - name: Ensure directory {{ downloads_dir }} exists
+      file:
+        path: "{{ downloads_dir }}"
+        state: directory
+
+    - name: Download stroom-proxy distribution {{ stroom_proxy_url }}
+      get_url:
+        url: "{{ stroom_proxy_url }}"
+        dest: "{{ downloads_dir }}/{{ stroom_proxy_archive_filename }}"
+        checksum: "sha256:{{ stroom_proxy_url }}.sha256"
+
+    - name: Ensure install directory {{ stroom_proxy_bin_dir }} exists
+      file:
+        path: "{{ stroom_proxy_bin_dir }}"
+        state: directory
+
+    - name: Unpack Stroom-proxy's distribution zip
+      unarchive:
+        src: "{{ downloads_dir }}/{{ stroom_proxy_archive_filename }}"
+        dest:  "{{ stroom_proxy_bin_dir }}"
+        remote_src: yes
+
+    - name: Ensure logs directory exists
+      file:
+        path:  "{{ stroom_proxy_bin_dir }}/logs"
+        state: directory
+
+######## END OF BLOCK ######## 
+
+
+- name: Create a symlink for 'latest'
+  file:
+    state: link
+    force: yes
+    src: "{{ stroom_proxy_version }}"
+    dest: "{{ stroom_proxy_install_root_dir }}/stroom-proxy/latest"
+

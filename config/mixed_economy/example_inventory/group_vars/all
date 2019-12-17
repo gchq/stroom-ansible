@@ -5,20 +5,132 @@ ansible_connection: ssh
 # The user should have passwordless sudo and an ssh key pair that has already
 # been set up on the remote host(s). The ssh key to use can be set on the command line
 # using '--private-key=~/.ssh/my_private_key_id_rsa'
-ansible_user: "vagrant"
+ansible_user: "centos"
+
+# The name of the environment, as used in the browser title bar
+environment_name: "Test Stroom"
+
+# The name of the stack to deploy
+stack_name: "stroom_services"
 
 stroom_version: "v6.0.27"
+
+stroom_proxy_version: "{{ stroom_version }}"
+
+# The version of the stack to deploy
+stack_version: "{{ stroom_version }}"
+
+# The path on a file server where the stack archive file can be found
+stroom_stack_archive_url_base: "https://github.com/gchq/stroom-resources/releases/download/stroom-stacks-{{ stack_version }}"
 
 # The local directory where the stack configuration is kept. This configuration
 # will be pushed out to the proxy hosts. This directory should be under source
 # control. 
 # IMPORTANT: This is relative to the playbook being run.
-local_config_dir: "../config/mixed_economy"
+local_config_dir: "../config/mixed_economy/example_inventory"
 
 # The user that stroom-proxy will run as
 stroom_user: "stroomuser"
 
-# The directory where stroom-proxy will be installed on the remote host
+# The directory where the stack will be installed on the remote host
 stack_install_root_dir: "/home/{{ stroom_user }}"
+
+# The directory where stroom will be installed on the remote host
+stroom_install_root_dir: "/home/{{ stroom_user }}"
+
+# The directory where stroom-proxy will be installed on the remote host
+stroom_proxy_install_root_dir: "/home/{{ stroom_user }}"
+
+stroom_temp_dir: "/tmp/stroom"
+
+# The hostname of the nginx API gateway. This could be a DNS name in front of
+# multiple nginx instances.
+nginx_advertised_host: "{{ hostvars[groups['stroom_services_stack'][0]]['inventory_hostname'] }}"
+
+# The hostname of the database server
+db_host: "{{ hostvars[groups['stroom_database'][0]]['inventory_hostname'] }}"
+
+# Database credentials
+stroom_db_root_password: "my-secret-pw"
+stroom_databases:
+
+  - name: stroom
+    user: stroomuser
+    password: stroompassword1
+
+  - name: stats
+    user: statsuser
+    password: stroompassword1
+
+  - name: auth
+    user: authuser
+    password: stroompassword1
+
+# TODO move to the appropriate host group vars file
+
+# Key/value pairs to set in the stack env file.  These will replace existing
+# values in the env file or add a new line if the name doesn't already exist.
+# It is debatable if we should hold a jinja2 template for this file or use this
+# apporach
+stack_env_vars:
+
+  DOCKER_HOST_HOSTNAME: "{{ inventory_hostname }}"
+  DOCKER_HOST_IP: "{{ inventory_hostname }}"
+
+  DB_HOST_IP: "{{ db_host }}"
+  STROOM_AUTH_DB_HOST: "{{ db_host }}"
+
+  NGINX_ADVERTISED_HOST: "{{ nginx_advertised_host }}"
+
+  # TODO these probably don't need to be set as they are mostly used
+  # for nginx reverse proxying which we are doing via jinja templates
+  #STROOM_AUTH_SERVICE_HOST: "{{ nginx_advertised_host }}"
+  #STROOM_AUTH_UI_HOST: "{{ nginx_advertised_host }}"
+  #STROOM_HOST: "{{ nginx_advertised_host }}"
+  #STROOM_PROXY_HOST: "{{ nginx_advertised_host }}"
+
+  #NGINX_SSL_CERTIFICATE_KEY: "example.server.key"
+  #NGINX_SSL_CERTIFICATE: "example.server.cert"
+  #NGINX_SSL_CA_CERTIFICATE: "example.ca.cert"
+
+  #STROOM_NGINX_DOCKER_REPO: "gchq/stroom-nginx"
+  #STROOM_PROXY_DOCKER_REPO: "gchq/stroom-proxy"
+
+  #STROOM_PROXY_LOCAL_FEED_STATUS_API_KEY: "eyJhbG......ciOwd7Q"
+  STROOM_PROXY_LOCAL_FEED_STATUS_URL: "https://{{ nginx_advertised_host }}/api/feedStatus/v1"
+
+  # Use same (key|trust)store for client and forwarding
+  #STROOM_PROXY_LOCAL_FORWARDING_KEYSTORE_PASSWORD: "a new password"
+  #STROOM_PROXY_LOCAL_FORWARDING_KEYSTORE_PATH: "/stroom-proxy/certs/example.client.jks"
+
+  #STROOM_PROXY_LOCAL_FORWARDING_TRUSTSTORE_PASSWORD: "a new password"
+  #STROOM_PROXY_LOCAL_FORWARDING_TRUSTSTORE_PATH: "/stroom-proxy/certs/example.ca.jks"
+
+
+# TODO move to the appropriate host group vars file
+# Values for the stroom.conf file
+stroom_conf_values:
+
+  - key: stroom.temp
+    value: "{{ stroom_temp_dir }}"
+
+  - key: stroom.node
+    value: "{{ inventory_hostname_short }}"
+
+  - key: stroom.htmlTitle
+    value: "{{ environment_name }}"
+
+  - key: stroom.jdbcDriverUrl
+    value: jdbc:mysql://{{ db_host }}:3307/stroom?useUnicode=yes&characterEncoding=UTF-8
+
+  - key: stroom.statistics.sql.jdbcDriverUrl
+    value: jdbc:mysql://{{ db_host }}:3307/stats?useUnicode=yes&characterEncoding=UTF-8
+
+  - key: stroom.serviceDiscovery.simpleLookup.basePath
+    value: http://{{ inventory_hostname }}:8080
+
+    # Not using kafka yet
+  - key: stroom.connectors.kafka.default.bootstrap.servers
+    value: ""
 
 # vim: set filetype=yaml shiftwidth=2 tabstop=2 expandtab:

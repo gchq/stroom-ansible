@@ -1,0 +1,14 @@
+---
+
+# stroom.conf entries look like 
+#
+#  stroom.node=node1a
+#  stroom.rack=rack1
+#  stroom.temp=/tmp/stroom/
+
+- name: "Setting {{ item.key }}={{ item.value }} in {{ stroom_conf_file }}"
+  lineinfile:
+    path: "{{ stroom_conf_file }}"
+    regexp: '^\s*#?\s*{{ item.key }}=.*'
+    line: "{{ item.key }}={{ item.value }}"
+
