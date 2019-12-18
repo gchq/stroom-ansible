@@ -27,7 +27,7 @@
   changed_when: "'NO CHANGE' not in result.stdout"
   
 - name: Ensure '{{ stack_install_root_dir }}/{{ stack_name }}' is absent
-  become: yes
+  become: true
   file:
     path: "{{ stack_install_root_dir }}/{{ stack_name }}"
     state: absent

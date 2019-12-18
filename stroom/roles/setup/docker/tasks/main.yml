@@ -28,7 +28,7 @@
   service:
     name: docker
     state: started
-    enabled: yes
+    enabled: true
 
 # We need to add the user (i.e. stroomuser)
 # to the docker group, so they can run docker commands without sudo.
@@ -37,7 +37,7 @@
   user:
     name: "{{ docker_user }}"
     groups: docker
-    append: yes
+    append: true
 
 # Install docker-compose -- a yum install doesn't get a high-enough version
 - name: Remove old docker-compose if there is one

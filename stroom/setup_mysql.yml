@@ -13,5 +13,5 @@
   firewalld:
     port: "{{ mysql_port }}/tcp"
     zone: public
-    permanent: yes
+    permanent: true
     state: enabled

@@ -1,40 +1,87 @@
 ---
-# TODO sort out where vars are defined
-
 - name: Setup all hosts with common packages, and a yum update
   hosts: all
-  vars_files:
-    - ./variables.yml
-  roles:
-    - roles/setup/common
+  gather_facts: true
   tags:
     - common
+  tasks:
+    - import_role:
+        name: roles/setup/common
+
 
 - name: Setup hosts with docker and docker-compose
-  become: yes
+  become: true
   hosts:
     - ~.*_stack$
-  roles:
-    - roles/setup/docker
   vars:
     docker_user: "{{ stroom_user }}"
   tags:
     - install_docker
+  tasks:
+
+    - import_role:
+        name: roles/setup/docker
+
+      # TODO The ports we need are dependant on what is in the stack
+      # so we ought to only open the required ports
+      # TODO Assumes the public zone is in use
+    - name: Opening TCP port to public zone in firewalld
+      firewalld:
+        port: "{{ item }}/tcp"
+        zone: public
+        permanent: true
+        immediate: true
+        state: enabled
+      loop:
+        - "{{ stroom_all_dbs_port | default(3307) }}"
+        - "{{ stroom_app_port | default(8080) }}"
+        - "{{ stroom_proxy_local_app_port | default(8090) }}"
+        - "{{ stroom_auth_service_app_port | default(8099) }}"
+        - "{{ stroom_proxy_remote_app_port | default(9090) }}"
+        - "{{ stroom_auth_ui_https_port | default(9443) }}"
+
+      # TODO The ports we need are dependant on what is in the stack
+      # so we ought to only open the required ports
+      # TODO Assumes the public zone is in use
+    - name: Opening services to public zone in firewalld
+      firewalld:
+        service: "{{ item }}"
+        zone: public
+        permanent: true
+        immediate: true
+        state: enabled
+      loop:
+        - http # For nginx
+        - https # For nginx
+
 
 - name: Setup hosts with java
-  become: yes
+  become: true
   hosts:
     - stroom_and_proxy
-  roles:
-    - roles/setup/java
   vars:
     # Set java_version based on the stroom version
     java_version: '{{ 8 if stroom_version is search("^v6\.") else 12 }}'
   tags:
     - install_java
+  tasks:
+
+    - import_role:
+        name: roles/setup/java
+
+    - name: Opening TCP port to public zone
+      firewalld:
+        port: "{{ item }}/tcp"
+        zone: public
+        permanent: true
+        immediate: true
+        state: enabled
+      loop:
+        - "{{ stroom_app_port | default(8080) }}"
+        - "{{ stroom_proxy_app_port | default(8090) }}"
 
 - name: Setup hosts with mysql
-  become: yes
+  become: true
   hosts:
     - stroom_database
   tags:
@@ -47,7 +94,7 @@
     - name: Open port for MySQL
       firewalld:
         service: mysql
-        #port: "{{ db_port | default(3306) }}/tcp"
         zone: public
-        permanent: yes
+        permanent: true
+        immediate: true
         state: enabled

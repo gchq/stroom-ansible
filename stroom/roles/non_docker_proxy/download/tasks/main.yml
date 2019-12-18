@@ -43,7 +43,7 @@
       unarchive:
         src: "{{ downloads_dir }}/{{ stroom_proxy_archive_filename }}"
         dest:  "{{ stroom_proxy_bin_dir }}"
-        remote_src: yes
+        remote_src: true
 
     - name: Ensure logs directory exists
       file:
@@ -56,7 +56,7 @@
 - name: Create a symlink for 'latest'
   file:
     state: link
-    force: yes
+    force: true
     src: "{{ stroom_proxy_version }}"
     dest: "{{ stroom_proxy_install_root_dir }}/stroom-proxy/latest"
 

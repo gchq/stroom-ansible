@@ -4,6 +4,6 @@
 server <<<AUTH_UI_URL>>>;
 
 #{% for host in groups['stroom_services_stack'] %}
-#server {{ hostvars[host]['inventory_hostname'] }}:<<<AUTH_UI_PORT>>>;
+#server {{ hostvars[host]['vagrant_ip_address'] | default(hostvars[host]['inventory_hostname'])}}:<<<AUTH_UI_PORT>>>;
 #{% endfor %}
 

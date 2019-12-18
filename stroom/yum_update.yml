@@ -1,7 +1,7 @@
 ---
 - name: Perform a YUM update then reboot
   hosts: all
-  become: yes
+  become: true
   tasks:
 
   - import_role:

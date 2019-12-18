@@ -18,7 +18,7 @@ stroom_version: "v6.0.27"
 stroom_proxy_version: "{{ stroom_version }}"
 
 # The version of the stack to deploy
-stack_version: "{{ stroom_version }}"
+stack_version: "{{ stroom_version }}-1"
 
 # The path on a file server where the stack archive file can be found
 stroom_stack_archive_url_base: "https://github.com/gchq/stroom-resources/releases/download/stroom-stacks-{{ stack_version }}"
@@ -46,12 +46,20 @@ stroom_temp_dir: "/tmp/stroom"
 # Set to true to delete all the self signed development certificates
 remove_development_certificates: false
 
+# NOTE: If you are running in an environment withouth a DNS server then the docker
+# containers will not be able to resolve and hostnames defined in the /etc/hosts
+# file. Thus we need to use IP addresses everywhere. This could be mitigated by
+# using the extra_hosts feature of docker-compose and getting ansible to add entries
+# to that.
+
 # The hostname of the nginx API gateway. This could be a DNS name in front of
 # multiple nginx instances.
-nginx_advertised_host: "{{ hostvars[groups['stroom_services_stack'][0]]['inventory_hostname'] }}"
+nginx_advertised_host: "{{ hostvars[groups['stroom_services_stack'][0]]['vagrant_ip_address'] 
+  | default(hostvars[groups['stroom_services_stack'][0]]['inventory_hostname'])}}"
 
 # The hostname of the database server
-db_host: "{{ hostvars[groups['stroom_database'][0]]['inventory_hostname'] }}"
+db_host: "{{ hostvars[groups['stroom_database'][0]]['vagrant_ip_address'] 
+  | default(hostvars[groups['stroom_database'][0]]['inventory_hostname']) }}"
 db_port: 3306
 
 # Database credentials
@@ -70,16 +78,16 @@ stroom_databases:
     user: authuser
     password: stroompassword1
 
-# TODO move to the appropriate host group vars file
-
 # Key/value pairs to set in the stack env file.  These will replace existing
 # values in the env file or add a new line if the name doesn't already exist.
 # It is debatable if we should hold a jinja2 template for this file or use this
 # apporach
 stack_env_vars:
 
+  # HOST_IP current set in roles/stack/set_host_ip
+
   DOCKER_HOST_HOSTNAME: "{{ inventory_hostname }}"
-  DOCKER_HOST_IP: "{{ inventory_hostname }}"
+  DOCKER_HOST_IP: "{{ vagrant_ip_address | default(ansible_default_ipv4 | default(ansible_all_ipv4_addresses[0])) }}"
 
   DB_HOST_IP: "{{ db_host }}"
   STROOM_AUTH_DB_HOST: "{{ db_host }}"
@@ -112,7 +120,7 @@ stack_env_vars:
   #STROOM_PROXY_LOCAL_FORWARDING_TRUSTSTORE_PATH: "/stroom-proxy/certs/example.ca.jks"
 
 
-# TODO move to the appropriate host group vars file
+# TODO maybe move to the appropriate host group vars file
 # Values for the stroom.conf file
 # These could be acheived with a jinja template
 stroom_conf_values:
@@ -133,11 +141,26 @@ stroom_conf_values:
     value: jdbc:mysql://{{ db_host }}:{{ db_port }}/stats?useUnicode=yes&characterEncoding=UTF-8
 
   - key: stroom.serviceDiscovery.simpleLookup.basePath
-    value: http://{{ inventory_hostname }}:8080
+    value: http://localhost:8080
 
     # Not using kafka yet, so set to blank to stop it trying to connect
   - key: stroom.connectors.kafka.default.bootstrap.servers
     value: ""
+
+  - key: stroom.advertisedUrl
+    value: https://{{ nginx_advertised_host }}
+  - key: stroom.auth.services.url
+    value: https://{{ nginx_advertised_host }}/api/auth
+  - key: stroom.auth.authentication.service.url
+    value: https://{{ nginx_advertised_host }}/api/auth/authentication/v1
+  - key: stroom.users.ui.url
+    value: https://{{ nginx_advertised_host }}/s/users
+  - key: stroom.apikeys.ui.url
+    value: https://{{ nginx_advertised_host }}/s/tokens
+  - key: stroom.changepassword.url
+    value: https://{{ nginx_advertised_host }}/s/changepassword
+  - key: stroom.url.dashboard
+    value: http://{{ nginx_advertised_host }}/stroom/dashboard.jsp
 
     # Settings these stops stroom trying to send internal stats to stroom-stats
   - key: stroom.internalstatistics.benchmarkCluster.docRefs

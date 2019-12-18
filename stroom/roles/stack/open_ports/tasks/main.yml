@@ -7,7 +7,7 @@
   firewalld:
     port: 3307/tcp # TODO use variable for port, or get from the stack env
     zone: public
-    permanent: yes
+    permanent: true
     state: enabled
 
 - name: Open public http
@@ -15,7 +15,7 @@
   firewalld:
     service: http
     zone: public
-    permanent: yes
+    permanent: true
     state: enabled
 
 - name: Open public https
@@ -23,5 +23,5 @@
   firewalld:
     service: https
     zone: public
-    permanent: yes
+    permanent: true
     state: enabled

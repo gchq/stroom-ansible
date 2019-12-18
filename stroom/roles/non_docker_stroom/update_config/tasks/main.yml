@@ -24,11 +24,11 @@
 
   # Some instances of IP_ADDRESS are not nginx_advertised_host, so they must be explicitly set
   # in set_stroom_conf_values above
-- name: Replace any instances of IP_ADDRESS in {{ stroom_conf_file }} with {{ nginx_advertised_host }}
-  replace:
-    path: "{{ stroom_conf_file }}"
-    regexp: 'IP_ADDRESS'
-    replace: "{{ nginx_advertised_host }}"
+#- name: Replace any instances of IP_ADDRESS in {{ stroom_conf_file }} with {{ nginx_advertised_host }}
+  #replace:
+    #path: "{{ stroom_conf_file }}"
+    #regexp: 'IP_ADDRESS'
+    #replace: "{{ nginx_advertised_host }}"
 
 - debug:
     msg:
@@ -61,7 +61,7 @@
   with_filetree: "{{ stroom_config_files_and_templates_dir }}/config"
   loop_control:
     label: "{{ item.path }}"
-  when: stroom__config_files_and_templates_dir_info.stat.exists 
+  when: _stroom_config_files_and_templates_dir_info.stat.exists 
         and item.state == 'file' 
         and item.path is not match ".*\.j2$"
   tags:
@@ -107,7 +107,7 @@
     #path: "{{ stroom_conf_file }}"
     #regexp: '^\s*#?\s*(stroom\.contentPackImportEnabled)=false\s*$'
     #line: '\1=true'
-    #backrefs: yes
+    #backrefs: true
 
 #- name: Un-comment internal stat entries to disable stroom-stats internal stats
   #replace:

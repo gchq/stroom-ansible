@@ -22,7 +22,7 @@
     verbosity: 2
 
 - name: Ensure '{{ stroom_config_dir}}' is absent
-  become: yes
+  become: true
   file:
     path: "{{ stroom_config_dir }}"
     state: absent

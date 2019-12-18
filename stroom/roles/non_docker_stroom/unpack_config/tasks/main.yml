@@ -30,7 +30,7 @@
   unarchive:
     src: "{{ downloads_dir }}/{{ stroom_archive_filename }}"
     dest:  "{{ stroom_unpack_temp_dir.path }}"
-    remote_src: yes
+    remote_src: true
 
 - name: "Ensure directory {{ stroom_config_path }} exists"
   file:
@@ -41,12 +41,12 @@
   copy:
     src: "{{ stroom_unpack_temp_dir.path }}/config"
     dest:  "{{ stroom_release_path }}/"
-    remote_src: yes
+    remote_src: true
 
 - name: Create a symlink for latest
   file:
     state: link
-    force: yes
+    force: true
     src: "{{ stroom_version }}"
     dest: "{{ stroom_releases_path }}/latest"
 

@@ -11,7 +11,7 @@
     dest: "{{home}}/{{stack_name}}/latest"
 
 #- name: Copy volumes to remote
-#  become: yes # We need to escalate because volumes become owned by root, because docker
+#  become: true # We need to escalate because volumes become owned by root, because docker
 #  copy:
 #    src: "{{stack_releases_path}}/volumes"
 #    dest: "{{home}}/{{stack_name}}"

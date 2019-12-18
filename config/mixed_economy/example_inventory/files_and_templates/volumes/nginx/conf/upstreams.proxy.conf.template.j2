@@ -1,5 +1,5 @@
 # Define the upstream host(s) that are running stroom-proxy-local
 {% for host in groups['stroom_services_stack'] %}
-server {{ hostvars[host]['inventory_hostname'] }}:<<<STROOM_PROXY_PORT>>>;
+server {{ hostvars[host]['vagrant_ip_address'] | default(hostvars[host]['inventory_hostname'])}}:<<<STROOM_PROXY_PORT>>>;
 {% endfor %}
 

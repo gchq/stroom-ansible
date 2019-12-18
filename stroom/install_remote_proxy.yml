@@ -59,7 +59,7 @@
 
 
     - name: "Block of tasks to run as {{ stroom_user }}"
-      become: yes
+      become: true
       become_user: "{{ stroom_user }}"
       block:
 

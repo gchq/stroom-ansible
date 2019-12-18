@@ -31,7 +31,7 @@
 - hosts:
     - stroom_services_stack
   gather_facts: true # Needed for yum stuff
-  become: yes
+  become: true
   become_user: "{{ stroom_user }}"
   vars:
     stack_bin_dir: "{{ stack_install_root_dir }}/{{ stack_name }}/{{ stack_name }}-{{ stack_version }}"
@@ -89,7 +89,7 @@
 - hosts:
     - stroom_and_proxy
   gather_facts: true # Needed for yum stuff
-  become: yes
+  become: true
   become_user: "{{ stroom_user }}"
   vars:
     stroom_bin_dir: "{{ stroom_install_root_dir }}/stroom/{{ stroom_version }}"
@@ -134,37 +134,3 @@
 
 
 
-
-
-#- hosts:
-    #- localhost
-  #gather_facts: false
-  #tags:
-    #- local_config
-  #vars_files:
-    #- variables.yml
-  #tasks:
-
-    #- import_role:
-        #name: non_docker_stroom/download
-
-    #- import_role:
-        #name: non_docker_stroom/unpack_config
-
-    ##- import_role:
-        ##name: non_docker_proxy/download
-
-    ##- import_role:
-        ##name: non_docker_proxy/unpack_config
-
-
-#- name: YUM update and reeboot
-  #import_playbook: ./yum_update.yml
-  #tags:
-    #- never
-    #- yum_update
-
-#- name: Setup stroom hosts
-  #import_playbook: ./setup_stroom_hosts.yml
-  #tags:
-    #- setup

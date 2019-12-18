@@ -38,6 +38,7 @@
   vars:
     packages:
       - bash
+      - bind-utils # for nslookup
       - coreutils  # realpath is used by some stroom scripts
       - curl
       - htop # Useful process monitoring
@@ -55,9 +56,36 @@
   service: 
     name: firewalld 
     state: started 
-    enabled: yes
+    enabled: true
 
 - name: "Ensure we have user {{ stroom_user }} for running stroom software"
   become: true
   user:
     name: "{{ stroom_user }}"
+
+  # Allows nodes to see ech other when there is no dns server availble
+  # Attemps to get the IP address of the host from (in this order):
+  # The variable 'vagrant_ip_address' as set when using vagrant
+  # The 'default' ipv4 address
+  # The first ipv4 address in the list of addresses
+  # Needs gather_facts
+- name: Add IP address of all hosts to /etc/hosts on all hosts
+  become: true
+  lineinfile:
+    dest: /etc/hosts
+    regexp: '.*{{ item }}$'
+    line: "{{ hostvars[item]['vagrant_ip_address'] 
+      | default(hostvars[item]['ansible_default_ipv4']['address']
+      | default(hostvars[item]['ansible_all_ipv4_addresses'][0])) }} {{item}}"
+    state: present
+  when: (hostvars[item].vagrant_ip_address is defined 
+      or hostvars[item].ansible_default_ipv4 is defined 
+      or hostvars[item].ansible_all_ipv4_addresses is defined )
+    and add_etc_hosts_entries | default(true) == true
+  with_items: "{{ groups.all }}"
+  loop_control:
+    label: "{{ hostvars[item]['vagrant_ip_address'] 
+      | default(hostvars[item]['ansible_default_ipv4']['address']
+      | default(hostvars[item]['ansible_all_ipv4_addresses'][0])) }} {{ item }}"
+  tags:
+    - etc_hosts

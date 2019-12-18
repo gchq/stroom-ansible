@@ -67,7 +67,7 @@
       #unarchive:
         #src: "{{ _downloaded_archive_info.dest }}"
         #dest:  "{{ downloads_dir }}"
-        #remote_src: yes
+        #remote_src: true
 
     - name: "Delete archive {{ _downloaded_archive_info.dest }}"
       file:
@@ -117,7 +117,7 @@
 - name: Create a symlink for 'latest'
   file:
     state: link
-    force: yes
+    force: true
     src: "{{ stack_name }}-{{ stack_version }}" # relative to dest
     dest: "{{ _stack_install_latest_link }}" # absolute
 

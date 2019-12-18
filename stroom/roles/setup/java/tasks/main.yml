@@ -67,7 +67,7 @@
         src: "{{ downloads_dir }}/{{ java_archive_filename }}"
         #src: "{{ downloads_dir }}/{{ java_archive[java_version].targz }}"
         dest:  "{{ java_unarchive_dest }}"
-        remote_src: yes
+        remote_src: true
 
   vars:
     #sha256_url: "{{ java_archive[java_version].url }}.sha256"

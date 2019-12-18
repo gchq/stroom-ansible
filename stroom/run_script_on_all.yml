@@ -26,7 +26,7 @@
     - ./variables.yml
     - ../global_variables.yml
     - ../config/user_settings.yml
-  become: yes
+  become: true
   hosts: 
     -.*_stack$
   roles:

@@ -37,7 +37,7 @@
   vars:
     # TODO is this needed
     # stack_type: stroom_and_proxy_stack
-  become: yes
+  become: true
   hosts:
     - ~.*_stack$
   roles:

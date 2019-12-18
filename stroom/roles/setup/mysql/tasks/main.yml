@@ -5,19 +5,19 @@
 # for running this role in docker with molecule
 
 - name: Download mysql repo rpm {{ mysql_repo_rpm_file }}
-  become: yes
+  become: true
   get_url: 
     url: "https://dev.mysql.com/get/{{ mysql_repo_rpm_file }}"
     dest: "/tmp/{{ mysql_repo_rpm_file }}"
 
 - name: Install mysql repo package {{ mysql_repo_rpm_file }}
-  become: yes
+  become: true
   yum:
      name:  "/tmp/{{ mysql_repo_rpm_file }}"
      state: present
 
 - name: Disable default/latest MySQL repository
-  become: yes
+  become: true
   ini_file:
     dest: "{{ mysql_repo_local_install }}"
     section: "mysql{{ mysql_repo_version }}-community"
@@ -25,7 +25,7 @@
     value: "0"
 
 - name: Enable target MySQL repository
-  become: yes
+  become: true
   ini_file:
     dest: "{{ mysql_repo_local_install }}"
     section: "mysql{{ mysql_repo_target_version }}-community"
@@ -33,7 +33,7 @@
     value: "1"
 
 - name: Install MySQL and related YUM packages
-  become: yes
+  become: true
   yum: 
     name: "{{ packages }}" 
     state: present
@@ -45,18 +45,18 @@
     - MySQL-python # needed for MySQLdb python api
 
 - name: Copy my.cnf to /etc/my.cnf
-  become: yes
+  become: true
   copy:
     src: my.cnf
     dest: /etc/my.cnf
   notify: Restart mysql
 
 - name: Ensure mysqld service is running
-  become: yes
+  become: true
   service: 
     name: mysqld 
     state: started 
-    enabled: yes
+    enabled: true
 
 # Harden mysql - see:
 # https://dba.stackexchange.com/questions/102066/ansible-how-to-change-mysql-server-root-password-by-reprovisioning-the-server/102100
@@ -65,7 +65,7 @@
 # with no password (see check_implicit_admin), then will update the
 # root user. On subsequent runs it will log in with the new password.
 - name: Update mysql root password for localhost
-  become: yes
+  become: true
   mysql_user: 
     name: root 
     host: localhost 
@@ -77,7 +77,7 @@
     check_implicit_admin: true
 
 - name: Copy .my.cnf file with root password credentials
-  become: yes
+  become: true
   template: 
     src: templates/my.cnf.j2
     dest: /root/.my.cnf 
@@ -85,7 +85,7 @@
     mode: 0600
 
 - name: Update mysql root password for all other root accounts
-  become: yes
+  become: true
   mysql_user: 
     name: root 
     host: "{{ item }}" 
