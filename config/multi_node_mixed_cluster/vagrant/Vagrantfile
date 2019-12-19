@@ -71,7 +71,7 @@ Vagrant.configure("2") do |config|
       # This is because ansible_host gets set to 127.0.0.1 as vagrant has
       # some funky port forwearding approach to connecting to the hosts
       ansible.host_vars[machine[:hostname]] = {
-        "vagrant_ip_address" => machine[:ip],
+        "public_ip_address" => machine[:ip],
       }
     end
 

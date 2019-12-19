@@ -54,11 +54,11 @@ remove_development_certificates: false
 
 # The hostname of the nginx API gateway. This could be a DNS name in front of
 # multiple nginx instances.
-nginx_advertised_host: "{{ hostvars[groups['stroom_services_stack'][0]]['vagrant_ip_address'] 
+nginx_advertised_host: "{{ hostvars[groups['stroom_services_stack'][0]]['public_ip_address'] 
   | default(hostvars[groups['stroom_services_stack'][0]]['inventory_hostname'])}}"
 
 # The hostname of the database server
-db_host: "{{ hostvars[groups['stroom_database'][0]]['vagrant_ip_address'] 
+db_host: "{{ hostvars[groups['stroom_database'][0]]['public_ip_address'] 
   | default(hostvars[groups['stroom_database'][0]]['inventory_hostname']) }}"
 db_port: 3306
 
@@ -87,7 +87,7 @@ stack_env_vars:
   # HOST_IP current set in roles/stack/set_host_ip
 
   DOCKER_HOST_HOSTNAME: "{{ inventory_hostname }}"
-  DOCKER_HOST_IP: "{{ vagrant_ip_address | default(ansible_default_ipv4 | default(ansible_all_ipv4_addresses[0])) }}"
+  DOCKER_HOST_IP: "{{ public_ip_address | default(ansible_default_ipv4 | default(ansible_all_ipv4_addresses[0])) }}"
 
   DB_HOST_IP: "{{ db_host }}"
   STROOM_AUTH_DB_HOST: "{{ db_host }}"

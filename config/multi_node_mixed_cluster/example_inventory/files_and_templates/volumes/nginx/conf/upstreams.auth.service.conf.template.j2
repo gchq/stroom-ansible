@@ -1,4 +1,4 @@
 # Define the upstream host(s) that are running stroom-auth-service
 {% for host in groups['stroom_services_stack'] %}
-server {{ hostvars[host]['vagrant_ip_address'] | default(hostvars[host]['inventory_hostname'])}}:<<<AUTH_SERVICE_PORT>>>;
+server {{ hostvars[host]['public_ip_address'] | default(hostvars[host]['inventory_hostname'])}}:<<<AUTH_SERVICE_PORT>>>;
 {% endfor %}
