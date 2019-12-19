@@ -26,7 +26,7 @@
 
 ########### stroom and proxy HOSTS  ###########
 
-  # TODO move out into its own playbook, or one for each of stroom and proxy
+  # TODO move (stroom|proxy) stuff into a non_docker_(stroom|proxy)/deploy role
 - hosts:
     - stroom_and_proxy
   gather_facts: true # Needed for yum stuff
