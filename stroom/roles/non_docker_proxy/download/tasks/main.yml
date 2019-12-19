@@ -14,19 +14,27 @@
       - "stroom_proxy_url: {{ stroom_proxy_url }}"
     verbosity: 2
 
-- name: "See if {{ stroom_proxy_bin_dir }} exists"
+- name: "See if {{ stroom_proxy_home_dir }} exists"
   stat:
-    path: "{{ stroom_proxy_bin_dir }}"
-  register: _stroom_proxy_bin_dir_info
+    path: "{{ stroom_proxy_home_dir }}"
+  register: _stroom_proxy_home_dir_info
+
+- name: Ensure directories exists
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - "{{ downloads_dir }}"
+    - "{{ stroom_proxy_home_dir }}"
+    - "{{ stroom_proxy_home_dir }}" 
+    - "{{ stroom_proxy_certs_dir }}"
+    - "{{ stroom_proxy_content_dir }}"
+    - "{{ stroom_proxy_logs_dir }}"
+    - "{{ stroom_proxy_repo_dir }}"
 
 - name: "Download archive {{ _stroom_proxy_stack_archive_url }}" 
-  when: _stroom_proxy_bin_dir_info.stat.exists == false
+  when: _stroom_proxy_home_dir_info.stat.exists == false
   block:
-
-    - name: Ensure directory {{ downloads_dir }} exists
-      file:
-        path: "{{ downloads_dir }}"
-        state: directory
 
     - name: Download stroom-proxy distribution {{ stroom_proxy_url }}
       get_url:
@@ -34,24 +42,13 @@
         dest: "{{ downloads_dir }}/{{ stroom_proxy_archive_filename }}"
         checksum: "sha256:{{ stroom_proxy_url }}.sha256"
 
-    - name: Ensure install directory {{ stroom_proxy_bin_dir }} exists
-      file:
-        path: "{{ stroom_proxy_bin_dir }}"
-        state: directory
-
     - name: Unpack Stroom-proxy's distribution zip
       unarchive:
         src: "{{ downloads_dir }}/{{ stroom_proxy_archive_filename }}"
-        dest:  "{{ stroom_proxy_bin_dir }}"
+        dest:  "{{ stroom_proxy_home_dir }}"
         remote_src: true
 
-    - name: Ensure logs directory exists
-      file:
-        path:  "{{ stroom_proxy_bin_dir }}/logs"
-        state: directory
-
 ######## END OF BLOCK ######## 
-
 
 - name: Create a symlink for 'latest'
   file:

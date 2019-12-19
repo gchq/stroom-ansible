@@ -15,13 +15,13 @@
       - "stroom_url: {{ stroom_url }}"
     verbosity: 2
 
-- name: "See if {{ stroom_bin_dir }} exists"
+- name: "See if {{ stroom_home_dir }} exists"
   stat:
-    path: "{{ stroom_bin_dir }}"
-  register: _stroom_bin_dir_info
+    path: "{{ stroom_home_dir }}"
+  register: _stroom_home_dir_info
 
 - name: "Download archive {{ _stroom_stack_archive_url }}" 
-  when: _stroom_bin_dir_info.stat.exists == false
+  when: _stroom_home_dir_info.stat.exists == false
   block:
 
     - name: Ensure directory {{ downloads_dir }} exists
@@ -35,20 +35,20 @@
         dest: "{{ downloads_dir }}/{{ stroom_archive_filename }}"
         checksum: "sha256:{{ stroom_url }}.sha256"
 
-    - name: Ensure install directory {{ stroom_bin_dir }} exists
+    - name: Ensure install directory {{ stroom_home_dir }} exists
       file:
-        path: "{{ stroom_bin_dir }}"
+        path: "{{ stroom_home_dir }}"
         state: directory
 
     - name: Unpack Stroom's distribution zip
       unarchive:
         src: "{{ downloads_dir }}/{{ stroom_archive_filename }}"
-        dest:  "{{ stroom_bin_dir }}"
+        dest:  "{{ stroom_home_dir }}"
         remote_src: true
 
     - name: Ensure logs directory exists
       file:
-        path:  "{{ stroom_bin_dir }}/logs"
+        path:  "{{ stroom_home_dir }}/logs"
         state: directory
 
 ######## END OF BLOCK ######## 

@@ -1,91 +1,30 @@
 ---
 ########### LOCALHOST  ###########
 
-- hosts:
-    - localhost
-  gather_facts: false
-  vars:
-  tasks:
+- name: Verify local_config_dir is set up
+  import_playbook: ./verify_local_config_dir_exists.yml
 
-    - name: 'Check mandatory variables are defined'
-      assert:
-        that:
-          - local_config_dir is defined
-
-    - debug:
-        msg:
-          - "local_config_dir: {{ local_config_dir }}"
-      tags:
-        - all
-
-################### SETUP HOSTS ###################
+################### SETUP HOST(S) ###################
 
 - name: Setup stroom hosts
   import_playbook: ./setup_stroom_hosts.yml
   tags:
     - setup
 
-########### 'stroom_services_stack' HOSTS  ###########
+########### '.*_stack' HOSTS  ###########
 
-  # TODO move out into its own playbook
-- hosts:
+- name: "Deploy stack"
+  hosts:
     - stroom_services_stack
-  gather_facts: true # Needed for yum stuff
-  become: true
-  become_user: "{{ stroom_user }}"
-  vars:
-    stack_bin_dir: "{{ stack_install_root_dir }}/{{ stack_name }}/{{ stack_name }}-{{ stack_version }}"
-    stack_config_dir: "{{ stack_install_root_dir }}/{{ stack_name }}/{{ stack_name }}-{{ stack_version }}/config"
-    stack_volumes_dir: "{{ stack_install_root_dir }}/{{ stack_name }}/volumes"
-    stack_env_var_file: "{{ stack_config_dir }}/{{ stack_name }}.env"
-    config_files_and_templates_dir: "{{ local_config_dir }}/files_and_templates/volumes"
-    stroom_config_files_and_templates_dir: "{{ local_config_dir }}/files_and_templates/stroom"
-    stroom_proxy_config_files_and_templates_dir: "{{ local_config_dir }}/files_and_templates/stroom-proxy"
+  gather_facts: true
   tasks:
 
-    - name: 'Check mandatory variables are defined'
-      assert:
-        that:
-          - local_config_dir is defined
-          - stack_env_vars is defined
-          - stack_install_root_dir is defined
-          - stack_name is defined
-          - stack_version is defined
-          - stroom_user is defined
-
-    - debug:
-        msg:
-          - "Deploying/configuring stroom-proxy in {{ stack_bin_dir }} as user {{ stroom_user }}"
-      tags:
-        - deploy
-        - configure
-
-
-    ########### DEPLOY VANILLA REMOTE PROXY STACK  ###########
-
     - import_role:
-        name: stack/download
+        name: stack/deploy
       tags:
         - deploy
 
-    ########### UPDATE REMOTE STACK CONFIG  ###########
-
-      # Remove the development certificates
-    - import_role:
-        name: stack/remove_certs
-      tags:
-        - remove_dev_certs
-        - deploy
-        - configure
-      when: remove_development_certificates | default(false) == true
-
-    - import_role:
-        name: stack/update_config
-      tags:
-        - deploy
-        - configure
-
-
+########### stroom and proxy HOSTS  ###########
 
   # TODO move out into its own playbook, or one for each of stroom and proxy
 - hosts:
@@ -94,13 +33,20 @@
   become: true
   become_user: "{{ stroom_user }}"
   vars:
-    stroom_bin_dir: "{{ stroom_install_root_dir }}/stroom/{{ stroom_version }}"
-    stroom_config_dir: "{{ stroom_bin_dir }}/config"
-    stroom_proxy_bin_dir: "{{ stroom_proxy_install_root_dir }}/stroom-proxy/{{ stroom_proxy_version }}"
-    stroom_proxy_config_dir: "{{ stroom_proxy_bin_dir }}/config"
-    stroom_config_files_and_templates_dir: "{{ local_config_dir }}/files_and_templates/stroom"
-    stroom_proxy_config_files_and_templates_dir: "{{ local_config_dir }}/files_and_templates/stroom-proxy"
+    # non docker stroom
+    stroom_home_dir: "{{ stroom_install_root_dir }}/stroom/{{ stroom_version }}"
+    stroom_config_dir: "{{ stroom_home_dir }}/config"
     stroom_conf_file: "{{ stroom_config_dir }}/stroom.conf"
+    stroom_config_files_and_templates_dir: "{{ local_config_dir }}/files_and_templates/stroom"
+
+    # non docker proxy
+    stroom_proxy_home_dir: "{{ stroom_proxy_install_root_dir }}/stroom-proxy/{{ stroom_proxy_version }}"
+    stroom_proxy_repo_dir: "{{ stroom_proxy_install_root_dir }}/stroom-proxy/repo"
+    stroom_proxy_config_dir: "{{ stroom_proxy_home_dir }}/config"
+    stroom_proxy_logs_dir: "{{ stroom_proxy_home_dir }}/logs"
+    stroom_proxy_certs_dir: "{{ stroom_proxy_home_dir }}/certs"
+    stroom_proxy_content_dir: "{{ stroom_proxy_home_dir }}/content"
+    stroom_proxy_config_files_and_templates_dir: "{{ local_config_dir }}/files_and_templates/stroom-proxy"
   tasks:
 
     - name: 'Check mandatory variables are defined'
@@ -111,13 +57,10 @@
           - stroom_version is defined
           - stroom_user is defined
 
-    - import_role:
-        name: non_docker_stroom/download
-      tags:
-        - deploy
+    # non docker stroom
 
     - import_role:
-        name: non_docker_proxy/download
+        name: non_docker_stroom/download
       tags:
         - deploy
 
@@ -127,9 +70,16 @@
         - deploy
         - configure
 
-    #- import_role:
-        #name: non_docker_proxy/update_config
-      #tags:
-        #- deploy
-        #- configure
+    # non docker proxy
+
+    - import_role:
+        name: non_docker_proxy/download
+      tags:
+        - deploy
+
+    - import_role:
+        name: non_docker_proxy/update_config
+      tags:
+        - deploy
+        - configure
 

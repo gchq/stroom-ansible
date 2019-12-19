@@ -51,14 +51,14 @@
   # Will only add/update files on the remote, not delete.
   # To make deletion happen we would need to have all of the files
   # locally.
-- name: Copy static files from {{ stroom_config_files_and_templates_dir }}/config
-        to {{ stroom_config_dir }}/
+- name: Copy static files from {{ stroom_config_files_and_templates_dir }}/
+        to {{ stroom_home_dir }}/
   copy:
     src: "{{ item.src }}/"
-    dest: "{{ stroom_config_dir }}/{{ item.path }}"
+    dest: "{{ stroom_home_dir }}/{{ item.path }}"
     mode: "u=rw,g=,o="
     backup: true
-  with_filetree: "{{ stroom_config_files_and_templates_dir }}/config"
+  with_filetree: "{{ stroom_config_files_and_templates_dir }}/"
   loop_control:
     label: "{{ item.path }}"
   when: _stroom_config_files_and_templates_dir_info.stat.exists 
@@ -71,14 +71,14 @@
   # Copies and templates any *.j2 files found in the tree, removing the .j2 extension.
   # Mirrors the directory structure.
   # Will only add/update files on the remote, not delete.
-- name: Copy and template .j2 files from {{ stroom_config_files_and_templates_dir }}/config
-        to {{ stroom_config_dir }}/
+- name: Copy and template .j2 files from {{ stroom_config_files_and_templates_dir }}/
+        to {{ stroom_home_dir }}/
   template:
     src: "{{ item.src }}/"
-    dest: "{{ stroom_config_dir }}/{{ item.path | regex_replace('.j2$','') }}"
+    dest: "{{ stroom_home_dir }}/{{ item.path | regex_replace('.j2$','') }}"
     mode: "u=rw,g=,o="
     backup: true
-  with_filetree: "{{ stroom_config_files_and_templates_dir }}/config/"
+  with_filetree: "{{ stroom_config_files_and_templates_dir }}/"
   loop_control:
     label: "{{ item.path }}"
   when: _stroom_config_files_and_templates_dir_info.stat.exists 

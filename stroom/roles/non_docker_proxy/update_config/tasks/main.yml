@@ -1,1 +1,68 @@
 ---
+
+- name: Ensure directory {{ stroom_temp_dir }} exists
+  file:
+    path: "{{ stroom_temp_dir }}"
+    state: directory
+  tags:
+    - deploy
+    - configure
+
+- name: "Check if {{ stroom_proxy_config_files_and_templates_dir }} exists on the Ansible controller"
+  local_action: stat path={{ stroom_proxy_config_files_and_templates_dir }}
+  become: false
+  register: _stroom_proxy_config_files_and_templates_dir_info
+  tags:
+    - deploy
+    - configure
+
+  # Copies any files (except *.j2 files) as they are to the remote.
+  # Mirrors the directory structure.
+  # Will only add/update files on the remote, not delete.
+  # To make deletion happen we would need to have all of the files
+  # locally.
+- name: Copy static files from {{ stroom_proxy_config_files_and_templates_dir }}
+        to {{ stroom_proxy_home_dir }}/
+  copy:
+    src: "{{ item.src }}/"
+    dest: "{{ stroom_proxy_home_dir }}/{{ item.path }}"
+    mode: "u=rw,g=,o="
+    backup: true
+  with_filetree: "{{ stroom_proxy_config_files_and_templates_dir }}/"
+  loop_control:
+    label: "{{ item.path }}"
+  when: _stroom_proxy_config_files_and_templates_dir_info.stat.exists 
+        and item.state == 'file' 
+        and item.path is not match ".*\.j2$"
+  tags:
+    - deploy
+    - configure
+
+  # Copies and templates any *.j2 files found in the tree, removing the .j2 extension.
+  # Mirrors the directory structure.
+  # Will only add/update files on the remote, not delete.
+- name: Copy and template .j2 files from {{ stroom_proxy_config_files_and_templates_dir }}
+        to {{ stroom_proxy_home_dir }}/
+  template:
+    src: "{{ item.src }}/"
+    dest: "{{ stroom_proxy_home_dir }}/{{ item.path | regex_replace('.j2$','') }}"
+    mode: "u=rw,g=,o="
+    backup: true
+  with_filetree: "{{ stroom_proxy_config_files_and_templates_dir }}/"
+  loop_control:
+    label: "{{ item.path }}"
+  when: _stroom_proxy_config_files_and_templates_dir_info.stat.exists 
+        and item.state == 'file' 
+        and item.path is match ".*\.j2$"
+  tags:
+    - deploy
+    - configure
+
+  # Not used for proxy
+- name: Ensure directory {{ stroom_proxy_config_dir }}/stroom.conf does not exist
+  file:
+    path: "{{ stroom_proxy_config_dir }}/stroom.conf"
+    state: absent
+  tags:
+    - deploy
+    - configure

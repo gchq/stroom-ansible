@@ -12,4 +12,4 @@
   loop: "{{ service_dev_certs }}"
   loop_control:
     loop_var: _service_dev_certs
-    label: "{{ _service_dev_certs.service }}"
+    label: "{{ _service_dev_certs.path }}"
