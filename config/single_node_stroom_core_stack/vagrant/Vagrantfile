@@ -1,34 +1,19 @@
 Vagrant.configure("2") do |config|
 
   @ip_counter=10
+
   def get_ip()
     @ip_counter += 1
-    "192.168.100.#{@ip_counter}"
+    "192.168.102.#{@ip_counter}"
   end
 
-  # A mixed economy deployment
   # TODO Only allows a host to belong to one group, but that should
   # be fine for now.
   servers=[
     {
-      :hostname => "stroom-and-proxy-1",
+      :hostname => "stroom-core-stack-host",
       :ip => get_ip(),
-      :group => "stroom_and_proxy"
-    },
-    {
-      :hostname => "stroom-and-proxy-2",
-      :ip =>get_ip(),
-      :group => "stroom_and_proxy"
-    },
-    {
-      :hostname => "stroom-services-stack",
-      :ip =>get_ip(),
-      :group => "stroom_services_stack"
-    },
-    {
-      :hostname => "stroom-database",
-      :ip =>get_ip(),
-      :group => "stroom_database"
+      :group => "stroom_core_stack"
     },
   ]
 
@@ -51,6 +36,9 @@ Vagrant.configure("2") do |config|
     # Noddy playbook so we can generate an inventory
     ansible.playbook = "vagrant_playbook.yml"
 
+    # TODO Figure out how to get rid of those pesky cows
+
+    # Add each machine to the appropriate ansible group
     ansible.groups = { }
     ansible.host_vars = { }
 
@@ -58,7 +46,7 @@ Vagrant.configure("2") do |config|
     servers.each do |machine|
       group = machine[:group]
       hostname = machine[:hostname]
-      $stdout.puts "  hostname: #{hostname}, ip: #{machine[:ip]}, group: #{group},"
+      $stdout.puts "  hostname: #{hostname}, ip: #{machine[:ip]}, group: #{group}"
 
       if !ansible.groups.key?(group)
         # No key for this group so create an empty array

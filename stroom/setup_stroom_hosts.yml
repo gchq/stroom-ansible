@@ -39,6 +39,8 @@
         - "{{ stroom_auth_service_app_port | default(8099) }}"
         - "{{ stroom_proxy_remote_app_port | default(9090) }}"
         - "{{ stroom_auth_ui_https_port | default(9443) }}"
+      notify:
+        - Restart docker
 
       # TODO The ports we need are dependant on what is in the stack
       # so we ought to only open the required ports
@@ -53,6 +55,14 @@
       loop:
         - http # For nginx
         - https # For nginx
+      notify:
+        - Restart docker
+
+  handlers:
+    - name: Restart docker
+      service: 
+        name: docker 
+        state: restarted
 
 
 - name: Setup hosts with java

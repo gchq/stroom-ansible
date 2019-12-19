@@ -44,12 +44,12 @@
       - htop # Useful process monitoring
       - httpie  # Used by some stroom scripts
       - iproute  # needed for the ip command used in our scripts
-      - jq  # Used by some stroom scripts, handy for json munging
+      - jq  # Used by some stroom scripts, handy for REST json munging
       - net-tools
       - python  # Not sure we need it but just in case
       - python3  # Not sure we need it but just in case
       - unzip
-      - vim  # vi just doesn't cut it
+      - vim  # vi is not a mustard cutter
 
 - name: Ensure firewalld is running
   become: true

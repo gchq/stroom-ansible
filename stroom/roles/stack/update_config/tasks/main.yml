@@ -50,12 +50,15 @@
   # Will only add/update files on the remote, not delete.
   # To make deletion happen we would need to have all of the volumes dir
   # locally.
+  # TODO The files in the volumes dir need to be accessed by the user inside
+  # the container which may have a different uid to the host user, thus we
+  # need to open up read to g and o
 - name: Copy static files from {{ config_files_and_templates_dir }}/
         to {{ stack_volumes_dir }}/
   copy:
     src: "{{ item.src }}/"
     dest: "{{ stack_volumes_dir }}/{{ item.path }}"
-    mode: "u=rw,g=,o="
+    mode: "u=rw,g=r,o=r"
     backup: true
   with_filetree: "{{ config_files_and_templates_dir }}/"
   loop_control:
@@ -70,12 +73,15 @@
   # Copies and templates any *.j2 files found in the tree, removing the .j2 extension.
   # Mirrors the directory structure.
   # Will only add/update files on the remote, not delete.
+  # TODO The files in the volumes dir need to be accessed by the user inside
+  # the container which may have a different uid to the host user, thus we
+  # need to open up read to g and o
 - name: Copy and template .j2 files from {{ config_files_and_templates_dir }}/
         to {{ stack_volumes_dir }}/
   template:
     src: "{{ item.src }}/"
     dest: "{{ stack_volumes_dir }}/{{ item.path | regex_replace('.j2$','') }}"
-    mode: "u=rw,g=,o="
+    mode: "u=rw,g=r,o=r"
     backup: true
   with_filetree: "{{ config_files_and_templates_dir }}/"
   loop_control:

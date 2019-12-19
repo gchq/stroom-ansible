@@ -1,0 +1,19 @@
+---
+all:
+  children:
+    stroom_and_proxy:
+      hosts:
+        stroom-and-proxy-host-1:
+          # Set public_ip_address to the hosts public IP
+          # address when testing without a DNS server
+          #public_ip_address: 192.168.100.11
+        stroom-and-proxy-host-2:
+          #public_ip_address: 192.168.100.12
+    stroom-services-stack:
+      hosts:
+        stroom-services-stack-host:
+          #public_ip_address: 192.168.100.13
+    stroom-database:
+      hosts:
+        stroom-database-host:
+          #public_ip_address: 192.168.100.14

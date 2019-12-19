@@ -15,18 +15,27 @@ client_keystore_files:
   - "ca.jks"
 
 service_dev_certs:
-  - service: stroom
+  - path: "{{ stack_volumes_dir }}/stroom/certs"
     files: "{{ client_keystore_files }}"
-  - service: stroom-log-sender
+
+  - path: "{{ stack_volumes_dir }}/stroom-log-sender/certs"
     files: "{{ client_cert_files }}"
-  - service: stroom-proxy-local
+
+  - path: "{{ stack_volumes_dir }}/stroom-proxy-local/certs"
     files: "{{ client_keystore_files }}"
-  - service: stroom-proxy-remote
+
+  - path: "{{ stack_volumes_dir }}/stroom-proxy-remote/certs"
     files: "{{ client_keystore_files }}"
-  - service: stroom-auth-service
+
+  - path: "{{ stack_volumes_dir }}/stroom-auth-service/certs"
     files: "{{ client_keystore_files }}"
-  - service: stroom-auth-ui
+
+  - path: "{{ stack_volumes_dir }}/stroom-auth-ui/certs"
     files: "{{ client_keystore_files }}"
-  - service: nginx
+
+  - path: "{{ stack_volumes_dir }}/nginx/certs"
     files: "{{ server_cert_files }}"
+
+  - path: "{{ stack_bin_dir }}/certs"
+    files: "{{ client_cert_files }}"
 

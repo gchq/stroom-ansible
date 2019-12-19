@@ -27,7 +27,7 @@ stroom_stack_archive_url_base: "https://github.com/gchq/stroom-resources/release
 # will be pushed out to the proxy hosts. This directory should be under source
 # control. 
 # IMPORTANT: This is relative to the playbook being run.
-local_config_dir: "../config/mixed_economy/example_inventory"
+local_config_dir: "../config/multi_node_mixed_cluster/example_inventory"
 
 # The user that stroom-proxy will run as
 stroom_user: "stroomuser"

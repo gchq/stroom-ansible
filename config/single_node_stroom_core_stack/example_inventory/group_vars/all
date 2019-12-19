@@ -5,10 +5,10 @@ ansible_connection: ssh
 # The user should have passwordless sudo and an ssh key pair that has already
 # been set up on the remote host(s). The ssh key to use can be set on the command line
 # using '--private-key=~/.ssh/my_private_key_id_rsa'
-ansible_user: centos
+ansible_user: vagrant
 
 # The name of the stack to deploy
-stack_name: "stroom_proxy"
+stack_name: "stroom_core_test"
 
 # The version of the stack to deploy
 stack_version: "v6.0.27-1"
@@ -16,11 +16,10 @@ stack_version: "v6.0.27-1"
 # The path on a file server where the stack archive file can be found
 stroom_stack_archive_url_base: "https://github.com/gchq/stroom-resources/releases/download/stroom-stacks-{{ stack_version }}"
 
-# The local directory where the stack configuration is kept. This configuration
-# will be pushed out to the proxy hosts. This directory should be under source
-# control.
+# The local directory where the stack configuration is kept.
+# This directory should be under source control.
 # IMPORTANT: This is relative to the playbook being run.
-local_config_dir: "../config/remote_proxy/example_inventory"
+local_config_dir: "../config/single_node_stroom_core_stack/example_inventory"
 
 # The user that stroom-proxy will run as
 stroom_user: "stroomuser"
@@ -31,17 +30,19 @@ stack_install_root_dir: "/home/{{ stroom_user }}"
 # Set to true to delete all the self signed development certificates
 remove_development_certificates: false
 
+# The hostname of the nginx API gateway
+#nginx_advertised_host: "{{ hostvars[groups['stroom_remote_proxy_stack'][0]]['inventory_hostname'] }}"
+
 # Key/value pairs to set in the stack env file.  These will replace existing
 # values in the env file or add a new line if the name doesn't already exist.
 # It is debatable if we should hold a jinja2 template for this file or use this
 # apporach
 stack_env_vars:
 
-  # Uncomment this if you have a DNS server, else the containers can't resolve it
-  #HOST_IP: "{{ inventory_hostname }}"
+  #HOST_IP: "{{ nginx_advertised_host }}"
 
-  # The key/cert/ca files used by nginx
-  # Must exist in files_and_templates/volumes/nginx/certs
+  #NGINX_ADVERTISED_HOST: "{{ nginx_advertised_host }}"
+
   #NGINX_SSL_CERTIFICATE_KEY: "example.server.key"
   #NGINX_SSL_CERTIFICATE: "example.server.cert"
   #NGINX_SSL_CA_CERTIFICATE: "example.ca.cert"
@@ -49,34 +50,22 @@ stack_env_vars:
   #STROOM_NGINX_DOCKER_REPO: "gchq/stroom-nginx"
   #STROOM_PROXY_DOCKER_REPO: "gchq/stroom-proxy"
 
-  # The java key/truststores to use when checking feed status
-  # Must exist in files_and_templates/volumes/stroom-proxy-remote/certs
   #STROOM_PROXY_REMOTE_CLIENT_KEYSTORE_PASSWORD: "a new password"
   #STROOM_PROXY_REMOTE_CLIENT_KEYSTORE_PATH: "/stroom-proxy/certs/example.client.jks"
+
   #STROOM_PROXY_REMOTE_CLIENT_TRUSTSTORE_PASSWORD: "a new password"
   #STROOM_PROXY_REMOTE_CLIENT_TRUSTSTORE_PATH: "/stroom-proxy/certs/example.ca.jks"
 
-  # The API token used for checking feed status as provided by stroom admins
   #STROOM_PROXY_REMOTE_FEED_STATUS_API_KEY: "eyJhbG......ciOwd7Q"
+  #STROOM_PROXY_REMOTE_FEED_STATUS_URL: "https://downstream-stroom-or-proxy.some.domain/api/proxy/feedStatus/v1"
 
-  # Set this with the dns/hostname/IP of the downstream proxy/stroom
-  # DNS/hostname will only work if there is a DNS server.
-  STROOM_PROXY_REMOTE_FEED_STATUS_URL: "https://192.168.102.11/api/proxy/feedStatus/v1"
+  #STROOM_PROXY_REMOTE_FORWARD_URL: "https://downstream-stroom-or-proxy.some.domain/stroom/datafeed"
 
-  # Set this with the dns/hostname/IP of the downstream proxy/stroom
-  # DNS/hostname will only work if there is a DNS server.
-  STROOM_PROXY_REMOTE_FORWARD_URL: "https://192.168.102.11/stroom/datafeed"
-
-  # The java key/truststores to use when forwarding data downstream
-  # Must exist in files_and_templates/volumes/stroom-proxy-remote/certs
+  ## Use same (key|trust)store for client and forwarding
   #STROOM_PROXY_REMOTE_FORWARDING_KEYSTORE_PASSWORD: "a new password"
   #STROOM_PROXY_REMOTE_FORWARDING_KEYSTORE_PATH: "/stroom-proxy/certs/example.client.jks"
+
   #STROOM_PROXY_REMOTE_FORWARDING_TRUSTSTORE_PASSWORD: "a new password"
   #STROOM_PROXY_REMOTE_FORWARDING_TRUSTSTORE_PATH: "/stroom-proxy/certs/example.ca.jks"
-
-  # These need to be set for dev testing when using IPs and self signed certs
-  STROOM_PROXY_REMOTE_FORWARDING_HOST_VERIFICATION_ENABLED: "false"
-  STROOM_PROXY_REMOTE_JERSEY_VERIFY_HOSTNAME: "false"
-  STROOM_PROXY_REMOTE_JERSEY_TRUST_SELF_SIGNED: "true"
 
 # vim: set filetype=yaml shiftwidth=2 tabstop=2 expandtab:

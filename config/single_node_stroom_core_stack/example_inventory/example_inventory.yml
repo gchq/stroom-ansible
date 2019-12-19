@@ -1,0 +1,6 @@
+---
+all:
+  children:
+    stroom_core_stack:
+      hosts:
+        stroom-core-stack-host

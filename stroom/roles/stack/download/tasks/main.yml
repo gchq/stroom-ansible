@@ -60,8 +60,6 @@
       # to handle the archive. It untars manually without problems, so I'l just do that.
     - name: "Unpack Stroom's distribution tar into {{ _stack_unpack_tmp_dir_info.path }}"
       command: "tar -xvf {{ _downloaded_archive_info.dest }} --directory {{ _stack_unpack_tmp_dir_info.path }}/"
-      args:
-        creates: "{{ stack_bin_dir }}" # Stop the task being re-run if we have downloaded it
 
     #- name: Unpack the stack tar file 
       #unarchive:
@@ -89,11 +87,14 @@
     force: false # Don't copy if it is already there
   when: _stack_volumes_dir_info.stat.exists == false
 
+  # TODO The files in the volumes dir need to be accessed by the user inside
+  # the container which may have a different uid to the host user, thus we
+  # need to open up read to g and o
 - name: Change permissions for {{ stack_volumes_dir }}
   file:
     path: "{{ stack_volumes_dir }}"
     owner: "{{ stroom_user }}"
-    mode: "u=rwX,g=,o="
+    mode: "u=rwX,g=rX,o=rX"
     recurse: true
   when: _stack_volumes_dir_info.stat.exists == false
 

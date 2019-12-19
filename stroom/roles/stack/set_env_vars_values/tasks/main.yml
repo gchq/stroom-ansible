@@ -7,7 +7,7 @@
       - stack_env_vars is defined
 
 - debug:
-    var: env_vars
+    var: stack_env_vars
     verbosity: 2
 
   # Expecting env_vars to look like
@@ -18,5 +18,6 @@
   #     value: some value
 - name: "Setting multiple env vars in {{ stack_env_var_file }}"
   include_tasks: set_env_var.yml
-  loop: "{{ stack_env_vars | dict2items }}"
+  # Protection against an empty stack_env_vars dict
+  loop: "{{ stack_env_vars is none | ternary({ }, stack_env_vars) | dict2items }}"
 

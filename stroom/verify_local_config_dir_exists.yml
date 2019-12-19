@@ -1,0 +1,28 @@
+---
+- hosts:
+    - localhost
+  gather_facts: false
+  vars:
+  tasks:
+
+    - name: 'Check mandatory variables are defined'
+      assert:
+        that:
+          - local_config_dir is defined
+
+    - debug:
+        msg:
+          - "local_config_dir: {{ local_config_dir }}"
+      tags:
+        - all
+
+    - name:
+      stat:
+        path: "{{ local_config_dir }}"
+      register: _local_config_dir_info
+
+    - name: 'Check {{ local_config_dir }} exists'
+      assert:
+        that:
+          - _local_config_dir_info.stat.exists == true
+

@@ -39,6 +39,8 @@
     stack_volumes_dir: "{{ stack_install_root_dir }}/{{ stack_name }}/volumes"
     stack_env_var_file: "{{ stack_config_dir }}/{{ stack_name }}.env"
     config_files_and_templates_dir: "{{ local_config_dir }}/files_and_templates/volumes"
+    stroom_config_files_and_templates_dir: "{{ local_config_dir }}/files_and_templates/stroom"
+    stroom_proxy_config_files_and_templates_dir: "{{ local_config_dir }}/files_and_templates/stroom-proxy"
   tasks:
 
     - name: 'Check mandatory variables are defined'
@@ -130,7 +132,4 @@
       #tags:
         #- deploy
         #- configure
-
-
-
 
