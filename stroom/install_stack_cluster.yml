@@ -1,0 +1,55 @@
+---
+########### LOCALHOST  ###########
+
+- name: Verify local_config_dir is set up
+  import_playbook: ./verify_local_config_dir_exists.yml
+
+
+################### SETUP HOST(S) ###################
+
+- name: Setup stroom hosts
+  import_playbook: ./setup_stroom_hosts.yml
+  tags:
+    - setup
+
+
+########### stroom_and_proxy_stack HOSTS  ###########
+
+- name: "Deploy stroom_and_proxy stack"
+  hosts:
+    - stroom_and_proxy_stack
+  gather_facts: true
+  tasks:
+
+    - import_role:
+        name: stack/deploy
+      tags:
+        - deploy
+
+
+########### stroom_services_stack HOSTS  ###########
+
+- name: "Deploy stack"
+  hosts:
+    - stroom_services_stack
+  gather_facts: true
+  tasks:
+
+    - import_role:
+        name: stack/deploy
+      tags:
+        - deploy
+
+
+########### stroom_dbs_stack HOSTS  ###########
+
+- name: "Deploy stack"
+  hosts:
+    - stroom_dbs_stack
+  gather_facts: true
+  tasks:
+
+    - import_role:
+        name: stack/deploy
+      tags:
+        - deploy
