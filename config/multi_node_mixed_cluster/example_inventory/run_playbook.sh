@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # shellcheck disable=SC2034
-ANSIBLE_CONFIG=vagrant_ansible_config.cfg \
+ANSIBLE_CONFIG=ansible_config.cfg \
   ansible-playbook \
   -i vagrant_inventory.yml \
   "$@" \

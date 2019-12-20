@@ -140,7 +140,7 @@ against them.
    file as follows:
 
   ```bash
-  ANSIBLE_CONFIG=vagrant_ansible_config.cfg ansible-playbook -i other_inventory.yml ../../../stroom/install_mixed_cluster.yml
+  ANSIBLE_CONFIG=ansible_config.cfg ansible-playbook -i other_inventory.yml ../../../stroom/install_mixed_cluster.yml
   ```
   Where `other_inventory.yml` is the new inventory file you created.
 

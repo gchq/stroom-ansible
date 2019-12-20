@@ -60,7 +60,7 @@ main() {
   echo -e "${GREEN}Running command ${BLUE}${shell_cmd}${GREEN} on hosts ${BLUE}${pattern}${NC}"
 
   # shellcheck disable=SC2034
-  ANSIBLE_CONFIG=vagrant_ansible_config.cfg \
+  ANSIBLE_CONFIG=ansible_config.cfg \
     ansible \
     "${pattern}"\
     -vv \
