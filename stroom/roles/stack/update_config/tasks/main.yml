@@ -66,6 +66,7 @@
   when: _config_files_and_templates_dir_info.stat.exists 
         and item.state == 'file' 
         and item.path is not match ".*\.j2$"
+        and item.path is not match ".*\.gitkeep$" # Ignore .gitkeep files used to maintain empty dirs
   tags:
     - deploy
     - configure
@@ -89,6 +90,7 @@
   when: _config_files_and_templates_dir_info.stat.exists 
         and item.state == 'file' 
         and item.path is match ".*\.j2$"
+        and item.path is not match ".*\.gitkeep$" # Ignore .gitkeep files used to maintain empty dirs
   tags:
     - deploy
     - configure
