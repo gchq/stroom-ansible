@@ -1,0 +1,8 @@
+---
+stroom_proxy_home_dir: "{{ stroom_proxy_install_root_dir }}/stroom-proxy/{{ stroom_proxy_version }}"
+stroom_proxy_repo_dir: "{{ stroom_proxy_install_root_dir }}/stroom-proxy/repo"
+stroom_proxy_config_dir: "{{ stroom_proxy_home_dir }}/config"
+stroom_proxy_logs_dir: "{{ stroom_proxy_home_dir }}/logs"
+stroom_proxy_certs_dir: "{{ stroom_proxy_home_dir }}/certs"
+stroom_proxy_content_dir: "{{ stroom_proxy_home_dir }}/content"
+stroom_proxy_config_files_and_templates_dir: "{{ local_config_dir }}/files_and_templates/stroom-proxy"

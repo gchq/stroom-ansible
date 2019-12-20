@@ -1,0 +1,5 @@
+---
+stroom_home_dir: "{{ stroom_install_root_dir }}/stroom/{{ stroom_version }}"
+stroom_config_dir: "{{ stroom_home_dir }}/config"
+stroom_conf_file: "{{ stroom_config_dir }}/stroom.conf"
+stroom_config_files_and_templates_dir: "{{ local_config_dir }}/files_and_templates/stroom"

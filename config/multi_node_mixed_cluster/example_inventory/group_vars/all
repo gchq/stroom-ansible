@@ -36,10 +36,10 @@ stroom_user: "stroomuser"
 stack_install_root_dir: "/home/{{ stroom_user }}"
 
 # The directory where stroom will be installed on the remote host
-stroom_install_root_dir: "/home/{{ stroom_user }}"
+stroom_install_root_dir: "{{ stack_install_root_dir }}"
 
 # The directory where stroom-proxy will be installed on the remote host
-stroom_proxy_install_root_dir: "/home/{{ stroom_user }}"
+stroom_proxy_install_root_dir: "{{ stack_install_root_dir }}"
 
 stroom_temp_dir: "/tmp/stroom"
 

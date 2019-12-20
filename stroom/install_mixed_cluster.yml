@@ -26,60 +26,15 @@
 
 ########### stroom and proxy HOSTS  ###########
 
-  # TODO move (stroom|proxy) stuff into a non_docker_(stroom|proxy)/deploy role
 - hosts:
     - stroom_and_proxy
   gather_facts: true # Needed for yum stuff
   become: true
   become_user: "{{ stroom_user }}"
-  vars:
-    # non docker stroom
-    stroom_home_dir: "{{ stroom_install_root_dir }}/stroom/{{ stroom_version }}"
-    stroom_config_dir: "{{ stroom_home_dir }}/config"
-    stroom_conf_file: "{{ stroom_config_dir }}/stroom.conf"
-    stroom_config_files_and_templates_dir: "{{ local_config_dir }}/files_and_templates/stroom"
-
-    # non docker proxy
-    stroom_proxy_home_dir: "{{ stroom_proxy_install_root_dir }}/stroom-proxy/{{ stroom_proxy_version }}"
-    stroom_proxy_repo_dir: "{{ stroom_proxy_install_root_dir }}/stroom-proxy/repo"
-    stroom_proxy_config_dir: "{{ stroom_proxy_home_dir }}/config"
-    stroom_proxy_logs_dir: "{{ stroom_proxy_home_dir }}/logs"
-    stroom_proxy_certs_dir: "{{ stroom_proxy_home_dir }}/certs"
-    stroom_proxy_content_dir: "{{ stroom_proxy_home_dir }}/content"
-    stroom_proxy_config_files_and_templates_dir: "{{ local_config_dir }}/files_and_templates/stroom-proxy"
   tasks:
 
-    - name: 'Check mandatory variables are defined'
-      assert:
-        that:
-          - local_config_dir is defined
-          - stroom_install_root_dir is defined
-          - stroom_version is defined
-          - stroom_user is defined
-
-    # non docker stroom
+    - import_role:
+        name: non_docker_stroom/deploy
 
     - import_role:
-        name: non_docker_stroom/download
-      tags:
-        - deploy
-
-    - import_role:
-        name: non_docker_stroom/update_config
-      tags:
-        - deploy
-        - configure
-
-    # non docker proxy
-
-    - import_role:
-        name: non_docker_proxy/download
-      tags:
-        - deploy
-
-    - import_role:
-        name: non_docker_proxy/update_config
-      tags:
-        - deploy
-        - configure
-
+        name: non_docker_proxy/deploy
