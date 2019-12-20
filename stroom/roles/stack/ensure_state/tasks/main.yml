@@ -13,7 +13,7 @@
       - "op: {{ op }}"
     verbosity: 2
 
-  # Srat/stop are idempotent so we can just always run them
+  # Start/stop are idempotent so we can just always run them
 #- name: "Performing '{{ op }}' on '{{ stack_name }}'"
   #command: "chdir={{ stack_dir }}/ ./{{ op }}"
   ## Sometimes get a tput error if we don't do this.
