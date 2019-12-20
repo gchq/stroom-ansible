@@ -1,0 +1,21 @@
+# Tmuxinator config
+name: stroom-ansible
+root: ~/git_work/stroom-ansible
+
+windows:
+  - vim: vim stroom/install*.yml
+  - mixed:
+      layout: even-vertical
+      panes:
+        - cd config/multi_node_mixed_cluster/vagrant
+        - cd config/multi_node_mixed_cluster/example_inventory
+  - single:
+      layout: even-vertical
+      panes:
+        - cd config/single_node_stroom_core_stack/vagrant
+        - cd config/single_node_stroom_core_stack/example_inventory
+  - proxy:
+      layout: even-vertical
+      panes:
+        - cd config/remote_proxy/vagrant
+        - cd config/remote_proxy/example_inventory
