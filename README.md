@@ -115,21 +115,18 @@ Ansible - https://docs.ansible.com/ansible/latest/installation_guide/intro_insta
 1. Run the Ansible playbook to setup the host(s) and deploy stroom.
 
   ```bash
-  cd config/multi_node_mixed_cluster/example_inventory
-  ./deploy.sh
+  ./deploy_to_vagrant.sh
   ```
 
 1. You can SSH onto Vagrant host using its hostname, e.g.
 
   ```bash
-  cd config/multi_node_mixed_cluster/vagrant
   vagrant ssh stroom-and-proxy-host-1
   ```
 
 1. To shutdown the Vagrant host(s) run
 
   ```bash
-  cd config/multi_node_mixed_cluster/vagrant
   vagrant halt
   ```
 
@@ -145,7 +142,8 @@ against them.
    file as follows:
 
   ```bash
-  ANSIBLE_CONFIG=ansible_config.cfg ansible-playbook -i other_inventory.yml ../../../stroom/install_mixed_cluster.yml
+  cd config/multi_node_mixed_cluster/example_inventory
+  ./deploy.sh other_inventory.yml
   ```
   Where `other_inventory.yml` is the new inventory file you created.
 
@@ -236,14 +234,14 @@ Jinja2 templates to copy/template onto the host.
 This directory has a number of fixed sub-directories that map to locations on
 the remote host.
 
-* `stroom` -> `<stroom home>/`, e.g. `~/stroom/v6.0.27/` 
-* `stroom-proxy` -> `<stroom-proxy home>/`, e.g. `~/stroom-proxy/v6.0.27/` 
-* `volumes` -> `<stack volumes dir>/`, e.g. `~/stroom_core/volumes/` 
+* `stroom` => `<stroom home>/`, e.g. `~/stroom/v6.0.27/` 
+* `stroom-proxy` => `<stroom-proxy home>/`, e.g. `~/stroom-proxy/v6.0.27/` 
+* `volumes` => `<stack volumes dir>/`, e.g. `~/stroom_core/volumes/` 
 
 Any files or directories in one of these directories will be mirrored onto
 corresponding directory on the remote host. The relative path of the file in these directories will be applied to the remote host. E.g. in a _stroom_core_stack_:
 
-`files_and_templates/volumes/nginx/conf/upstreams.proxy.conf.template.j2` -> `~/stroom_core/volumes/nginx/conf/upstreams.proxy.conf.template` 
+`files_and_templates/volumes/nginx/conf/upstreams.proxy.conf.template.j2` => `~/stroom_core/volumes/nginx/conf/upstreams.proxy.conf.template` 
 
 ### Host Vars
 
