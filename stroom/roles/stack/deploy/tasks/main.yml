@@ -10,7 +10,7 @@
 
 - debug:
     msg:
-      - "Deploying/configuring stroom-proxy in {{ stack_bin_dir }} as user {{ stroom_user }}"
+      - "Deploying/configuring stroom-proxy in {{ stack_install_root_dir }} as user {{ stroom_user }}"
   tags:
     - deploy
     - configure

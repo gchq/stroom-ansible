@@ -111,7 +111,7 @@ Ansible - https://docs.ansible.com/ansible/latest/installation_guide/intro_insta
 
   ```bash
   cd stroom-ansible/config/multi_node_mixed_cluster/example_inventory
-  ./run_playbook.sh
+  ./deploy.sh
   ```
 
 1. You can SSH onto Vagrant host using its hostname, e.g.
