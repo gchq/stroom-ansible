@@ -51,10 +51,6 @@ This is a deployment of the _stroom core stack_ on a single node. All services
 run in Docker containers. This is suitable for small scale deployments or
 testing.
 
-### Multi Node Stroom Core Stack
-
-> TODO
-
 ### Multi Node Mixed Cluster
 
 `config/multi_node_mixed_cluster`
@@ -89,11 +85,14 @@ example of how to structure an Ansible inventory for that shape of deployment.
 
 ### Prerequisites
 
+Ansible - https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html
+
+The following are only needed if you want to use Vagrant and VirtualBox to
+create hosts to deploy to.
+
 VirtualBox - https://www.virtualbox.org/wiki/Downloads
 
 Vagrant - https://www.vagrantup.com/docs/installation/
-
-Ansible - https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html
 
 ### Steps
 
