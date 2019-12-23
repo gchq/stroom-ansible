@@ -238,10 +238,13 @@ the remote host.
 * `volumes` => `<stack volumes dir>/`, e.g. `~/stroom_core/volumes/` 
 
 Any files or directories in one of these directories will be mirrored onto
-corresponding directory on the remote host. The relative path of the file in these directories will be applied to the remote host. E.g. in a _stroom_core_stack_:
+corresponding directory on the remote host. The relative path of the file in
+these directories will be applied to the remote host. E.g. in a
+_stroom_core_stack_:
 
 `files_and_templates/volumes/nginx/conf/upstreams.proxy.conf.template.j2` => `~/stroom_core/volumes/nginx/conf/upstreams.proxy.conf.template` 
 
 ### Host Vars
 
-Host specific variables can be set by creating files of the form `host_vars/<inventory hostname>`.
+Host specific variables can be set by creating files of the form
+`host_vars/<inventory hostname>`.
