@@ -1,0 +1,11 @@
+---
+
+- name: Block for a dump file
+  block:
+  loop: "{{ db_dumps }}"
+  loop_control:
+    label: "{{ db_name }} - {{ file_path }}"
+  tasks:
+
+    - name: Import dump file {{ item.file_path }} into database {{ db_name }}
+      include_tasks: import_dump.yml

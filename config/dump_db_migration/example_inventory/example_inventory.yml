@@ -1,0 +1,6 @@
+---
+all:
+  children:
+    stroom_db_migration:
+      hosts:
+        stroom-dump-db-migration-host

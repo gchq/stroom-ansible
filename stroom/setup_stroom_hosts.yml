@@ -13,6 +13,7 @@
   become: true
   hosts:
     - ~.*_stack$
+    - stroom_db_migration
   vars:
     docker_user: "{{ stroom_user }}"
   tags:

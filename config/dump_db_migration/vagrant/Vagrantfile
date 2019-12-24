@@ -1,0 +1,73 @@
+Vagrant.configure("2") do |config|
+
+  @ip_counter=10
+
+  def get_ip()
+    @ip_counter += 1
+    "192.168.105.#{@ip_counter}"
+  end
+
+  # TODO Only allows a host to belong to one group, but that should
+  # be fine for now.
+  servers=[
+    {
+      :hostname => "stroom-dump-db-migration-host",
+      :ip => get_ip(),
+      :group => "stroom_db_migration"
+    },
+  ]
+
+  servers.each do |machine|
+    config.vm.define machine[:hostname] do |node|
+      node.vm.box = "centos/7"
+      node.vm.hostname = machine[:hostname]
+      node.vm.network "private_network", ip: machine[:ip]
+
+      node.vm.provider "virtualbox" do |vb|
+        vb.memory = "12096"
+        vb.cpus = "4"
+      end
+
+    end
+  end
+
+  config.vm.provision "ansible" do |ansible|
+    ansible.verbose = "v"
+    # Noddy playbook so we can generate an inventory
+    ansible.playbook = "vagrant_playbook.yml"
+
+    # TODO Figure out how to get rid of those pesky cows
+
+    # Add each machine to the appropriate ansible group
+    ansible.groups = { }
+    ansible.host_vars = { }
+
+    $stdout.puts "Ansible hosts:"
+    servers.each do |machine|
+      group = machine[:group]
+      hostname = machine[:hostname]
+      $stdout.puts "  hostname: #{hostname}, ip: #{machine[:ip]}, group: #{group}"
+
+      if !ansible.groups.key?(group)
+        # No key for this group so create an empty array
+        ansible.groups[group] = []
+      end
+      # Add this host to the group
+      ansible.groups[group].push(hostname)
+
+      # Add our fixed IP as a host_var so we can access it in ansible
+      # This is because ansible_host gets set to 127.0.0.1 as vagrant has
+      # some funky port forwearding approach to connecting to the hosts
+      ansible.host_vars[machine[:hostname]] = {
+        "public_ip_address" => machine[:ip],
+      }
+    end
+
+    $stdout.puts "Ansible groups:"
+    ansible.groups.each_pair do |key,value|
+      $stdout.puts "  #{key}: #{value}"
+    end
+  end
+end
+
+# vim: set tabstop=2 shiftwidth=2 expandtab filetype=ruby:

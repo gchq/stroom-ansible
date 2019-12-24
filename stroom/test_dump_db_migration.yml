@@ -1,0 +1,74 @@
+---
+########### LOCALHOST  ###########
+
+- name: Verify local_config_dir is set up
+  import_playbook: ./verify_local_config_dir_exists.yml
+
+################### SETUP HOST(S) ###################
+
+- name: Setup stroom hosts
+  import_playbook: ./setup_stroom_hosts.yml
+  tags:
+    - setup
+
+        
+- hosts:
+    - all
+  gather_facts: true # Needed for yum stuff
+  become: true
+  become_user: "{{ stroom_user }}"
+  vars:
+      # Normally we would deploy a stack on top of another but if we do that we
+      # can't go back as the config is different
+    - stack_dir_to: "{{ migration_dir }}"
+  tasks:
+
+    ################### TEAR DOWN ###################
+
+      # Remove the to stack dir
+    - name: Ensure '{{ stack_dir_to }}' is absent
+      file:
+        path: "{{ stack_dir_to }}"
+        state: absent
+      tags:
+        - teardown
+
+      # Remove the whole migration dir only if we want to remove the compiled source
+      # as it takes so long to compile
+    - name: Ensure '{{ migration_dir}}' is absent
+      file:
+        path: "{{ migration_dir }}"
+        state: absent
+      tags:
+        - never
+        - clean_compiled
+        - teardown
+
+    - import_role:
+        name: stack/delete
+      vars:
+        stack_version: "{{ stroom_version_to }}"
+        stack_install_root_dir: "{{ stack_dir_to }}"
+      tags:
+        - teardown
+
+    ################### SET UP & RUN TO VERSION ###################
+
+    - import_role:
+        name: stack/deploy
+      vars:
+        stack_version: "{{ stroom_version_to }}"
+        stack_install_root_dir: "{{ stack_dir_to }}"
+
+    - import_role:
+        name: stack/import_dump
+      vars:
+        stack_install_root_dir: "{{ stack_dir_to }}"
+
+      # Start up all the services in the new stack which will run the migration
+    - import_role:
+        name: stack/ensure_state
+      vars:
+        stack_install_root_dir: "{{ stack_dir_to }}"
+        stack_version: "{{ stroom_version_to }}"
+        state: "started"

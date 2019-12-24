@@ -123,3 +123,4 @@
     chdir: "{{ source_dir }}"
     # Stop it building if the build dir exists
     creates: "stroom-app/build"
+  register: _build_info

@@ -1,0 +1,24 @@
+---
+
+- name: See if {{ item.file_path }} exists
+  stat:
+    path: "{{ item.file_path }}"
+  register: _dump_file_info
+
+- name: Ensure {{ item.file_path }} exists
+  assert:
+    that:
+      - _dump_file_info.stat.exists == true
+
+- name: Ensure we have gunzip
+  become: true
+  yum:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+      - gunzip
+
+- name: Run the DB import
+  shell: "gunzip < {{ item.file_path }}" 
+           "| docker exec -i stroom-all-dbs sh -c \"mysql -u{{ {{ item.username }} -p'{{ item.password }}' {{ item.db_name }}\"

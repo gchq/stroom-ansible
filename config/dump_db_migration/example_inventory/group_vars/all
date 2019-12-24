@@ -1,0 +1,20 @@
+---
+ansible_connection: ssh
+
+# The user that ansible will connect as, must have sudo rights to 'sudo su -'.
+# The user should have passwordless sudo and an ssh key pair that has already
+# been set up on the remote host(s). The ssh key to use can be set on the command line
+# using '--private-key=~/.ssh/my_private_key_id_rsa'
+ansible_user: vagrant
+
+stroom_user: "stroomuser"
+
+stroom_version_to: "v7.0-beta.13"
+
+migration_dir: "/home/{{stroom_user}}/migration_to_{{ stroom_version_to }}"
+
+stack_name: "stroom_core"
+
+local_config_dir: "../config/dump_db_migration/example_inventory"
+
+# vim: set filetype=yaml shiftwidth=2 tabstop=2 expandtab:
