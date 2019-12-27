@@ -1,17 +1,20 @@
 ---
 
 db_dumps:
-  - file_path:
+  - filename:
     db_name: stroom
     username: stroomuser
     password: password1
-  - file_path:
+  - filename:
     db_name: stats
     username: statsuser
     password: password1
-  - file_path:
+  - filename:
     db_name: auth
     username: authuser
     password: password1
 
 stack_dir: "{{ stack_install_root_dir }}/{{ stack_name }}/{{ stack_name }}-{{stack_version }}"
+
+# Dir on the remote to copy the local dump files into
+remote_dump_files_dest_dir: "/tmp/stroom_db_dumps"

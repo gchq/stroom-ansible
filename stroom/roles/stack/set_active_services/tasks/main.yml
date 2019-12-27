@@ -7,5 +7,5 @@
       - stack_name is defined
       - services_to_run is defined
 
-- name: Set the services that are running on a host
+- name: Set the services that are running on a host to {{ services_to_run }}
   command: "{{ stack_install_root_dir }}/{{ stack_name }}/{{ stack_name }}-{{ stack_version }}/set_services.sh -m {{ services_to_run }}"

@@ -37,7 +37,13 @@
 - debug:
     msg: "{{ stack_op.stdout }}"
     verbosity: 2
-  when: "'stdout' in stack_op and (op=='info' or op=='status' or op=='health' or op=='logs' or op=='show_config')"
+  when: >-
+    'stdout' in stack_op
+      and (op=='info'
+        or op=='status'
+        or op=='health'
+        or op=='logs'
+        or op=='show_config')
     
 - debug:
     msg: "{{ stack_op.stderr }}"
@@ -50,7 +56,9 @@
   register: cmd_result
   when: "state=='started' or state=='restarted'"
   #until: cmd_result.rc==0
-  until:  "'stdout' in cmd_result and 'Overall system health: HEALTHY' in cmd_result.stdout"
+  until: >- 
+    'stdout' in cmd_result
+    and 'Overall system health: HEALTHY' in cmd_result.stdout
   retries: "{{ retry_count }}"
   delay: "{{ delay_secs }}"
 

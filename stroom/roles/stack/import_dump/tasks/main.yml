@@ -1,11 +1,58 @@
 ---
 
-- name: Block for a dump file
+- name: Block when dump files are local to the ansible controller
+  when: is_db_dump_file_dir_remote == false
   block:
+
+    - name: Check if {{ db_dump_files_dir }} exists locally
+      local_action: stat path={{ db_dump_files_dir }}
+      become: false
+      register: _db_dump_files_dir_info
+
+    - name: Ensure {{ db_dump_files_dir }} exists
+      assert:
+        that:
+          - _db_dump_files_dir_info.stat.exists == true
+
+    - name: Create temporary directory for dump files
+      file:
+        path: "{{ remote_dump_files_dest_dir }}"
+        state: directory
+
+    - name: Set remote_db_dump_files_dir to {{ remote_dump_files_dest_dir }}
+      set_fact: 
+        remote_db_dump_files_dir: "{{ remote_dump_files_dest_dir }}"
+
+    - name: Copy the dump files to the remote host
+      copy:
+        src: "{{ db_dump_files_dir }}/{{ item.filename }}"
+        dest: "{{ remote_db_dump_files_dir }}/"
+      loop: "{{ db_dumps }}"
+      loop_control:
+        label: "{{ item.filename }}"
+
+
+- name: Block when dump files are remote
+  when: is_db_dump_file_dir_remote == true
+  block:
+
+    - name: Check if {{ db_dump_files_dir }} exists on the remote
+      stat:
+        path: "{{ db_dump_files_dir }}"
+      register: _db_dump_files_dir_info
+
+    - name: Ensure {{ db_dump_files_dir }} exists
+      assert:
+        that:
+          - _db_dump_files_dir_info.stat.exists == true
+
+    - name: Set remote_db_dump_files_dir to {{ db_dump_files_dir }}
+      set_fact: 
+        remote_db_dump_files_dir: "{{ db_dump_files_dir }}"
+
+
+- name: Import dump files from {{ remote_db_dump_files_dir }}
+  include_tasks: import_dump.yml
   loop: "{{ db_dumps }}"
   loop_control:
-    label: "{{ db_name }} - {{ file_path }}"
-  tasks:
-
-    - name: Import dump file {{ item.file_path }} into database {{ db_name }}
-      include_tasks: import_dump.yml
+    label: "{{ item.db_name }} - {{ item.filename }}"

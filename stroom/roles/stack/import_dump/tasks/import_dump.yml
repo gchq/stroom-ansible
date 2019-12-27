@@ -1,11 +1,11 @@
 ---
 
-- name: See if {{ item.file_path }} exists
+- name: See if {{ remote_db_dump_files_dir }}/{{ item.filename }} exists
   stat:
-    path: "{{ item.file_path }}"
+    path: "{{ remote_db_dump_files_dir }}/{{ item.filename }}"
   register: _dump_file_info
 
-- name: Ensure {{ item.file_path }} exists
+- name: Ensure {{ item.filename }} exists
   assert:
     that:
       - _dump_file_info.stat.exists == true
@@ -17,8 +17,19 @@
     state: present
   vars:
     packages:
-      - gunzip
+      - gzip
 
-- name: Run the DB import
-  shell: "gunzip < {{ item.file_path }}" 
-           "| docker exec -i stroom-all-dbs sh -c \"mysql -u{{ {{ item.username }} -p'{{ item.password }}' {{ item.db_name }}\"
+- name: Wait for the DB to be up
+  shell: >-
+    docker exec -i stroom-all-dbs sh -c
+    'mysqladmin status -h"127.0.0.1" -u"{{ item.username }}" -p"{{ item.password }}"'
+  register: _cmd_result
+  until: _cmd_result.rc == 0
+  retries: 20
+  delay: 1
+
+- name: Run the DB import for {{ remote_db_dump_files_dir }}/{{ item.filename }}
+  shell: >-
+    gunzip < {{ remote_db_dump_files_dir }}/{{ item.filename }}
+    | docker exec -i stroom-all-dbs sh -c
+    'mysql -h"127.0.0.1" -u"{{ item.username }}" -p"{{ item.password }}" {{ item.db_name }}'

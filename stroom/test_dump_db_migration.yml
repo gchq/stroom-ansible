@@ -18,12 +18,19 @@
   become: true
   become_user: "{{ stroom_user }}"
   vars:
-      # Normally we would deploy a stack on top of another but if we do that we
-      # can't go back as the config is different
-    - stack_dir_to: "{{ migration_dir }}"
+    - stack_dir_from: "{{ migration_dir }}/stack-{{ stroom_version_from }}"
+    - stack_dir_to: "{{ migration_dir }}/stack-{{ stroom_version_to }}"
   tasks:
 
     ################### TEAR DOWN ###################
+
+      # Remove the from stack dir
+    - name: Ensure '{{ stack_dir_from }}' is absent
+      file:
+        path: "{{ stack_dir_from }}"
+        state: absent
+      tags:
+        - teardown
 
       # Remove the to stack dir
     - name: Ensure '{{ stack_dir_to }}' is absent
@@ -47,10 +54,49 @@
     - import_role:
         name: stack/delete
       vars:
+        stack_version: "{{ stroom_version_from }}"
+        stack_install_root_dir: "{{ stack_dir_from }}"
+      tags:
+        - teardown
+
+    - import_role:
+        name: stack/delete
+      vars:
         stack_version: "{{ stroom_version_to }}"
         stack_install_root_dir: "{{ stack_dir_to }}"
       tags:
         - teardown
+
+    ################### SET UP & RUN FROM VERSION ###################
+
+    - import_role:
+        name: stack/deploy
+      vars:
+        stack_version: "{{ stroom_version_from }}"
+        stack_install_root_dir: "{{ stack_dir_from }}"
+
+      # Start up the db so we can import into it
+    - import_role:
+        name: stack/ensure_state
+      vars:
+        stack_install_root_dir: "{{ stack_dir_from }}"
+        stack_version: "{{ stroom_version_from }}"
+        state: "started"
+
+      # Start up the DB
+    - import_role:
+        name: stack/ensure_state
+      vars:
+        stack_install_root_dir: "{{ stack_dir_from }}"
+        stack_version: "{{ stroom_version_from }}"
+        state: "started"
+
+    - import_role:
+        name: stack/import_dump
+      vars:
+        stack_install_root_dir: "{{ stack_dir_from }}"
+      tags:
+        - import_dump
 
     ################### SET UP & RUN TO VERSION ###################
 
@@ -58,11 +104,6 @@
         name: stack/deploy
       vars:
         stack_version: "{{ stroom_version_to }}"
-        stack_install_root_dir: "{{ stack_dir_to }}"
-
-    - import_role:
-        name: stack/import_dump
-      vars:
         stack_install_root_dir: "{{ stack_dir_to }}"
 
       # Start up all the services in the new stack which will run the migration

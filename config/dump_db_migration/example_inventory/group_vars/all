@@ -9,12 +9,41 @@ ansible_user: vagrant
 
 stroom_user: "stroomuser"
 
+# We are working from a DB import, but setting the from
+# version means we get the right DBs to import into.
+stroom_version_from: "v6.0.27-1"
 stroom_version_to: "v7.0-beta.13"
 
-migration_dir: "/home/{{stroom_user}}/migration_to_{{ stroom_version_to }}"
+migration_dir: "/home/{{stroom_user}}/migration-{{ stroom_version_from }}-{{ stroom_version_to }}"
 
 stack_name: "stroom_core"
 
 local_config_dir: "../config/dump_db_migration/example_inventory"
+
+# The dir where the dump files are (could be local or remote)
+# If local, then it is relative to the playbook
+db_dump_files_dir: "../config/dump_db_migration/example_inventory/db_dumps"
+
+# False if the dump files are on the ansible controller,
+# true if on the remote host
+is_db_dump_file_dir_remote: false
+
+# Define the locations of the dump files and the creds for the DBs
+db_dumps:
+
+  - filename: stroom_v6.0.27-1_20191227130215.sql.gz
+    db_name: stroom
+    username: stroomuser
+    password: stroompassword1
+
+  - filename: stats_v6.0.27-1_20191227130215.sql.gz
+    db_name: stats
+    username: statsuser
+    password: stroompassword1
+
+  - filename: auth_v6.0.27-1_20191227130215.sql.gz
+    db_name: auth
+    username: authuser
+    password: stroompassword1
 
 # vim: set filetype=yaml shiftwidth=2 tabstop=2 expandtab:

@@ -13,7 +13,7 @@ stroom_version_to: "v7.0-beta.13"
 java_version_from: "{{ stroom_6_java_version }}"
 java_version_to: "{{ stroom_7_java_version }}"
 
-migration_dir: "~/migration-{{ stroom_version_from }}-{{ stroom_version_to }}"
+migration_dir: "/home/{{stroom_user}}/migration-{{ stroom_version_from }}-{{ stroom_version_to }}"
 stack_name: "stroom_core_test"
 stroom_6_java_version: "8"
 stroom_7_java_version: "12"
