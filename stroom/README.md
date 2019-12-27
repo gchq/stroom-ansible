@@ -1,5 +1,10 @@
 # stroom-ansible
 
+---
+> WARNING: The majority of this document is out of date and needs updating. It
+> has mostly been superseded by the content in the root readme.
+---
+
 ## Prerequisites
 
 1. Create four Centos 7 hosts
@@ -44,12 +49,9 @@
 
 
 ## TODO
-  1. Create a non-root user for running stroom, i.e. `stroomuser`.
   1. Give install user rights to sudo up to `stroomuser`.
-  1. Change stroom install steps to become `stroomuser`.
   1. Change `stroom.serviceDiscovery.simpleLookup.basePath` to use localhost, or maybe it should go via api gateway
   1. Disable creation of default volumes as they do not work in multi node setup.
-  1. Disable stroom-stats internal stats
   1. Enable content pack import
   1. Create certs with fqdns in the SAN list
   1. Sort out proxy
