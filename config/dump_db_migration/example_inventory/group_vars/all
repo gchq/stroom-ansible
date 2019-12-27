@@ -14,6 +14,9 @@ stroom_user: "stroomuser"
 stroom_version_from: "v6.0.27-1"
 stroom_version_to: "v7.0-beta.13"
 
+# The path on a file server where the stack archive file can be found
+stroom_stack_archive_url_base: "https://github.com/gchq/stroom-resources/releases/download/stroom-stacks-{{ stack_version }}"
+
 migration_dir: "/home/{{stroom_user}}/migration-{{ stroom_version_from }}-{{ stroom_version_to }}"
 
 stack_name: "stroom_core"

@@ -26,7 +26,8 @@
   register: _stack_bin_dir_info
 
 - name: "Download archive {{ _stroom_stack_archive_url }}" 
-  when: _stack_volumes_dir_info.stat.exists == false or _stack_bin_dir_info.stat.exists == false
+  when: _stack_volumes_dir_info.stat.exists == false
+        or _stack_bin_dir_info.stat.exists == false
   block:
 
     # Use a set dir rather than a temporay one to save us having to download a big archive
@@ -59,7 +60,11 @@
       # FIXME: I can't get the unarchive module to work on macOS or Ubuntu. Ansible complains about /bin/tar not being able
       # to handle the archive. It untars manually without problems, so I'l just do that.
     - name: "Unpack Stroom's distribution tar into {{ _stack_unpack_tmp_dir_info.path }}"
-      command: "tar -xvf {{ _downloaded_archive_info.dest }} --directory {{ _stack_unpack_tmp_dir_info.path }}/"
+      command: >-
+        tar
+        -xv
+        -f {{ _downloaded_archive_info.dest }}
+        --directory {{ _stack_unpack_tmp_dir_info.path }}/
 
     #- name: Unpack the stack tar file 
       #unarchive:
@@ -129,4 +134,6 @@
   file:
     path: "{{ _stack_unpack_tmp_dir_info.path }}"
     state: absent
-  when: _stack_volumes_dir_info.stat.exists == false or _stack_bin_dir_info.stat.exists == false and _stack_unpack_tmp_dir_info is defined
+  when: _stack_volumes_dir_info.stat.exists == false
+        or _stack_bin_dir_info.stat.exists == false
+        and _stack_unpack_tmp_dir_info is defined

@@ -10,7 +10,6 @@
   import_playbook: ./setup_stroom_hosts.yml
   tags:
     - setup
-
         
 - hosts:
     - all
@@ -113,3 +112,8 @@
         stack_install_root_dir: "{{ stack_dir_to }}"
         stack_version: "{{ stroom_version_to }}"
         state: "started"
+
+      # At this point the migration will either have worked in which case the
+      # playbook will complete successfully or it will fail and the step above
+      # will be a failure. The logs can be viewed using 'docker logs stroom' or
+      # 'docker logs stroom-auth-service' on the remote host.
