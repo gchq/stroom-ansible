@@ -1,12 +1,26 @@
 ---
 # Devised from https://docs.docker.com/install/linux/docker-ce/centos/
 
-# We need the repo
+- name: See if the docker repo url exists
+  uri: 
+    url: "{{ docker_yum_repo_file_url }}"
+    return_content: false
+  register: _docker_yum_repo_file_url_info
+  
+
+# Download the docker yum repo file if the url exists
 - name: Add docker YUM repo
   become: true
   get_url:
-    url: https://download.docker.com/linux/centos/docker-ce.repo
-    dest: /etc/yum.repos.d/docker-ce.repo
+    url: "{{ docker_yum_repo_file_url }}"
+    dest: "{{ docker_yum_repo_file_path }}" 
+  when: _docker_yum_repo_file_url_info.status == 200
+
+- name: Fallback copy our docker yum repo file
+  template: 
+    src: docker-ce.repo.j2
+    dest: "{{ docker_yum_repo_file_path }}" 
+  when: _docker_yum_repo_file_url_info.status != 200
 
 - name: Install dependencies
   become: true
@@ -49,6 +63,6 @@
 - name: Install docker-compose 
   become: true
   get_url:
-    url: "https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64"
+    url: "{{ docker_compose_url }}"
     dest: /usr/bin/docker-compose
     mode: +x
