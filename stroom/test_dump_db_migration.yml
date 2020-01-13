@@ -23,6 +23,23 @@
 
     ################### TEAR DOWN ###################
 
+      # Remove the docker containers
+    - import_role:
+        name: stack/delete
+      vars:
+        stack_version: "{{ stroom_version_from }}"
+        stack_install_root_dir: "{{ stack_dir_from }}"
+      tags:
+        - teardown
+
+    - import_role:
+        name: stack/delete
+      vars:
+        stack_version: "{{ stroom_version_to }}"
+        stack_install_root_dir: "{{ stack_dir_to }}"
+      tags:
+        - teardown
+
       # Remove the from stack dir
     - name: Ensure '{{ stack_dir_from }}' is absent
       file:
@@ -39,8 +56,6 @@
       tags:
         - teardown
 
-      # Remove the whole migration dir only if we want to remove the compiled source
-      # as it takes so long to compile
     - name: Ensure '{{ migration_dir}}' is absent
       file:
         path: "{{ migration_dir }}"
@@ -50,21 +65,6 @@
         - clean_compiled
         - teardown
 
-    - import_role:
-        name: stack/delete
-      vars:
-        stack_version: "{{ stroom_version_from }}"
-        stack_install_root_dir: "{{ stack_dir_from }}"
-      tags:
-        - teardown
-
-    - import_role:
-        name: stack/delete
-      vars:
-        stack_version: "{{ stroom_version_to }}"
-        stack_install_root_dir: "{{ stack_dir_to }}"
-      tags:
-        - teardown
 
     ################### SET UP & RUN FROM VERSION ###################
 
