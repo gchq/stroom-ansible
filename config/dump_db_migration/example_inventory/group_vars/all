@@ -49,4 +49,26 @@ db_dumps:
     username: authuser
     password: stroompassword1
 
+# Key/value pairs to set in the stack env file.  These will replace existing
+# values in the env file or add a new line if the name doesn't already exist.
+stack_env_vars:
+
+  # Uncomment this if you have a DNS server, else the containers can't resolve it
+  # HOST_IP: "{{ inventory_hostname }}"
+
+  # MYSQL_DOCKER_REPO: "mysql"
+  # STROOM_AUTH_SERVICE_DOCKER_REPO: "gchq/stroom-auth-service"
+  # STROOM_AUTH_UI_DOCKER_REPO: "gchq/stroom-auth-ui"
+  # STROOM_DOCKER_REPO: "gchq/stroom"
+  # STROOM_LOG_SENDER_DOCKER_REPO: "gchq/stroom-log-sender"
+  # STROOM_NGINX_DOCKER_REPO: "gchq/stroom-nginx"
+  # STROOM_PROXY_DOCKER_REPO: "gchq/stroom-proxy"
+  # STROOM_UI_DOCKER_REPO: "gchq/stroom-ui"
+
+# If you have no internet connection then you may want to set some of the following
+# docker_yum_repo_file_url:
+# docker_compose_url
+# epel_repo_url
+# epel_repo_gpg_key_url
+
 # vim: set filetype=yaml shiftwidth=2 tabstop=2 expandtab:
