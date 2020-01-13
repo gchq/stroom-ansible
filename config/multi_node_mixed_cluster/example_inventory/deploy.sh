@@ -37,7 +37,7 @@ main() {
 
   local inventory_file="$1"; shift
 
-  if [ ! -f "inventory_file" ]; then
+  if [ ! -f "${inventory_file}" ]; then
     echo -e "${RED}Error${NC}: File ${inventory_file} does not exist${NC}"
     exit 1
   fi
