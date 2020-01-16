@@ -53,6 +53,8 @@ db_dumps:
 # values in the env file or add a new line if the name doesn't already exist.
 stack_env_vars:
 
+  STROOM_CONTENT_PACK_IMPORT_ENABLED: "false"
+
   # Uncomment this if you have a DNS server, else the containers can't resolve it
   # HOST_IP: "{{ inventory_hostname }}"
 
