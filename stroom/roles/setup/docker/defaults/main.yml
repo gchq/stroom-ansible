@@ -2,11 +2,21 @@
 # The user that will be added to the docker group so they can run docker without sudo
 docker_user: "centos"
 
+# The URL to download the docker-ce yum repo file from
 docker_yum_repo_file_url: https://download.docker.com/linux/centos/docker-ce.repo
+
+# If true, the role will download the docker-ce yum repo file from docker_yum_repo_file_url
+# If false, the role will use the local template file docker-ce.repo.j2
+use_docker_yum_repo_file_url: true
+
+# The destination of the docker-ce yum repo file
 docker_yum_repo_file_path: /etc/yum.repos.d/docker-ce.repo
 
-# This is the base url for the yum repo
+# This is the baseurl value used in the templated docker-ce yum repo file (docker-ce.repo.j2)
 docker_yum_repo_base_url: https://download.docker.com/linux/centos/7/$basearch/stable
 
+# The version of docker-compose to install
 docker_compose_version: "1.24.1"
+
+# The URL to download the docker-compose binary from
 docker_compose_url:  "https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64"

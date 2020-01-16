@@ -1,26 +1,19 @@
 ---
 # Devised from https://docs.docker.com/install/linux/docker-ce/centos/
 
-- name: See if the docker repo url exists
-  uri: 
-    url: "{{ docker_yum_repo_file_url }}"
-    return_content: false
-  register: _docker_yum_repo_file_url_info
-  
-
 # Download the docker yum repo file if the url exists
-- name: Add docker YUM repo
+- name: Download docker-ce YUM repo file
   become: true
   get_url:
     url: "{{ docker_yum_repo_file_url }}"
     dest: "{{ docker_yum_repo_file_path }}" 
-  when: _docker_yum_repo_file_url_info.status == 200
+  when: use_docker_yum_repo_file_url == true
 
-- name: Fallback copy our docker yum repo file
+- name: Fallback copy our local docker-ce yum repo templated file
   template: 
     src: docker-ce.repo.j2
     dest: "{{ docker_yum_repo_file_path }}" 
-  when: _docker_yum_repo_file_url_info.status != 200
+  when: use_docker_yum_repo_file_url == false
 
 - name: Install dependencies
   become: true
