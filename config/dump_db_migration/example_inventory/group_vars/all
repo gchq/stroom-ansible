@@ -66,9 +66,19 @@ stack_env_vars:
   # STROOM_UI_DOCKER_REPO: "gchq/stroom-ui"
 
 # If you have no internet connection then you may want to set some of the following
-# docker_yum_repo_file_url:
-# docker_compose_url
-# epel_repo_url
-# epel_repo_gpg_key_url
+
+# The URL to download the docker-ce yum repo file from
+# docker_yum_repo_file_url: https://download.docker.com/linux/centos/docker-ce.repo
+
+# The baseurl value to use in the docker-ce yum repo file if you are not downloading
+# the repo file from docker_yum_repo_file_url
+# docker_yum_repo_base_url: https://download.docker.com/linux/centos/7/$basearch/stable
+
+# The URL to download the docker-compose binary from
+# docker_compose_url: "https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64"
+
+# epel_repo_url:
+# epel_repo_gpg_key_url:
+
 
 # vim: set filetype=yaml shiftwidth=2 tabstop=2 expandtab:
