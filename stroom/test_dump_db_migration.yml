@@ -74,15 +74,9 @@
         stack_version: "{{ stroom_version_from }}"
         stack_install_root_dir: "{{ stack_dir_from }}"
 
-      # Start up the db so we can import into it
-    - import_role:
-        name: stack/ensure_state
-      vars:
-        stack_install_root_dir: "{{ stack_dir_from }}"
-        stack_version: "{{ stroom_version_from }}"
-        state: "started"
 
-      # Start up the DB
+        # TODO could just start up the DB
+      # Start up the stack so we can import into it
     - import_role:
         name: stack/ensure_state
       vars:
@@ -97,6 +91,14 @@
       tags:
         - import_dump
 
+      # Stop the stack
+    - import_role:
+        name: stack/ensure_state
+      vars:
+        stack_install_root_dir: "{{ stack_dir_from }}"
+        stack_version: "{{ stroom_version_from }}"
+        state: "stopped"
+
     ################### SET UP & RUN TO VERSION ###################
 
     - import_role:
@@ -105,7 +107,16 @@
         stack_version: "{{ stroom_version_to }}"
         stack_install_root_dir: "{{ stack_dir_to }}"
 
-      # Start up all the services in the new stack which will run the migration
+    - import_role:
+        name: stack/migrate
+      vars:
+        stack_install_root_dir: "{{ stack_dir_to }}"
+        stack_version: "{{ stroom_version_to }}"
+
+      # If the migration fails, the logs can also be found in the logs dir
+      # of the stack
+
+      # Start up the stack so we can test the app
     - import_role:
         name: stack/ensure_state
       vars:
@@ -113,7 +124,3 @@
         stack_version: "{{ stroom_version_to }}"
         state: "started"
 
-      # At this point the migration will either have worked in which case the
-      # playbook will complete successfully or it will fail and the step above
-      # will be a failure. The logs can be viewed using 'docker logs stroom' or
-      # 'docker logs stroom-auth-service' on the remote host.
