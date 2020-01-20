@@ -12,7 +12,7 @@ stroom_user: "stroomuser"
 # We are working from a DB import, but setting the from
 # version means we get the right DBs to import into.
 stroom_version_from: "v6.0.27-1"
-stroom_version_to: "v7.0-beta.15"
+stroom_version_to: "v7.0-beta.16"
 
 # The path on a file server where the stack archive file can be found
 stroom_stack_archive_url_base: "https://github.com/gchq/stroom-resources/releases/download/stroom-stacks-{{ stack_version }}"
