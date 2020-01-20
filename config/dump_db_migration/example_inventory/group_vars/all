@@ -56,7 +56,8 @@ stack_env_vars:
   STROOM_CONTENT_PACK_IMPORT_ENABLED: "false"
 
   # Uncomment this if you have a DNS server, else the containers can't resolve it
-  # HOST_IP: "{{ inventory_hostname }}"
+  HOST_IP: "{{ hostvars['stroom-dump-db-migration-host']['public_ip_address'] 
+    | default(hostvars['stroom-dump-db-migration-host']['inventory_hostname'])}}"
 
   # MYSQL_DOCKER_REPO: "mysql"
   # STROOM_AUTH_SERVICE_DOCKER_REPO: "gchq/stroom-auth-service"
