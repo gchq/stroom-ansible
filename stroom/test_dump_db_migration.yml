@@ -74,9 +74,17 @@
         stack_version: "{{ stroom_version_from }}"
         stack_install_root_dir: "{{ stack_dir_from }}"
 
+      # Change the stack so we only run up the DB.
+      # If we run up the whole stack it will build the DBs
+      # which we don't want.
+    - import_role:
+        name: stack/set_active_services
+      vars:
+        stack_install_root_dir: "{{ stack_dir_from }}"
+        stack_version: "{{ stroom_version_from }}"
+        services_to_run: "stroom-all-dbs"
 
-        # TODO could just start up the DB
-      # Start up the stack so we can import into it
+      # Start up the active services, i.e. the DB
     - import_role:
         name: stack/ensure_state
       vars:
