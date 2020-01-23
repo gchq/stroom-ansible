@@ -32,4 +32,4 @@
   shell: >-
     gunzip < {{ remote_db_dump_files_dir }}/{{ item.filename }}
     | docker exec -i stroom-all-dbs sh -c
-    'mysql -h"127.0.0.1" -u"{{ item.username }}" -p"{{ item.password }}" {{ item.db_name }}'
+    'mysql --init-command="SET SESSION FOREIGN_KEY_CHECKS=0;" -h"127.0.0.1" -u"{{ item.username }}" -p"{{ item.password }}" {{ item.db_name }}'
