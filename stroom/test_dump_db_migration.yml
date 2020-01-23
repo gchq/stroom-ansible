@@ -112,6 +112,8 @@
       vars:
         stack_install_root_dir: "{{ stack_dir_to }}"
         stack_version: "{{ stroom_version_to }}"
+      tags:
+        - migrate_stack
 
       # If the migration fails, the logs can also be found in the logs dir
       # of the stack
@@ -123,4 +125,6 @@
         stack_install_root_dir: "{{ stack_dir_to }}"
         stack_version: "{{ stroom_version_to }}"
         state: "started"
+      tags:
+        - start_stack
 
