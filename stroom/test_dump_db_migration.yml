@@ -100,6 +100,8 @@
         option: lower_case_table_names
         value: 1 # Mode 1 means tables are stored on the filesystem in lowercase but sql is case insensitive
         backup: false
+      tags:
+        - configure_db
 
     - import_role:
         name: stack/import_dump
@@ -132,6 +134,8 @@
         option: lower_case_table_names
         value: 1 # Mode 1 means tables are stored on the filesystem in lowercase but sql is case insensitive
         backup: false
+      tags:
+        - configure_db
 
       # Run the DB migratino as a foreground process, could take ages.
       # This will start up the DB and stroom (in migrate mode) as required
