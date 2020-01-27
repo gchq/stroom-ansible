@@ -92,6 +92,15 @@
         stack_version: "{{ stroom_version_from }}"
         state: "started"
 
+    - name: Ensure the DB runs in case insensitve mode
+      ini_file:
+        create: false
+        path: "{{ stack_dir_from }}/{{ stack_name }}/volumes/stroom-all-dbs/conf/stroom-all-dbs.cnf"
+        section: mysqld
+        option: lower_case_table_names
+        value: 1 # Mode 1 means tables are stored on the filesystem in lowercase but sql is case insensitive
+        backup: false
+
     - import_role:
         name: stack/import_dump
       vars:
@@ -115,6 +124,17 @@
         stack_version: "{{ stroom_version_to }}"
         stack_install_root_dir: "{{ stack_dir_to }}"
 
+    - name: Ensure the DB runs in case insensitve mode
+      ini_file:
+        create: false
+        path: "{{ stack_dir_to }}/{{ stack_name }}/volumes/stroom-all-dbs/conf/stroom-all-dbs.cnf"
+        section: mysqld
+        option: lower_case_table_names
+        value: 1 # Mode 1 means tables are stored on the filesystem in lowercase but sql is case insensitive
+        backup: false
+
+      # Run the DB migratino as a foreground process, could take ages.
+      # This will start up the DB and stroom (in migrate mode) as required
     - import_role:
         name: stack/migrate
       vars:
