@@ -37,17 +37,18 @@
     state: present
   vars:
     packages:
-      - bash
+      - bash # All stroom shell scripts expect bash or bash 4+
       - bind-utils # for nslookup
       - coreutils  # realpath is used by some stroom scripts
       - curl
       - htop # Useful process monitoring
-      - httpie  # Used by some stroom scripts
+      - httpie  # Used by some stroom scripts, handy for inspecting REST endpoints
       - iproute  # needed for the ip command used in our scripts
       - jq  # Used by some stroom scripts, handy for REST json munging
       - net-tools
       - python  # Not sure we need it but just in case
       - python3  # Not sure we need it but just in case
+      - rsync # Needed by ansible synchronize module, plus v handy
       - unzip
       - vim  # vi is not a mustard cutter
 

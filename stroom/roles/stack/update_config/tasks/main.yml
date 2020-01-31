@@ -11,11 +11,12 @@
       - stroom_user is defined
 
   # Set the HOST_IP variable to the inventory hostname
-- import_role:
-    name: stack/set_host_ip
-  tags:
-    - deploy
-    - configure
+# TODO this just needs to be set in the inventory, using jinja2 env file
+#- import_role:
+    #name: stack/set_host_ip
+  #tags:
+    #- deploy
+    #- configure
 
 # NOTE: It is debatable if we configure the file like this or use a jinja template file
 # If we use templates then we need to maintain the template in this repo.
@@ -23,11 +24,67 @@
 # would probably make more sense, and be a load faster.
 
   # Set all the env vars in the stack env file
-- import_role:
-    name: stack/set_env_vars_values
-  tags:
-    - deploy
-    - configure
+# TODO switch to using jinja2 template
+#- import_role:
+    #name: stack/set_env_vars_values
+  #tags:
+    #- deploy
+    #- configure
+
+
+  # This means the remotes don't need to be able to reach the
+  # download url.
+- name: Block of tasks to run once on the controller
+  delegate_to: 127.0.0.1
+  connection: local
+  become: false
+  run_once: true
+  block:
+
+  - name: Ensure downloads directory exists on the controller
+    file:
+      path: "{{ downloads_dir }}"
+      state: directory
+
+    # Download and unpack the archive on the ansible controller.
+  - name: Download stack release to the controller
+    get_url:
+      url: "{{ _stroom_stack_archive_url }}"
+      dest: "{{ downloads_dir }}/"
+      checksum: "sha256:{{ _stroom_stack_archive_url }}.sha256"
+    register: _downloaded_archive_info
+
+  - name: "Create temporary directory on the controller to unpack the .env.j2 file to"
+    tempfile:
+      state: directory
+      prefix: stroom_stack_unpack_
+    register: _templated_env_file_tmp_dir_info
+
+  - name: Extract the .env.j2 file to the temporary directory
+    command: >-
+      tar 
+      --transform='s/.*\///' 
+      -xvf {{ _downloaded_archive_info.dest }} 
+      --directory {{ _templated_env_file_tmp_dir_info.path }}
+      ./{{ templated_env_file_relative_path }}
+
+  # ---- END OF BLOCK ----
+
+- name: Apply the .env.j2 template to {{ stack_env_var_file }}
+  template:
+    src: "{{ _templated_env_file_tmp_dir_info.path }}/{{ templated_env_var_file_name }}"
+    dest: "{{ stack_env_var_file }}"
+    mode: "u=rw,g=r,o=r"
+    backup: true
+
+- name: "Delete temp dir {{ _templated_env_file_tmp_dir_info.path }}"
+  file:
+    path: "{{ _templated_env_file_tmp_dir_info.path }}"
+    state: absent
+  delegate_to: 127.0.0.1
+  connection: local
+  become: false
+  run_once: true
 
 - debug:
     msg:
@@ -40,6 +97,7 @@
 - name: "Check if {{ config_files_and_templates_dir }} exists on the Ansible controller"
   local_action: stat path={{ config_files_and_templates_dir }}
   become: false
+  run_once: true
   register: _config_files_and_templates_dir_info
   tags:
     - deploy

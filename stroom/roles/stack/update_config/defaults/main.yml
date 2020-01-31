@@ -1,7 +1,15 @@
 ---
 
-stack_bin_dir: "{{ stack_install_root_dir }}/{{ stack_name }}/{{ stack_name }}-{{ stack_version }}"
-stack_config_dir: "{{ stack_install_root_dir }}/{{ stack_name }}/{{ stack_name }}-{{ stack_version }}/config"
-stack_volumes_dir: "{{ stack_install_root_dir }}/{{ stack_name }}/volumes"
-stack_env_var_file: "{{ stack_config_dir }}/{{ stack_name }}.env"
+stack_version_base_dir: "{{ stack_install_root_dir }}/{{ stack_name }}/{{ stack_version }}"
+stack_bin_dir: "{{ stack_version_base_dir }}/bin"
+stack_config_dir: "{{ stack_bin_dir }}/config"
+stack_volumes_dir: "{{ stack_version_base_dir }}/volumes"
+
+env_var_file_name: "{{ stack_name }}.env"
+templated_env_var_file_name: "{{ env_var_file_name }}.j2"
+
+stack_env_var_file: "{{ stack_config_dir }}/{{ env_var_file_name }}"
+
 config_files_and_templates_dir: "{{ local_config_dir }}/files_and_templates/volumes"
+
+templated_env_file_relative_path: "{{ stack_name }}/{{ stack_name }}-{{ stack_version }}/config/ansible/{{ templated_env_var_file_name }}"
