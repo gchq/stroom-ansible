@@ -48,7 +48,6 @@
       - net-tools
       - python  # Not sure we need it but just in case
       - python3  # Not sure we need it but just in case
-      - rsync # Needed by ansible synchronize module, plus v handy
       - unzip
       - vim  # vi is not a mustard cutter
 

@@ -1,0 +1,55 @@
+---
+
+  # This means the remotes don't need to be able to reach the
+  # download url.
+- name: "Block of tasks to run once on the controller"
+  delegate_to: 127.0.0.1
+  connection: local
+  become: false
+  run_once: true
+  block:
+
+  - name: "Ensure downloads directory exists on the controller"
+    file:
+      path: "{{ downloads_dir }}"
+      state: directory
+
+    # Download and unpack the archive on the ansible controller.
+  - name: "Download stack release to the controller"
+    get_url:
+      url: "{{ _stroom_stack_archive_url }}"
+      dest: "{{ downloads_dir }}/"
+      checksum: "sha256:{{ _stroom_stack_archive_url }}.sha256"
+    register: _downloaded_archive_info
+
+  - name: "Create temporary directory on the controller to unpack the .env.j2 file to"
+    tempfile:
+      state: directory
+      prefix: stroom_stack_unpack_
+    register: _templated_env_file_tmp_dir_info
+
+  - name: Extract the .env.j2 file to the temporary directory
+    command: >-
+      tar 
+      --transform='s/.*\///' 
+      -xvf {{ _downloaded_archive_info.dest }} 
+      --directory {{ _templated_env_file_tmp_dir_info.path }}
+      ./{{ templated_env_file_relative_path }}
+
+  # ---- END OF BLOCK ----
+
+- name: "Apply the .env.j2 template supplied in the stack release to {{ stack_env_var_file }}"
+  template:
+    src: "{{ _templated_env_file_tmp_dir_info.path }}/{{ templated_env_var_file_name }}"
+    dest: "{{ stack_env_var_file }}"
+    mode: "u=rw,g=r,o=r"
+    backup: true
+
+- name: "Delete temp dir {{ _templated_env_file_tmp_dir_info.path }}"
+  file:
+    path: "{{ _templated_env_file_tmp_dir_info.path }}"
+    state: absent
+  delegate_to: 127.0.0.1
+  connection: local
+  become: false
+  run_once: true

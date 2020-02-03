@@ -28,6 +28,11 @@ stack_install_root_dir: "/home/{{ stroom_user }}"
 # Set to true to delete all the self signed development certificates
 remove_development_certificates: false
 
+# Set this to the path of a templated env file on the controller
+# if you don't want to use the templated env file supplied in the stack
+# release archive.
+# local_templated_env_file_path:
+
 # All stack_env_ variables are used for substitution in the .env.j2 file that
 # comes bundled with the stack
 

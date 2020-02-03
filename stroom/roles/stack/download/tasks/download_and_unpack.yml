@@ -22,91 +22,87 @@
     mode: "u=rwX,g=,o="
     state: directory
 
-  # This means the remotes don't need to be able to reach the
-  # download url.
-- name: Block of tasks to run once on the controller
+  # Download the release archive onto the controller then copy it out to
+  # the remotes. This means the remotes don't need to be able to reach the
+  # download url. Also the controller needs it for updating config.
+- name: "Block of tasks to run once on the controller"
   delegate_to: 127.0.0.1
   connection: local
   become: false
   run_once: true
   block:
 
-  - name: Ensure downloads directory exists on the controller
+  - name: "Ensure downloads directory exists on the controller"
     file:
       path: "{{ downloads_dir }}"
       state: directory
 
     # Download and unpack the archive on the ansible controller.
-  - name: Download stack to the controller
+  - name: "Download stack release archive to the controller {{ _stroom_stack_archive_url }}"
     get_url:
       url: "{{ _stroom_stack_archive_url }}"
       dest: "{{ downloads_dir }}/"
       checksum: "sha256:{{ _stroom_stack_archive_url }}.sha256"
     register: _downloaded_archive_info
 
-  - name: "Create temporary directory on the controller to unpack the archive into"
-    tempfile:
-      state: directory
-      prefix: stroom_stack_unpack_
-    register: _stack_unpack_tmp_dir_info
-
-  - debug:
-      msg:
-        - "_stack_unpack_tmp_dir_info: {{ _stack_unpack_tmp_dir_info.path }}"
-      verbosity: 2
-
-    # FIXME: I can't get the unarchive module to work on macOS or Ubuntu. Ansible complains about /bin/tar not being able
-    # to handle the archive. It untars manually without problems, so I'l just do that.
-  - name: "Unpack stack distribution tar into {{ _stack_unpack_tmp_dir_info.path }}"
-    command: >-
-      tar
-      -xv
-      -f {{ _downloaded_archive_info.dest }}
-      --directory {{ _stack_unpack_tmp_dir_info.path }}/
-
-  #- name: Unpack the stack tar file 
-    #unarchive:
-      #src: "{{ _downloaded_archive_info.dest }}"
-      #dest:  "{{ downloads_dir }}"
-      #remote_src: true
-
-  # Commented out till the never tag works correctly
-  #- name: "Delete archive {{ _downloaded_archive_info.dest }}"
-    #file:
-      #path: "{{ _downloaded_archive_info.dest }}"
-      #state: absent
-    #tags:
-      #- never # TODO this doesn't seem to be working
-      #- delete_download
-
   # ---- END OF BLOCK ----
 
-  # We can't use synchronize here as we can't ssh into stroomuser
+- name: "Copy stack release archive {{ _downloaded_archive_info.dest }} from controller to {{ downloads_dir }} on remote" 
+  copy:
+    src: "{{ _downloaded_archive_info.dest }}"
+    dest: "{{ downloads_dir }}/"
+    remote_src: false
+
+- name: "Create temporary directory to unpack the archive into"
+  tempfile:
+    state: directory
+    prefix: stroom_stack_unpack_
+  register: _stack_unpack_tmp_dir_info
+
+  # FIXME: I can't get the unarchive module to work on macOS or Ubuntu. Ansible complains about /bin/tar not being able
+  # to handle the archive. It untars manually without problems, so I'l just do that.
+- name: "Unpack stack distribution tar into {{ _stack_unpack_tmp_dir_info.path }}"
+  command: >-
+    tar
+    -xv
+    -f {{ _downloaded_archive_info.dest }}
+    --directory {{ _stack_unpack_tmp_dir_info.path }}/
+
+#- name: Unpack the stack tar file 
+  #unarchive:
+    #src: "{{ _downloaded_archive_info.dest }}"
+    #dest:  "{{ downloads_dir }}"
+    #remote_src: true
+
+# Commented out till the never tag works correctly
+#- name: "Delete archive {{ _downloaded_archive_info.dest }}"
+  #file:
+    #path: "{{ _downloaded_archive_info.dest }}"
+    #state: absent
+  #tags:
+    #- never # TODO this doesn't seem to be working
+    #- delete_download
 
   # Relying on the archive having been downloaded above
 - name: "Copy stack bin dir from controller to {{ stack_bin_dir }}" 
   copy:
     src: "{{ _stack_unpack_tmp_dir_info.path }}/{{ _stack_archive_relative_bin_dir }}/"
     dest: "{{ stack_bin_dir }}/"
-    #mode: u=rwX,g=rwX,o=
-    #remote_src: true
+    mode: u=rwX,g=rwX,o=
+    remote_src: true
 
   # Relying on the archive having been downloaded above
 - name: "Copy stack volumes dir from controller to {{ stack_volumes_dir }}" 
   copy:
     src: "{{ _stack_unpack_tmp_dir_info.path }}/{{ _stack_archive_relative_volumes_dir }}/"
     dest: "{{ stack_volumes_dir }}/"
-    #mode: u=rwX,g=rwX,o=
-    #remote_src: true
+    mode: u=rwX,g=rwX,o=
+    remote_src: true
 
 - name: "Delete temp dir {{ _stack_unpack_tmp_dir_info.path }}"
   file:
     path: "{{ _stack_unpack_tmp_dir_info.path }}"
     state: absent
-  delegate_to: 127.0.0.1
-  connection: local
-  become: false
-  run_once: true
 
   # TODO The files in the volumes dir need to be accessed by the user inside
   # the container which may have a different uid to the host user, thus we
