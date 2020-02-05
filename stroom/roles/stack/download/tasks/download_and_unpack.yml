@@ -45,31 +45,13 @@
       checksum: "sha256:{{ _stroom_stack_archive_url }}.sha256"
     register: _downloaded_archive_info
 
-  # ---- END OF BLOCK ----
+  # ---- END OF LOCAL BLOCK ----
 
 - name: "Copy stack release archive {{ _downloaded_archive_info.dest }} from controller to {{ downloads_dir }} on remote" 
   copy:
     src: "{{ _downloaded_archive_info.dest }}"
     dest: "{{ downloads_dir }}/"
     remote_src: false
-
-- name: "Create temporary directory to unpack the archive into"
-  tempfile:
-    state: directory
-    prefix: stroom_stack_unpack_
-  register: _stack_unpack_tmp_dir_info
-
-  # FIXME: I can't get the unarchive module to work on macOS or Ubuntu. Ansible complains about /bin/tar not being able
-  # to handle the archive. It untars manually without problems, so I'l just do that.
-#- name: "Unpack stack distribution tar into {{ _stack_unpack_tmp_dir_info.path }}"
-  #command: >-
-    #tar
-    #-xv
-    #--transform 's,^\./{{ stack_name }}/volumes,./{{ stack_version }}/volumes,' 
-    #--transform 's,^\./{{ stack_name }}/{{ stack_name }}-{{ stack_version }},./{{ stack_version }}/bin,' 
-    #--show-transformed-names
-    #-f {{ _downloaded_archive_info.dest }}
-    #--directory {{ _stack_unpack_tmp_dir_info.path }}/
 
   # Unpack the archive but transform the locations of the 'bin' and volumes
   # dirs to provide a more sensible structure, i.e
@@ -97,28 +79,6 @@
     #- never # TODO this doesn't seem to be working
     #- delete_download
 
-  # Relying on the archive having been downloaded above
-#- name: "Copy stack bin dir from controller to {{ stack_bin_dir }}" 
-  #copy:
-    #src: "{{ _stack_unpack_tmp_dir_info.path }}/{{ _stack_archive_relative_bin_dir }}/"
-    #dest: "{{ stack_bin_dir }}/"
-    ##mode: u=rwX,g=rwX,o=
-    #mode: preserve
-    #remote_src: true
-
-  # Relying on the archive having been downloaded above
-#- name: "Copy stack volumes dir from controller to {{ stack_volumes_dir }}" 
-  #copy:
-    #src: "{{ _stack_unpack_tmp_dir_info.path }}/{{ _stack_archive_relative_volumes_dir }}/"
-    #dest: "{{ stack_volumes_dir }}/"
-    #mode: u=rwX,g=rwX,o=
-    #remote_src: true
-
-#- name: "Delete temp dir {{ _stack_unpack_tmp_dir_info.path }}"
-  #file:
-    #path: "{{ _stack_unpack_tmp_dir_info.path }}"
-    #state: absent
-
   # TODO The files in the volumes dir need to be accessed by the user inside
   # the container which may have a different uid to the host user, thus we
   # need to open up read to g and o
@@ -128,11 +88,4 @@
     owner: "{{ stroom_user }}"
     mode: "u=rwX,g=rX,o=rX"
     recurse: true
-
-#- name: Set permissions for {{ stack_bin_dir }}
-  #file:
-    #path: "{{ stack_bin_dir }}"
-    #owner: "{{ stroom_user }}"
-    #mode: "u=rwX,g=,o="
-    #recurse: true
 

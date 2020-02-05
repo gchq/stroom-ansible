@@ -44,3 +44,10 @@
         - deploy
         - configure
 
+    - name: Pull docker images
+      command: "./pull_images.sh -m"
+      args:
+        chdir: "{{ stack_bin_dir }}"
+      tags:
+        - deploy
+        - pull_images

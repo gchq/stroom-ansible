@@ -32,12 +32,3 @@
     src: "{{ stack_version }}" # relative to dest
     dest: "{{ _stack_install_latest_link }}" # absolute
 
-#- debug:
-    #var: _stack_unpack_tmp_dir_info | default('undefined')
-
-#- name: "Delete temporary directory"
-  #file:
-    #path: "{{ _stack_unpack_tmp_dir_info.path }}"
-    #state: absent
-  #when: _stack_version_base_dir_info.stat.exists == false
-        #and _stack_unpack_tmp_dir_info is defined
