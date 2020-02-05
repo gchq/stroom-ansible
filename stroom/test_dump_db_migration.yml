@@ -92,6 +92,7 @@
         stack_version: "{{ stroom_version_from }}"
         state: "started"
 
+      # TODO this causes problems when run with the dev dump file as it can't find strm_tp
     - name: Ensure the DB runs in case insensitve mode
       ini_file:
         create: false
@@ -126,6 +127,7 @@
         stack_version: "{{ stroom_version_to }}"
         stack_install_root_dir: "{{ stack_dir_to }}"
 
+      # TODO this causes problems when run with the dev dump file as it can't find strm_tp
     - name: Ensure the DB runs in case insensitve mode
       ini_file:
         create: false
