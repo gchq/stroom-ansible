@@ -41,6 +41,7 @@
       - bind-utils # for nslookup
       - coreutils  # realpath is used by some stroom scripts
       - curl
+      - git # Needed for migration testing, but useful to have
       - htop # Useful process monitoring
       - httpie  # Used by some stroom scripts, handy for inspecting REST endpoints
       - iproute  # needed for the ip command used in our scripts

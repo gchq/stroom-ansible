@@ -7,9 +7,9 @@
       - gradle_args is defined
       - gradle_java_home_path is defined
       - java_version is defined
-      - release_version is defined
       - repo_name is defined
       - stroom_config_dir is defined
+      - source_git_tag_or_hash is defined
 
 - debug:
     msg:
@@ -19,6 +19,7 @@
       - "repo_name: {{ repo_name }}"
       - "source_dir: {{ source_dir }}"
       - "stroom_config_dir: {{ stroom_config_dir }}"
+      - "source_git_tag_or_hash: {{ source_git_tag_or_hash }}"
     verbosity: 2
 
 - name: Ensure '{{ stroom_config_dir}}' is absent
@@ -32,18 +33,11 @@
     path: "{{ downloads_dir }}"
     state: directory
 
-  # TODO Would probably be better to git clone the repo and checkout a version or hash.
-  # That way we don't have to wait for a release to test a fix to a migration.
-- name: "Download stroom source"
-  get_url:
-    url: "https://github.com/gchq/{{ repo_name }}/archive/{{ stroom_source_archive_file }}"
-    dest: "{{ downloads_dir }}/{{ stroom_source_archive_file }}"
-
-- name: "Unpack source archive {{ stroom_source_archive_file }}"
-  unarchive:
-    src: "{{ downloads_dir }}/{{ stroom_source_archive_file }}"
-    dest: "{{ unpack_dir }}"
-    remote_src: true
+- name: "Clone repo {{ git_repo }} at {{ source_git_tag_or_hash }} into {{ source_dir }}"
+  git:
+    repo: "{{ git_repo }}"
+    dest: "{{ source_dir }}"
+    version: "{{ source_git_tag_or_hash }}"
 
 - stat:
     path: "{{ source_dir }}"

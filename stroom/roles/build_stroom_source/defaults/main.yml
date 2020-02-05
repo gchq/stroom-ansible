@@ -1,13 +1,12 @@
 ---
 # defaults file for build_stroom_source
 
-stroom_source_archive_file: "{{ release_version }}.tar.gz"
 downloads_dir: "/tmp/stroom_downloads"
-#unpack_dir: "~/{{ release_version }}"
 unpack_dir: "~/"
 stroom_config_dir: "~/.stroom"
-source_dir: "{{ unpack_dir }}/{{ repo_name }}-{{ release_version | regex_replace('^v', '') }}"
+source_dir: "{{ unpack_dir }}/{{ repo_name }}-{{ source_git_tag_or_hash }}"
 gradle_args: "clean build -x test -x integrationTest -x gwtCompile"
+git_repo: "https://github.com/gchq/stroom.git"
 java_version: 8
 
 # java_info is set as a fact in the java role
