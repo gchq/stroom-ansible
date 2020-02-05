@@ -45,7 +45,7 @@
     mode: "u=rw,g=r,o=r"
     backup: true
 
-- name: "Delete temp dir {{ _templated_env_file_tmp_dir_info.path }}"
+- name: "Delete temp dir {{ _templated_env_file_tmp_dir_info.path }} on the controller"
   file:
     path: "{{ _templated_env_file_tmp_dir_info.path }}"
     state: absent

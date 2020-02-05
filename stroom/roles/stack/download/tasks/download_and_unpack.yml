@@ -61,18 +61,32 @@
 
   # FIXME: I can't get the unarchive module to work on macOS or Ubuntu. Ansible complains about /bin/tar not being able
   # to handle the archive. It untars manually without problems, so I'l just do that.
-- name: "Unpack stack distribution tar into {{ _stack_unpack_tmp_dir_info.path }}"
+#- name: "Unpack stack distribution tar into {{ _stack_unpack_tmp_dir_info.path }}"
+  #command: >-
+    #tar
+    #-xv
+    #--transform 's,^\./{{ stack_name }}/volumes,./{{ stack_version }}/volumes,' 
+    #--transform 's,^\./{{ stack_name }}/{{ stack_name }}-{{ stack_version }},./{{ stack_version }}/bin,' 
+    #--show-transformed-names
+    #-f {{ _downloaded_archive_info.dest }}
+    #--directory {{ _stack_unpack_tmp_dir_info.path }}/
+
+  # Unpack the archive but transform the locations of the 'bin' and volumes
+  # dirs to provide a more sensible structure, i.e
+  # ./stroom_proxy/stroom_proxy-v6.0.32
+  # ./stroom_proxy/volumes
+  # becomes
+  # ./stroom_proxy/v6.0.32/bin
+  # ./stroom_proxy/v6.0.32/volumes
+- name: "Unpack stack distribution tar into {{ stack_version_base_dir }}"
   command: >-
     tar
     -xv
+    --transform 's,^\./{{ _stack_archive_relative_bin_dir }},./{{ _stack_archive_transformed_relative_bin_dir }},' 
+    --transform 's,^\./{{ _stack_archive_relative_volumes_dir }},./{{ _stack_archive_transformed_relative_volumes_dir }},' 
+    --show-transformed-names
     -f {{ _downloaded_archive_info.dest }}
-    --directory {{ _stack_unpack_tmp_dir_info.path }}/
-
-#- name: Unpack the stack tar file 
-  #unarchive:
-    #src: "{{ _downloaded_archive_info.dest }}"
-    #dest:  "{{ downloads_dir }}"
-    #remote_src: true
+    --directory {{ stack_install_root_dir }}/
 
 # Commented out till the never tag works correctly
 #- name: "Delete archive {{ _downloaded_archive_info.dest }}"
@@ -84,25 +98,26 @@
     #- delete_download
 
   # Relying on the archive having been downloaded above
-- name: "Copy stack bin dir from controller to {{ stack_bin_dir }}" 
-  copy:
-    src: "{{ _stack_unpack_tmp_dir_info.path }}/{{ _stack_archive_relative_bin_dir }}/"
-    dest: "{{ stack_bin_dir }}/"
-    mode: u=rwX,g=rwX,o=
-    remote_src: true
+#- name: "Copy stack bin dir from controller to {{ stack_bin_dir }}" 
+  #copy:
+    #src: "{{ _stack_unpack_tmp_dir_info.path }}/{{ _stack_archive_relative_bin_dir }}/"
+    #dest: "{{ stack_bin_dir }}/"
+    ##mode: u=rwX,g=rwX,o=
+    #mode: preserve
+    #remote_src: true
 
   # Relying on the archive having been downloaded above
-- name: "Copy stack volumes dir from controller to {{ stack_volumes_dir }}" 
-  copy:
-    src: "{{ _stack_unpack_tmp_dir_info.path }}/{{ _stack_archive_relative_volumes_dir }}/"
-    dest: "{{ stack_volumes_dir }}/"
-    mode: u=rwX,g=rwX,o=
-    remote_src: true
+#- name: "Copy stack volumes dir from controller to {{ stack_volumes_dir }}" 
+  #copy:
+    #src: "{{ _stack_unpack_tmp_dir_info.path }}/{{ _stack_archive_relative_volumes_dir }}/"
+    #dest: "{{ stack_volumes_dir }}/"
+    #mode: u=rwX,g=rwX,o=
+    #remote_src: true
 
-- name: "Delete temp dir {{ _stack_unpack_tmp_dir_info.path }}"
-  file:
-    path: "{{ _stack_unpack_tmp_dir_info.path }}"
-    state: absent
+#- name: "Delete temp dir {{ _stack_unpack_tmp_dir_info.path }}"
+  #file:
+    #path: "{{ _stack_unpack_tmp_dir_info.path }}"
+    #state: absent
 
   # TODO The files in the volumes dir need to be accessed by the user inside
   # the container which may have a different uid to the host user, thus we
@@ -114,10 +129,10 @@
     mode: "u=rwX,g=rX,o=rX"
     recurse: true
 
-- name: Set permissions for {{ stack_bin_dir }}
-  file:
-    path: "{{ stack_bin_dir }}"
-    owner: "{{ stroom_user }}"
-    mode: "u=rwX,g=,o="
-    recurse: true
+#- name: Set permissions for {{ stack_bin_dir }}
+  #file:
+    #path: "{{ stack_bin_dir }}"
+    #owner: "{{ stroom_user }}"
+    #mode: "u=rwX,g=,o="
+    #recurse: true
 

@@ -11,7 +11,7 @@ ansible_user: centos
 stack_name: "stroom_proxy"
 
 # The version of the stack to deploy
-stack_version: "v6.0.31-4"
+stack_version: "v6.0.32-2"
 
 # The local directory where the stack configuration is kept. This configuration
 # will be pushed out to the proxy hosts. This directory should be under source
@@ -47,6 +47,7 @@ stack_env_host_ip: "{{ inventory_hostname }}"
 
 #stack_env_stroom_nginx_docker_repo: "gchq/stroom-nginx"
 #stack_env_stroom_proxy_docker_repo: "gchq/stroom-proxy"
+#stack_env_stroom_log_sender_docker_repo: "gchq/stroom-log-sender"
 
 # The java key/truststores to use when checking feed status
 # Must exist in files_and_templates/volumes/stroom-proxy-remote/certs
@@ -79,6 +80,15 @@ stack_env_stroom_proxy_remote_forward_url: "https://192.168.102.11/stroom/datafe
 stack_env_stroom_proxy_remote_forwarding_host_verification_enabled: "false"
 stack_env_stroom_proxy_remote_jersey_verify_hostname: "false"
 stack_env_stroom_proxy_remote_jersey_trust_self_signed: "true"
+
+# Configure the sending of proxy/nginx logs to a downstream stroom/proxy
+#stack_env_stroom_log_sender_datafeed_url: "https://a-downstream-stroom-or-proxy/stroom/datafeeddirect"
+#stack_env_stroom_log_sender_default_environment: "DEV"
+# Must exist in files_and_templates/volumes/stroom-proxy-remote/certs
+# The absolute path inside the container
+#stack_env_stroom_log_sender_ca_cert_file: "/stroom-log-sender/certs/ca.pem.crt"
+#stack_env_stroom_log_sender_cert_file: "/stroom-log-sender/certs/client.pem.crt"
+#stack_env_stroom_log_sender_private_key_file: "/stroom-log-sender/certs/client.unencrypted.key"
 
 # If you have no internet connection then you will want to set the following
 # to locations on your network
