@@ -128,9 +128,9 @@
         name: build_stroom_source
       vars:
         repo_name: "stroom"
-        release_version: "{{ stroom_version_from }}"
+        source_git_tag_or_hash: "{{ stroom_version_from }}"
         java_version:  "{{ java_version_from }}"
-        gradle_args: "build -x test -x integrationTest -x gwtCompile setupSampleData"
+        gradle_args: "setupSampleData -x test -x integrationTest -x gwtCompile"
         unpack_dir: "{{ migration_dir }}"
 
       # Stop the DB
@@ -174,16 +174,16 @@
         name: build_stroom_source
       vars:
         repo_name: "stroom"
-        release_version: "{{ stroom_version_to }}"
+        source_git_tag_or_hash: "{{ stroom_source_git_tag_or_hash_to }}"
         java_version:  "{{ java_version_to }}"
-        gradle_args: "build -x test -x gwtCompile migrate"
+        gradle_args: "migrate -x test -x gwtCompile"
         unpack_dir: "{{ migration_dir }}"
 
       # It is nice to see the output of the migration
     - name: Migration stdout
       debug:
-        msg: "{{ _build_info.stdout_lines }}"
+        msg: "{{ _build_info.stdout_lines | default('stdout_lines undefined') }}"
 
     - name: Migration stderr
       debug:
-        msg: "{{ _build_info.stderr_lines }}"
+        msg: "{{ _build_info.stderr_lines | default('stderr_lines undefined') }}"
