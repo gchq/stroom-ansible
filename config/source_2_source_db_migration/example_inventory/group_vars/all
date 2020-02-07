@@ -27,6 +27,6 @@ stroom_temp_dir: "/tmp/stroom"
 stroom_user: "stroomuser"
 
 
-local_config_dir: "../config/db_migration/example_inventory"
+local_config_dir: "../config/source_2_source_db_migration/example_inventory"
 
 # vim: set filetype=yaml shiftwidth=2 tabstop=2 expandtab:
