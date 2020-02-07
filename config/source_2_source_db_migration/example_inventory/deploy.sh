@@ -47,7 +47,7 @@ main() {
     ansible-playbook \
     -i "${inventory_file}" \
     "$@" \
-    ../../../stroom/test_db_migration.yml
+    ../../../stroom/test_source_2_source_db_migration.yml
 }
 
 main "$@"

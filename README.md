@@ -82,9 +82,9 @@ done on the SetupSampleData data/content.
 If the test is successful, the application can opened to verify the state of
 the content/data/application.
 
-### Dump DB Migration
+### Dump to Stack DB Migration
 
-`config/dump_db_migration`
+`config/dump_2_stack_db_migration`
 
 This configuration/playbook performs a test of a database migration from one
 version to another. The test is performed using a set of database backups from

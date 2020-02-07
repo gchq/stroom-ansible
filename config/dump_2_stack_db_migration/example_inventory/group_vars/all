@@ -21,11 +21,11 @@ migration_dir: "/home/{{stroom_user}}/migration-{{ stroom_version_from }}-{{ str
 
 stack_name: "stroom_core"
 
-local_config_dir: "../config/dump_db_migration/example_inventory"
+local_config_dir: "../config/dump_2_stack_db_migration/example_inventory"
 
 # The dir where the dump files are (could be local or remote)
 # If local, then it is relative to the playbook
-db_dump_files_dir: "../config/dump_db_migration/example_inventory/db_dumps"
+db_dump_files_dir: "../config/dump_2_stack_db_migration/example_inventory/db_dumps"
 
 # False if the dump files are on the ansible controller,
 # true if on the remote host
