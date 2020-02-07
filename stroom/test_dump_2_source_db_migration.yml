@@ -10,6 +10,23 @@
   import_playbook: ./setup_stroom_hosts.yml
   tags:
     - setup
+
+################### Install Java ###################
+
+- hosts:
+    - all
+  gather_facts: true # Needed for yum stuff
+  tasks:
+
+    - import_role:
+        name: setup/java
+      vars:
+        java_version:  "{{ java_version_to }}"
+
+    #- import_role:
+        #name: stack/open_ports
+
+
         
 - hosts:
     - all
@@ -17,28 +34,13 @@
   become: true
   become_user: "{{ stroom_user }}"
   vars:
+      # Normally we would deploy a stack on top of another but if we do that we
+      # can't go back as the config is different
     - stack_dir_from: "{{ migration_dir }}/stack-{{ stroom_version_from }}"
     - stack_dir_to: "{{ migration_dir }}/stack-{{ stroom_version_to }}"
   tasks:
 
     ################### TEAR DOWN ###################
-
-      # Remove the docker containers
-    - import_role:
-        name: stack/delete
-      vars:
-        stack_version: "{{ stroom_version_from }}"
-        stack_install_root_dir: "{{ stack_dir_from }}"
-      tags:
-        - teardown
-
-    - import_role:
-        name: stack/delete
-      vars:
-        stack_version: "{{ stroom_version_to }}"
-        stack_install_root_dir: "{{ stack_dir_to }}"
-      tags:
-        - teardown
 
       # Remove the from stack dir
     - name: Ensure '{{ stack_dir_from }}' is absent
@@ -56,6 +58,8 @@
       tags:
         - teardown
 
+      # Remove the whole migration dir only if we want to remove the compiled source
+      # as it takes so long to compile
     - name: Ensure '{{ migration_dir}}' is absent
       file:
         path: "{{ migration_dir }}"
@@ -65,6 +69,29 @@
         - clean_compiled
         - teardown
 
+      # Remove the stroom temp dir that contains the stream store
+    - name: Ensure '{{ stroom_temp_dir }}' is absent
+      file:
+        path: "{{ stroom_temp_dir }}"
+        state: absent
+      tags:
+        - teardown
+
+    - import_role:
+        name: stack/delete
+      vars:
+        stack_version: "{{ stroom_version_from }}"
+        stack_install_root_dir: "{{ stack_dir_from }}"
+      tags:
+        - teardown
+
+    - import_role:
+        name: stack/delete
+      vars:
+        stack_version: "{{ stroom_version_to }}"
+        stack_install_root_dir: "{{ stack_dir_to }}"
+      tags:
+        - teardown
 
     ################### SET UP & RUN FROM VERSION ###################
 
@@ -84,7 +111,7 @@
         stack_version: "{{ stroom_version_from }}"
         services_to_run: "stroom-all-dbs"
 
-      # Start up the active services, i.e. the DB
+      # Start up the DB
     - import_role:
         name: stack/ensure_state
       vars:
@@ -119,6 +146,7 @@
         stack_version: "{{ stroom_version_from }}"
         state: "stopped"
 
+
     ################### SET UP & RUN TO VERSION ###################
 
     - import_role:
@@ -127,38 +155,37 @@
         stack_version: "{{ stroom_version_to }}"
         stack_install_root_dir: "{{ stack_dir_to }}"
 
-      # The value here depends on what it was set to in the DB that produced the dump file
-    - name: Ensure the DB runs in case insensitve mode
-      ini_file:
-        create: false
-        path: "{{ stack_dir_to }}/{{ stack_name }}/volumes/stroom-all-dbs/conf/stroom-all-dbs.cnf"
-        section: mysqld
-        option: lower_case_table_names
-        value: "{{ mysql_lower_case_table_names | default(1) }}" # Mode 1 means tables are stored on the filesystem in lowercase but sql is case insensitive
-        backup: false
-      tags:
-        - configure_db
-
-      # Run the DB migratino as a foreground process, could take ages.
-      # This will start up the DB and stroom (in migrate mode) as required
+      # Change the new stack to be just the services
     - import_role:
-        name: stack/migrate
+        name: stack/set_active_services
       vars:
+        services_to_run: "nginx stroom-all-dbs stroom-auth-service stroom-ui"
         stack_install_root_dir: "{{ stack_dir_to }}"
         stack_version: "{{ stroom_version_to }}"
-      tags:
-        - migrate_stack
 
-      # If the migration fails, the logs can also be found in the logs dir
-      # of the stack
-
-      # Start up the stack so we can test the app
+      # Start up all the services in the new stack
     - import_role:
         name: stack/ensure_state
       vars:
         stack_install_root_dir: "{{ stack_dir_to }}"
         stack_version: "{{ stroom_version_to }}"
         state: "started"
-      tags:
-        - start_stack
 
+      # Download, build and run the db migration from stroom release
+    - import_role:
+        name: build_stroom_source
+      vars:
+        repo_name: "stroom"
+        source_git_tag_or_hash: "{{ stroom_source_git_tag_or_hash_to }}"
+        java_version:  "{{ java_version_to }}"
+        gradle_args: "migrate -x test -x gwtCompile"
+        unpack_dir: "{{ migration_dir }}"
+
+      # It is nice to see the output of the migration
+    - name: Migration stdout
+      debug:
+        msg: "{{ _build_info.stdout_lines | default('stdout_lines undefined') }}"
+
+    - name: Migration stderr
+      debug:
+        msg: "{{ _build_info.stderr_lines | default('stderr_lines undefined') }}"

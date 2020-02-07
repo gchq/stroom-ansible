@@ -11,7 +11,7 @@ Vagrant.configure("2") do |config|
   # be fine for now.
   servers=[
     {
-      :hostname => "stroom-db-migration-host",
+      :hostname => "stroom-source-2-source-db-migration-host",
       :ip => get_ip(),
       :group => "stroom_db_migration"
     },
