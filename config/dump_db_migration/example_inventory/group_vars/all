@@ -11,7 +11,7 @@ stroom_user: "stroomuser"
 
 # We are working from a DB import, but setting the from
 # version means we get the right DBs to import into.
-stroom_version_from: "v6.0.27-1"
+stroom_version_from: "v6.0.32-3"
 stroom_version_to: "v7.0-beta.18"
 
 # The path on a file server where the stack archive file can be found
@@ -34,17 +34,17 @@ is_db_dump_file_dir_remote: false
 # Define the locations of the dump files and the creds for the DBs
 db_dumps:
 
-  - filename: stroom_v6.0.27-1_20191227130215.sql.gz
+  - filename: stroom_v6.0.32_20200207144838.sql.gz
     db_name: stroom
     username: stroomuser
     password: stroompassword1
 
-  - filename: stats_v6.0.27-1_20191227130215.sql.gz
+  - filename: stats_v6.0.32_20200207144838.sql.gz
     db_name: stats
     username: statsuser
     password: stroompassword1
 
-  - filename: auth_v6.0.27-1_20191227130215.sql.gz
+  - filename: auth_v6.0.32_20200207144838.sql.gz
     db_name: auth
     username: authuser
     password: stroompassword1
