@@ -37,17 +37,17 @@ mysql_lower_case_table_names: 0
 # Define the locations of the dump files and the creds for the DBs
 db_dumps:
 
-  - filename: stroom_v6.0.32_20200207144838.sql.gz
+  - filename: stroom_v6.0.32-3_20200210112652.sql.gz
     db_name: stroom
     username: stroomuser
     password: stroompassword1
 
-  - filename: stats_v6.0.32_20200207144838.sql.gz
+  - filename: stats_v6.0.32-3_20200210112652.sql.gz
     db_name: stats
     username: statsuser
     password: stroompassword1
 
-  - filename: auth_v6.0.32_20200207144838.sql.gz
+  - filename: auth_v6.0.32-3_20200210112652.sql.gz
     db_name: auth
     username: authuser
     password: stroompassword1
