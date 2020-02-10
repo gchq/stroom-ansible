@@ -92,14 +92,14 @@
         stack_version: "{{ stroom_version_from }}"
         state: "started"
 
-      # TODO this causes problems when run with the dev dump file as it can't find strm_tp
+      # The value here depends on what it was set to in the DB that produced the dump file
     - name: Ensure the DB runs in case insensitve mode
       ini_file:
         create: false
         path: "{{ stack_dir_from }}/{{ stack_name }}/volumes/stroom-all-dbs/conf/stroom-all-dbs.cnf"
         section: mysqld
         option: lower_case_table_names
-        value: 1 # Mode 1 means tables are stored on the filesystem in lowercase but sql is case insensitive
+        value: "{{ mysql_lower_case_table_names | default(1) }}" # Mode 1 means tables are stored on the filesystem in lowercase but sql is case insensitive
         backup: false
       tags:
         - configure_db
@@ -127,14 +127,14 @@
         stack_version: "{{ stroom_version_to }}"
         stack_install_root_dir: "{{ stack_dir_to }}"
 
-      # TODO this causes problems when run with the dev dump file as it can't find strm_tp
+      # The value here depends on what it was set to in the DB that produced the dump file
     - name: Ensure the DB runs in case insensitve mode
       ini_file:
         create: false
         path: "{{ stack_dir_to }}/{{ stack_name }}/volumes/stroom-all-dbs/conf/stroom-all-dbs.cnf"
         section: mysqld
         option: lower_case_table_names
-        value: 1 # Mode 1 means tables are stored on the filesystem in lowercase but sql is case insensitive
+        value: "{{ mysql_lower_case_table_names | default(1) }}" # Mode 1 means tables are stored on the filesystem in lowercase but sql is case insensitive
         backup: false
       tags:
         - configure_db

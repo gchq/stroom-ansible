@@ -1,0 +1,97 @@
+---
+ansible_connection: ssh
+
+# The user that ansible will connect as, must have sudo rights to 'sudo su -'.
+# The user should have passwordless sudo and an ssh key pair that has already
+# been set up on the remote host(s). The ssh key to use can be set on the command line
+# using '--private-key=~/.ssh/my_private_key_id_rsa'
+ansible_user: vagrant
+
+# This is used for both the services stack and the git tag of the stroom source
+stroom_version_from: "v6.0.32"
+# This is used for the services stack and should be the most recent release to
+# the git hash below
+stroom_version_to: "v7.0-beta.18"
+
+# The git tag or commit hash to migrate to
+stroom_source_git_tag_or_hash_to: "0b67d6e"
+
+# The path on a file server where the stack archive file can be found
+stroom_stack_archive_url_base: "https://github.com/gchq/stroom-resources/releases/download/stroom-stacks-{{ stack_version }}"
+
+stroom_7_java_version: "12"
+java_version_to: "{{ stroom_7_java_version }}"
+
+migration_dir: "/home/{{stroom_user}}/migration-{{ stroom_version_from }}-{{ stroom_version_to }}"
+stack_name: "stroom_core_test"
+stroom_config_dir: "~/.stroom"
+stroom_temp_dir: "/tmp/stroom"
+stroom_user: "stroomuser"
+
+
+local_config_dir: "../config/dump_2_source_db_migration/example_inventory"
+
+# The dir where the dump files are (could be local or remote)
+# If local, then it is relative to the playbook
+db_dump_files_dir: "../config/dump_2_source_db_migration/example_inventory/db_dumps"
+
+# False if the dump files are on the ansible controller,
+# true if on the remote host
+is_db_dump_file_dir_remote: false
+
+# Default dump was taken from a DB with this set to 0
+mysql_lower_case_table_names: 0
+
+# Define the locations of the dump files and the creds for the DBs
+db_dumps:
+
+  - filename: stroom_v6.0.32_20200207144838.sql.gz
+    db_name: stroom
+    username: stroomuser
+    password: stroompassword1
+
+  - filename: stats_v6.0.32_20200207144838.sql.gz
+    db_name: stats
+    username: statsuser
+    password: stroompassword1
+
+  - filename: auth_v6.0.32_20200207144838.sql.gz
+    db_name: auth
+    username: authuser
+    password: stroompassword1
+
+# Key/value pairs to set in the stack env file.  These will replace existing
+# values in the env file or add a new line if the name doesn't already exist.
+stack_env_vars:
+
+  STROOM_CONTENT_PACK_IMPORT_ENABLED: "false"
+
+  # Uncomment this if you have a DNS server, else the containers can't resolve it
+  HOST_IP: "{{ hostvars['stroom-dump-2-source-db-migration-host']['public_ip_address'] 
+    | default(hostvars['stroom-dump-2-source-db-migration-host']['inventory_hostname'])}}"
+
+  # MYSQL_DOCKER_REPO: "mysql"
+  # STROOM_AUTH_SERVICE_DOCKER_REPO: "gchq/stroom-auth-service"
+  # STROOM_AUTH_UI_DOCKER_REPO: "gchq/stroom-auth-ui"
+  # STROOM_DOCKER_REPO: "gchq/stroom"
+  # STROOM_LOG_SENDER_DOCKER_REPO: "gchq/stroom-log-sender"
+  # STROOM_NGINX_DOCKER_REPO: "gchq/stroom-nginx"
+  # STROOM_PROXY_DOCKER_REPO: "gchq/stroom-proxy"
+  # STROOM_UI_DOCKER_REPO: "gchq/stroom-ui"
+
+# If you have no internet connection then you may want to set some of the following
+
+# The URL to download the docker-ce yum repo file from
+# docker_yum_repo_file_url: https://download.docker.com/linux/centos/docker-ce.repo
+
+# The baseurl value to use in the docker-ce yum repo file if you are not downloading
+# the repo file from docker_yum_repo_file_url
+# docker_yum_repo_base_url: https://download.docker.com/linux/centos/7/$basearch/stable
+
+# The URL to download the docker-compose binary from
+# docker_compose_url: "https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64"
+
+# epel_repo_url:
+# epel_repo_gpg_key_url:
+
+# vim: set filetype=yaml shiftwidth=2 tabstop=2 expandtab:

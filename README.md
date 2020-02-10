@@ -70,26 +70,42 @@ applications sending data to stroom.
 By adding more hosts it could be used to deploy a farm of independent remote
 proxies.
 
-### DB Migration
+### Dump to Source DB Migration
 
-`config/db_migration`
-
-This configuration/playbook performs a test of a database migration from one
-version to another. The test is performed using a build from the java source to
-enable the use of the _SetupSampleData_ test content.
-
-If the test is successful, the application can opened to verify the state of
-the content/data/application.
-
-### Dump DB Migration
-
-`config/db_migration`
+`config/dump_2_source_db_migration`
 
 This configuration/playbook performs a test of a database migration from one
 version to another. The test is performed using a set of database backups from
 the source version which will be imported into empty databases for migration to
-the destination version. This is intended to be used with a backup of a
-production system to test major migrations.
+the destination version.  The destination version is build from source using a
+git tag or commit hash.  The DB imports can either be taken from a production
+system or exported from a test version of stroom running in the IDE.
+
+If the test is successful, the application can be opened to verify the state of
+the content/data/application.
+
+### Source to Source DB Migration
+
+`config/source_2_source_db_migration`
+
+This configuration/playbook performs a test of a database migration from one
+version to another. The test is performed using a build from the java source to
+enable the use of the _SetupSampleData_ test content. No stream processing is
+done on the SetupSampleData data/content.
+
+If the test is successful, the application can be opened to verify the state of
+the content/data/application.
+
+### Dump to Stack DB Migration
+
+`config/dump_2_stack_db_migration`
+
+This configuration/playbook performs a test of a database migration from one
+version to another. The test is performed using a set of database backups from
+the source version which will be imported into empty databases for migration to
+the destination version. The destination version is a released stack version.
+This is intended to be used with a backup of a production system to test major
+migrations.
 
 ## How to Deploy a Configuration
 

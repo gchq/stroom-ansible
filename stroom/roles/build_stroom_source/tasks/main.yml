@@ -97,7 +97,7 @@
   # TODO the wrapper needs internet access to download the appropriate gradle version
   # -q to only output errors, any stdout and log4j that is part of running the app
   # plain console to stop all the dynamic output that doesn't sit well with ansible
-  command: "./gradlew -q --console=plain -Dorg.gradle.java.home={{ gradle_java_home_path }} --no-daemon clean"
+  shell: "JAVA_HOME={{ gradle_java_home_path }} ./gradlew -q --console=plain -Dorg.gradle.java.home={{ gradle_java_home_path }} --no-daemon clean"
   args:
     chdir: "{{ source_dir }}"
     # Stop it building if the build dir exists
@@ -112,7 +112,7 @@
   # TODO the wrapper needs internet access to download the appropriate gradle version
   # -q to only output errors, any stdout and log4j that is part of running the app
   # plain console to stop all the dynamic output that doesn't sit well with ansible
-  command: "./gradlew -q --console=plain -Dorg.gradle.java.home={{ gradle_java_home_path }} --no-daemon {{ gradle_args }}"
+  shell: "JAVA_HOME={{ gradle_java_home_path }} ./gradlew -q --console=plain -Dorg.gradle.java.home={{ gradle_java_home_path }} --no-daemon {{ gradle_args }}"
   args:
     chdir: "{{ source_dir }}"
     # Stop it building if the build dir exists
