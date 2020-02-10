@@ -13,7 +13,7 @@ stroom_version_from: "v6.0.32"
 stroom_version_to: "v7.0-beta.17"
 
 # The git tag or commit hash to migrate to
-stroom_source_git_tag_or_hash_to: "42ba0d6"
+stroom_source_git_tag_or_hash_to: "0b67d6e"
 
 stroom_6_java_version: "8"
 stroom_7_java_version: "12"
