@@ -1,0 +1,21 @@
+# This configuration file is referenced as an 'include' in /etc/mysql/my.cnf
+
+# This file is bind-mounted in to the container using the inode of the file.
+# If the file is changed/replaced in a way that results in a new inode then the
+# container will see the old version.
+
+[mysqld]
+
+#max_connections=300
+
+# Mode 0 means tables are stored on the filesystem in the case used in CREATE TABLE and sql is case sensitive
+# Mode 1 means tables are stored on the filesystem in lowercase but sql is case insensitive
+lower_case_table_names={{ mysql_lower_case_table_names | default(1) }}
+
+# Buffer pool sizes
+#   https://dev.mysql.com/doc/refman/5.6/en/innodb-parameters.html#sysvar_innodb_buffer_pool_size
+#   https://dev.mysql.com/doc/refman/5.6/en/innodb-parameters.html#sysvar_innodb_buffer_pool_instances
+#   If you have large numbers of rows to migrate you will need to set the size quite high to allow
+#   for all the row locks that need to be created during the migration.
+innodb_buffer_pool_size={{ innodb_buffer_pool_size | default(2147483648) }}
+innodb_buffer_pool_instances={{ innodb_buffer_pool_instances | default(8) }}
