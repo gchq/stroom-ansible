@@ -9,7 +9,7 @@
 - name: "Setting HOST_IP=\"{{ public_ip_address | default(inventory_hostname) }}\" in {{ stack_env_var_file }}"
   lineinfile:
     path: "{{ stack_env_var_file }}"
-    regexp: '^\s*#?\s*HOST_IP=.*'
-    line: "HOST_IP=\"{{ public_ip_address | default(inventory_hostname) }}\""
+    regexp: '^\s*#?\s*(export\s+)?HOST_IP=.*'
+    line: "export HOST_IP=\"{{ public_ip_address | default(inventory_hostname) }}\""
 
 
