@@ -44,6 +44,7 @@
         url: "{{ _stroom_stack_archive_url }}"
         dest: "{{ downloads_dir }}/"
         checksum: "sha256:{{ _stroom_stack_archive_url }}.sha256"
+        timeout: 120
       register: _downloaded_archive_info
 
     - name: Create temporary directory to unpack the archive into

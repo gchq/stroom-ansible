@@ -41,6 +41,7 @@
         url: "{{ stroom_proxy_url }}"
         dest: "{{ downloads_dir }}/{{ stroom_proxy_archive_filename }}"
         checksum: "sha256:{{ stroom_proxy_url }}.sha256"
+        timeout: 120
 
     - name: Unpack Stroom-proxy's distribution zip
       unarchive:

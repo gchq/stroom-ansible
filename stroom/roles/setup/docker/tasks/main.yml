@@ -7,6 +7,7 @@
   get_url:
     url: "{{ docker_yum_repo_file_url }}"
     dest: "{{ docker_yum_repo_file_path }}" 
+    timeout: 120
   when: use_docker_yum_repo_file_url == true
 
 - name: Fallback copy our local docker-ce yum repo templated file
@@ -58,4 +59,5 @@
   get_url:
     url: "{{ docker_compose_url }}"
     dest: /usr/bin/docker-compose
+    timeout: 120
     mode: +x

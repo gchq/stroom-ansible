@@ -34,6 +34,7 @@
         url: "{{ stroom_url }}"
         dest: "{{ downloads_dir }}/{{ stroom_archive_filename }}"
         checksum: "sha256:{{ stroom_url }}.sha256"
+        timeout: 120
 
     - name: Ensure install directory {{ stroom_home_dir }} exists
       file:

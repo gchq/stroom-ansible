@@ -60,6 +60,7 @@
         dest: "{{ downloads_dir }}/{{ java_archive_filename }}"
         #checksum: "sha256:{{ sha256sum }}"
         checksum: "sha256:{{ java_archive_sha256_value }}"
+        timeout: 120
 
     - name: Extract tar.gz
       become: true
