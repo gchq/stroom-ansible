@@ -7,6 +7,7 @@
   tags:
     - never # Task won't run unless one of the other tags is set
     - yum_update
+  register: yum_update_info
 
 # The next three tasks will ONLY run if you supply the allow_reboot tag
 - name: restart system to reboot to newest kernel
@@ -17,6 +18,8 @@
   tags:
     - never
     - allow_reboot
+  when: yum_update_info.changed
+  register: reboot_info
 
 - name: wait for 10 seconds
   pause:
@@ -24,6 +27,7 @@
   tags:
     - never
     - allow_reboot
+  when: reboot_info.changed
 
 - name: wait for the system to reboot
   wait_for_connection:
@@ -34,3 +38,4 @@
   tags:
     - never
     - allow_reboot
+  when: reboot_info.changed
