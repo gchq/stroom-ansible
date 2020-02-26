@@ -38,3 +38,18 @@
 
     - import_role:
         name: non_docker_proxy/deploy
+
+########### stroom_database HOSTS  ###########
+
+- name: "Initialise database"
+  hosts:
+    - stroom_database
+  gather_facts: true
+  tasks:
+
+    - import_role:
+        name: db_init/nodes
+      tags:
+        - deploy
+        - configure
+        - db_init

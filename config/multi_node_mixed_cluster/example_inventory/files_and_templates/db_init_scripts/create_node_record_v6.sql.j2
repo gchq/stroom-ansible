@@ -1,0 +1,11 @@
+-- Create a stroom node entry linked to the first rack we find 
+-- (as rack is pretty much depreacted)
+-- Only works on v6
+UPDATE ND SET 
+  VER = VER + 1,
+  UPD_USER = 'INTERNAL_PROCESSING_USER',
+  CLSTR_URL = 'http://{{ stroom_hostname }}:{{ stroom_app_port }}/stroom/clustercall.rpc',
+  UPD_MS = UNIX_TIMESTAMP() * 1000
+WHERE NAME = '{{ stroom_node_name }}';
+
+-- vim: set shiftwidth=2 tabstop=2 expandtab filetype=sql:

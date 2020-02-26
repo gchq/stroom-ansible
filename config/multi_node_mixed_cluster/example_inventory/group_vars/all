@@ -66,15 +66,15 @@ db_port: 3306
 stroom_db_root_password: "my-secret-pw"
 stroom_databases:
 
-  - name: stroom
+  stroom:
     user: stroomuser
     password: stroompassword1
 
-  - name: stats
+  stats:
     user: statsuser
     password: stroompassword1
 
-  - name: auth
+  auth:
     user: authuser
     password: stroompassword1
 

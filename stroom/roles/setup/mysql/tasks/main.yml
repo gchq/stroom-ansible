@@ -114,9 +114,9 @@
   mysql_db: 
     name: "{{ item.name }}" 
     state: present
-  loop: "{{ stroom_databases | flatten(levels=1) }}"
+  loop: "{{ stroom_databases | dict2items }}"
   loop_control:
-      label: "{{ item.name }}"
+    label: "{{ item.key }}"
 
 - name: Setup MySQL users
   mysql_user:
@@ -124,6 +124,6 @@
     password: "{{ item.password | default('stroompassword1') }}"
     host: "{{ item.host | default('%') }}"
     priv: "{{ item.privs | default(item.name + '.*:ALL') }}"
-  loop: "{{ stroom_databases | flatten(levels=1) }}"
+  loop: "{{ stroom_databases | dict2items }}"
   loop_control:
-    label: "{{ item.name }}, {{ item.user }}, {{ item.host | default('%') }}, {{ item.privs | default(item.name + '.*:ALL') }}"
+    label: "{{ item.key }}, {{ item.user }}, {{ item.host | default('%') }}, {{ item.privs | default(item.key + '.*:ALL') }}"
