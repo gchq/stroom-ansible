@@ -121,7 +121,7 @@
 - name: Setup MySQL users
   mysql_user:
     name: "{{ item.user }}"
-    password: "{{ item.password | default('stroompassword1') }}"
+    password: "{{ item.password | default('Str00mP@ssword1') }}"
     host: "{{ item.host | default('%') }}"
     priv: "{{ item.privs | default(item.name + '.*:ALL') }}"
   loop: "{{ stroom_databases | flatten(levels=1) }}"

@@ -42,23 +42,27 @@ is_db_dump_file_dir_remote: false
 # Default dump was taken from a DB with this set to 0
 mysql_lower_case_table_names: 0
 
+mysql_stroomuser_pw: "Str00mP@ssword1"
+mysql_statsuser_pw: "Str00mP@ssword1"
+mysql_authuser_pw: "Str00mP@ssword1"
+
 # Define the locations of the dump files and the creds for the DBs
 db_dumps:
 
   - filename: stroom_v6.0.32_20200207144838.sql.gz
     db_name: stroom
     username: stroomuser
-    password: stroompassword1
+    password: "{{ mysql_stroomuser_pw }}"
 
   - filename: stats_v6.0.32_20200207144838.sql.gz
     db_name: stats
     username: statsuser
-    password: stroompassword1
+    password: "{{ mysql_statsuser_pw }}"
 
   - filename: auth_v6.0.32_20200207144838.sql.gz
     db_name: auth
     username: authuser
-    password: stroompassword1
+    password: "{{ mysql_authuser_pw }}"
 
 # Key/value pairs to set in the stack env file.  These will replace existing
 # values in the env file or add a new line if the name doesn't already exist.
