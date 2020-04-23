@@ -11,7 +11,7 @@ ansible_user: centos
 stack_name: "stroom_proxy"
 
 # The version of the stack to deploy
-stack_version: "v6.0.27-1"
+stack_version: "v7.0-.beta.26-2"
 
 # The path on a file server where the stack archive file can be found
 stroom_stack_archive_url_base: "https://github.com/gchq/stroom-resources/releases/download/stroom-stacks-{{ stack_version }}"
