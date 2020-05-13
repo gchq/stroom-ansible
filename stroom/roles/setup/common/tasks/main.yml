@@ -30,7 +30,7 @@
   when: not epel_repofile_result.stat.exists
 
 # Install common command line tools
-- name: YUM install various command line tools
+- name: YUM install various command line tools (applicable to all distro versions)
   become: true
   yum:
     name: "{{ packages }}"
@@ -43,14 +43,38 @@
       - curl
       - git # Needed for migration testing, but useful to have
       - htop # Useful process monitoring
-      - httpie  # Used by some stroom scripts
       - iproute  # needed for the ip command used in our scripts
       - jq  # Used by some stroom scripts, handy for REST json munging
       - net-tools
-      - python  # Not sure we need it but just in case
-      - python3  # Not sure we need it but just in case
       - unzip
       - vim  # vi is not a mustard cutter
+
+# Install common command line tools
+- name: YUM install various command line tools (specific to distro versions)
+  become: true
+  yum:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+      - httpie  # Used by some stroom scripts
+      - python  # Not sure we need it but just in case
+      - python3  # Not sure we need it but just in case
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == '7'
+
+# Install common command line tools
+- name: YUM install various command line tools (specific to distro versions)
+  become: true
+  yum:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+      # httpie doesn't seem to be available on centos8
+      #- httpie  # Used by some stroom scripts
+      - python2  # Not sure we need it but just in case
+      - python36  # Not sure we need it but just in case
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == '8'
 
 - name: Ensure firewalld is running
   become: true
