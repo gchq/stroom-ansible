@@ -63,20 +63,24 @@ db_host: "{{ hostvars[groups['stroom_database'][0]]['public_ip_address']
 db_port: 3306
 
 # Database credentials
-stroom_db_root_password: "my-secret-pw"
+stroom_db_root_password: "Str00mP@ssword1_Poot"
+mysql_stroomuser_pw: "Str00mP@ssword1"
+mysql_statsuser_pw: "Str00mP@ssword1"
+mysql_authuser_pw: "Str00mP@ssword1"
+
 stroom_databases:
 
   - name: stroom
     user: stroomuser
-    password: stroompassword1
+    password: "{{ mysql_stroomuser_pw }}"
 
   - name: stats
     user: statsuser
-    password: stroompassword1
+    password: "{{ mysql_statsuser_pw }}"
 
   - name: auth
     user: authuser
-    password: stroompassword1
+    password: "{{ mysql_authuser_pw }}"
 
 # Key/value pairs to set in the stack env file.  These will replace existing
 # values in the env file or add a new line if the name doesn't already exist.
@@ -92,6 +96,7 @@ stack_env_vars:
   DB_HOST_IP: "{{ db_host }}"
   STROOM_AUTH_DB_HOST: "{{ db_host }}"
   STROOM_AUTH_DB_PORT: "{{ db_port }}"
+  STROOM_AUTH_DB_PASSWORD: "{{ mysql_authuser_pw }}"
 
   NGINX_ADVERTISED_HOST: "{{ nginx_advertised_host }}"
 
@@ -139,6 +144,12 @@ stroom_conf_values:
 
   - key: stroom.statistics.sql.jdbcDriverUrl
     value: jdbc:mysql://{{ db_host }}:{{ db_port }}/stats?useUnicode=yes&characterEncoding=UTF-8
+
+  - key: stroom.jdbcDriverPassword
+    value: "{{ mysql_stroomuser_pw }}"
+
+  - key: stroom.statistics.sql.jdbcDriverPassword
+    value: "{{ mysql_statsuser_pw }}"
 
     # This should be set to the value of "stroomServiceUser's" token in Tools => API Keys
     # TODO the value below should be the default but won't be until 6.0.28
