@@ -82,7 +82,8 @@
       vars:
         stack_install_root_dir: "{{ stack_dir_from }}"
         stack_version: "{{ stroom_version_from }}"
-        services_to_run: "stroom-all-dbs"
+        services_to_run: 
+          - stroom-all-dbs
 
       # Start up the active services, i.e. the DB
     - import_role:
@@ -107,7 +108,7 @@
         stack_version: "{{ stroom_version_from }}"
         state: "stopped"
 
-    ################### SET UP & RUN TO VERSION ###################
+    ################### DEPLY TO VERSION ###################
 
     - import_role:
         name: stack/deploy
@@ -115,18 +116,19 @@
         stack_version: "{{ stroom_version_to }}"
         stack_install_root_dir: "{{ stack_dir_to }}"
 
-      # Run the DB migratino as a foreground process, could take ages.
-      # This will start up the DB and stroom (in migrate mode) as required
+    ################### DO THE DB AND STROOM MIGRATION ###################
+
+      # Do the 6-7 migration
     - import_role:
-        name: stack/migrate
+        name: stack/migrate_6_to_7
       vars:
         stack_install_root_dir: "{{ stack_dir_to }}"
         stack_version: "{{ stroom_version_to }}"
-      tags:
-        - migrate_stack
 
-      # If the migration fails, the logs can also be found in the logs dir
-      # of the stack
+      ## If the migration fails, the logs can also be found in the logs dir
+      ## of the stack
+
+    ################### START TO VERSION ###################
 
       # Start up the stack so we can test the app
     - import_role:
