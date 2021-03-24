@@ -11,15 +11,17 @@ stroom_user: "stroomuser"
 
 # We are working from a DB import, but setting the from
 # version means we get the right DBs to import into.
-stroom_version_from: "v6.0.32-3"
-stroom_version_to: "v7.0-beta.19"
+stroom_version_from: "v6.1.28"
+stroom_version_to: "v7.0-beta.96"
 
 # The path on a file server where the stack archive file can be found
 stroom_stack_archive_url_base: "https://github.com/gchq/stroom-resources/releases/download/stroom-stacks-{{ stack_version }}"
 
 migration_dir: "/home/{{stroom_user}}/migration-{{ stroom_version_from }}-{{ stroom_version_to }}"
 
-stack_name: "stroom_core"
+# Need to use _test stack else health checks will fail due to missing api keys.
+# In _test stack it uses an internal unsecure pre-canned key
+stack_name: "stroom_core_test"
 
 local_config_dir: "../config/dump_2_stack_db_migration/example_inventory"
 
@@ -34,20 +36,23 @@ is_db_dump_file_dir_remote: false
 # Default dump was taken from a DB with this set to 0
 mysql_lower_case_table_names: 0
 
+db_root_username: root
+db_root_password: my-secret-pw
+
 # Define the locations of the dump files and the creds for the DBs
 db_dumps:
 
-  - filename: stroom_v6.0.32-3_20200210112652.sql.gz
+  - filename: stroom_v6.1.28_20210312143513.sql.gz
     db_name: stroom
     username: stroomuser
     password: stroompassword1
 
-  - filename: stats_v6.0.32-3_20200210112652.sql.gz
+  - filename: stats_v6.1.28_20210312143513.sql.gz
     db_name: stats
     username: statsuser
     password: stroompassword1
 
-  - filename: auth_v6.0.32-3_20200210112652.sql.gz
+  - filename: auth_v6.1.28_20210312143513.sql.gz
     db_name: auth
     username: authuser
     password: stroompassword1
