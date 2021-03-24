@@ -108,7 +108,7 @@
         stack_version: "{{ stroom_version_from }}"
         state: "stopped"
 
-    ################### SET UP & RUN TO VERSION ###################
+    ################### DEPLY TO VERSION ###################
 
     - import_role:
         name: stack/deploy
@@ -116,76 +116,7 @@
         stack_version: "{{ stroom_version_to }}"
         stack_install_root_dir: "{{ stack_dir_to }}"
 
-      ## We need to tell the stack that only the db is active so the health check shows green
-    #- import_role:
-        #name: stack/set_active_services
-      #vars:
-        #stack_install_root_dir: "{{ stack_dir_to }}"
-        #stack_version: "{{ stroom_version_to }}"
-        #services_to_run: 
-          #- stroom-all-dbs
-
-      ## Start up the DB as mysql 5.7
-    #- import_role:
-        #name: stack/ensure_state
-      #environment:
-        #MYSQL_TAG: 5.7.33
-      #vars:
-        #stack_install_root_dir: "{{ stack_dir_to }}"
-        #stack_version: "{{ stroom_version_to }}"
-        #state: "started"
-
-    #- name: "Wait for MySQL to be up"
-      #wait_for:
-        #port: 3307
-        #delay: 3
-
-      ## Run mysql_upgrade as 5.7
-      ## Have to tweak the path so the scripts can find the 'ip' binary
-    #- name: "Running mysql 5.6=>5.7 migration on '{{ stack_name }}' in {{ stack_dir }}."
-      #shell: >-
-        #docker exec stroom-all-dbs mysql_upgrade -u"{{ db_root_username }}" -p"{{ db_root_password }}" --force
-      #tags:
-        #- mysql_upgrade
-
-      ## Stop the db
-    #- import_role:
-        #name: stack/ensure_state
-      #vars:
-        #stack_install_root_dir: "{{ stack_dir_to }}"
-        #stack_version: "{{ stroom_version_to }}"
-        #state: "stopped"
-
-      ## Start the DB as mysql 8
-    #- import_role:
-        #name: stack/ensure_state
-      #vars:
-        #stack_install_root_dir: "{{ stack_dir_to }}"
-        #stack_version: "{{ stroom_version_to }}"
-        #state: "started"
-
-    #- name: "Wait for MySQL to be up"
-      #wait_for:
-        #port: 3307
-        #delay: 3
-
-      ## Reset to all services
-    #- import_role:
-        #name: stack/set_active_services
-      #vars:
-        #stack_install_root_dir: "{{ stack_dir_to }}"
-        #stack_version: "{{ stroom_version_to }}"
-        #services_to_run: []
-
-      ## Run the DB migration as a foreground process, could take ages.
-      ## This will start up the DB and stroom (in migrate mode) as required
-    #- import_role:
-        #name: stack/migrate_stroom
-      #vars:
-        #stack_install_root_dir: "{{ stack_dir_to }}"
-        #stack_version: "{{ stroom_version_to }}"
-      #tags:
-        #- migrate_stack
+    ################### DO THE DB AND STROOM MIGRATION ###################
 
       # Do the 6-7 migration
     - import_role:
@@ -196,6 +127,8 @@
 
       ## If the migration fails, the logs can also be found in the logs dir
       ## of the stack
+
+    ################### START TO VERSION ###################
 
       # Start up the stack so we can test the app
     - import_role:

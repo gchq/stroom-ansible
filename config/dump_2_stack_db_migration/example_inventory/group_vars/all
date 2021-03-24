@@ -12,7 +12,7 @@ stroom_user: "stroomuser"
 # We are working from a DB import, but setting the from
 # version means we get the right DBs to import into.
 stroom_version_from: "v6.1.28"
-stroom_version_to: "v7.0-beta.96"
+stroom_version_to: "v7.0-beta.96-2"
 
 # The path on a file server where the stack archive file can be found
 stroom_stack_archive_url_base: "https://github.com/gchq/stroom-resources/releases/download/stroom-stacks-{{ stack_version }}"
@@ -27,11 +27,16 @@ local_config_dir: "../config/dump_2_stack_db_migration/example_inventory"
 
 # The dir where the dump files are (could be local or remote)
 # If local, then it is relative to the playbook
-db_dump_files_dir: "../config/dump_2_stack_db_migration/example_inventory/db_dumps"
+db_dump_files_dir: "{{ local_config_dir }}/db_dumps"
 
 # False if the dump files are on the ansible controller,
 # true if on the remote host
 is_db_dump_file_dir_remote: false
+
+# TODO Ideally need to bundle these with the stack and distributions so they are
+# already available on the host
+# see https://github.com/gchq/stroom/issues/2139
+db_mig_scripts_dir: "{{ local_config_dir }}/sql_migration_scripts"
 
 # Default dump was taken from a DB with this set to 0
 mysql_lower_case_table_names: 0
@@ -39,23 +44,33 @@ mysql_lower_case_table_names: 0
 db_root_username: root
 db_root_password: my-secret-pw
 
+db_stroom: stroom
+db_auth: auth
+db_stats: stats
+db_stroom_user: stroomuser
+db_auth_user: authuser
+db_stats_user: statsuser
+db_stroom_password: stroompassword1
+db_auth_password: stroompassword1
+db_stats_password: stroompassword1
+
 # Define the locations of the dump files and the creds for the DBs
 db_dumps:
 
   - filename: stroom_v6.1.28_20210312143513.sql.gz
-    db_name: stroom
-    username: stroomuser
-    password: stroompassword1
+    db_name: "{{ db_stroom }}"
+    username: "{{ db_stroom_user }}"
+    password: "{{ db_stroom_password }}"
 
   - filename: stats_v6.1.28_20210312143513.sql.gz
-    db_name: stats
-    username: statsuser
-    password: stroompassword1
+    db_name: "{{ db_stats }}"
+    username: "{{ db_stats_user }}"
+    password: "{{ db_stats_password }}"
 
   - filename: auth_v6.1.28_20210312143513.sql.gz
-    db_name: auth
-    username: authuser
-    password: stroompassword1
+    db_name: "{{ db_auth }}"
+    username: "{{ db_auth_user }}"
+    password: "{{ db_auth_password }}"
 
 # Key/value pairs to set in the stack env file.  These will replace existing
 # values in the env file or add a new line if the name doesn't already exist.

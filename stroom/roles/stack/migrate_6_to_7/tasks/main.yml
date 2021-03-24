@@ -1,74 +1,149 @@
+---
 
+- name: 'Check mandatory variables are defined'
+  assert:
+    that:
+      - stack_dir is defined
+      - stack_dir_to is defined
+      - stroom_version_to is defined
+      - stack_name is defined
+      - db_root_username is defined
+      - db_root_password is defined
     # We need to tell the stack that only the db is active so the health check shows green
-  - import_role:
-      name: stack/set_active_services
-    vars:
-      stack_install_root_dir: "{{ stack_dir_to }}"
-      stack_version: "{{ stroom_version_to }}"
-      services_to_run: 
-        - stroom-all-dbs
 
-    # Start up the DB as mysql 5.7
-  - import_role:
-      name: stack/ensure_state
-    environment:
-      MYSQL_TAG: 5.7.33
-    vars:
-      stack_install_root_dir: "{{ stack_dir_to }}"
-      stack_version: "{{ stroom_version_to }}"
-      state: "started"
+- import_role:
+    name: stack/set_active_services
+  vars:
+    stack_install_root_dir: "{{ stack_dir_to }}"
+    stack_version: "{{ stroom_version_to }}"
+    services_to_run: 
+      - stroom-all-dbs
 
-  - name: "Wait for MySQL to be up"
-    wait_for:
-      port: 3307
-      delay: 3
+  # Start up the stroom6 DB as mysql 5.7 (can't jump from 5.6 to 8)
+- import_role:
+    name: stack/ensure_state
+  environment:
+    MYSQL_TAG: 5.7.33
+  vars:
+    stack_install_root_dir: "{{ stack_dir_to }}"
+    stack_version: "{{ stroom_version_to }}"
+    state: "started"
 
-    # Run mysql_upgrade as 5.7
-    # Have to tweak the path so the scripts can find the 'ip' binary
-  - name: "Running mysql 5.6=>5.7 migration on '{{ stack_name }}' in {{ stack_dir }}."
-    shell: >-
-      docker exec stroom-all-dbs mysql_upgrade -u"{{ db_root_username }}" -p"{{ db_root_password }}" --force
-    tags:
-      - mysql_upgrade
+  # Can't wait on a port as that is up before the DB is fully up
+  # TODO turn this into a role for reuse
+- name: "Wait for MySQL to be up"
+  shell: >-
+    echo "select 1" | docker exec -i stroom-all-dbs mysql -u"{{ db_root_username }}" -p"{{ db_root_password }}"
+  register: result
+  until: result.stderr.find("Can't connect to local MySQL server through socket") == -1
+  retries: 10
+  delay: 3
 
-    # Stop the db
-  - import_role:
-      name: stack/ensure_state
-    vars:
-      stack_install_root_dir: "{{ stack_dir_to }}"
-      stack_version: "{{ stroom_version_to }}"
-      state: "stopped"
+  # Run mysql_upgrade as 5.7 to bring DB up to 5.7
+  # Have to tweak the path so the scripts can find the 'ip' binary
+- name: "Running mysql 5.6=>5.7 migration on '{{ stack_name }}' in {{ stack_dir }}."
+  shell: >-
+    docker exec stroom-all-dbs mysql_upgrade -u"{{ db_root_username }}" -p"{{ db_root_password }}" --force
+  tags:
+    - mysql_upgrade
 
-    # Start the DB as mysql 8
-  - import_role:
-      name: stack/ensure_state
-    vars:
-      stack_install_root_dir: "{{ stack_dir_to }}"
-      stack_version: "{{ stroom_version_to }}"
-      state: "started"
+  # Stop the db
+- import_role:
+    name: stack/ensure_state
+  vars:
+    stack_install_root_dir: "{{ stack_dir_to }}"
+    stack_version: "{{ stroom_version_to }}"
+    state: "stopped"
 
-  - name: "Wait for MySQL to be up"
-    wait_for:
-      port: 3307
-      delay: 3
+  # Start the mysql 8 DB binary which will auto-upgrade the DB to mysql8
+- import_role:
+    name: stack/ensure_state
+  vars:
+    stack_install_root_dir: "{{ stack_dir_to }}"
+    stack_version: "{{ stroom_version_to }}"
+    state: "started"
 
-    # Reset to all services
-  - import_role:
-      name: stack/set_active_services
-    vars:
-      stack_install_root_dir: "{{ stack_dir_to }}"
-      stack_version: "{{ stroom_version_to }}"
-      services_to_run: []
+  # Can't wait on a port as that is up before the DB is fully up
+  # TODO turn this into a role for reuse
+- name: "Wait for MySQL to be up"
+  shell: >-
+    echo "select 1" | docker exec -i stroom-all-dbs mysql -u"{{ db_root_username }}" -p"{{ db_root_password }}"
+  register: result
+  until: result.stderr.find("Can't connect to local MySQL server through socket") == -1
+  retries: 10
+  delay: 3
 
-    # Run the DB migration as a foreground process, could take ages.
-    # This will start up the DB and stroom (in migrate mode) as required
-  - import_role:
-      name: stack/migrate_stroom
-    vars:
-      stack_install_root_dir: "{{ stack_dir_to }}"
-      stack_version: "{{ stroom_version_to }}"
-    tags:
-      - migrate_stack
+  # Copy mig sql scripts to host
+  # If this fails you need to add the scripts into the db_mig_scripts_dir
+  # E.g. 
+  # wget https://raw.githubusercontent.com/gchq/stroom/v7.0-beta.96/scripts/v7_db_pre_migration_checks.sql
+  # wget https://raw.githubusercontent.com/gchq/stroom/v7.0-beta.96/scripts/v7_drop_unused_databases.sql
+  # wget https://raw.githubusercontent.com/gchq/stroom/v7.0-beta.96/scripts/v7_auth_db_table_rename.sql
+  # See TODO in group_vars/all
+- name: "Copy extra SQL migration scripts to the remote host"
+  copy:
+    src: "{{ db_mig_scripts_dir }}/{{ item }}"
+    dest: "{{ stack_dir_to }}"
+  loop:
+    - v7_auth_db_table_rename.sql
+    - v7_drop_unused_databases.sql
+    - v7_db_pre_migration_checks.sql
 
-    # If the migration fails, the logs can also be found in the logs dir
-    # of the stack
+  # Rename the auth tables
+
+- name: "Running pre-migration checks script"
+  shell: >-
+    docker exec -i stroom-all-dbs mysql --table -u"{{ db_stroom_user }}" -p"{{ db_stroom_password }}" {{ db_stroom }} < v7_db_pre_migration_checks.sql
+  args:
+    chdir: "{{ stack_dir_to }}"
+    executable: "/bin/bash"
+  tags:
+    - additional_migration
+
+- name: "Running auth table rename script"
+  shell: >-
+    docker exec -i stroom-all-dbs mysql -u"{{ db_auth_user }}" -p"{{ db_auth_password }}" {{ db_auth }} < v7_auth_db_table_rename.sql
+  args:
+    chdir: "{{ stack_dir_to }}"
+    executable: "/bin/bash"
+  tags:
+    - additional_migration
+
+- name: "Export/import the renamed auth tables into stroom DB"
+  shell: >-
+    ./backup_databases.sh -m . auth && ./restore_database.sh -f -m stroom auth_*.sql.gz
+  args:
+    chdir: "{{ stack_dir_to }}/{{ stack_name }}/{{ stack_name }}-{{ stack_version }}"
+    executable: "/bin/bash"
+  tags:
+    - additional_migration
+
+- name: "Dropping the unused DBs"
+  shell: >-
+    docker exec -i stroom-all-dbs mysql --force -u"{{ db_root_username }}" -p"{{ db_root_password }}" < v7_drop_unused_databases.sql
+  args:
+    chdir: "{{ stack_dir_to }}"
+    executable: "/bin/bash"
+  tags:
+    - additional_migration
+
+  # Reset to all services
+- import_role:
+    name: stack/set_active_services
+  vars:
+    stack_install_root_dir: "{{ stack_dir_to }}"
+    stack_version: "{{ stroom_version_to }}"
+    services_to_run: []
+
+  # Run the stroom DB migration as a foreground process, could take ages.
+  # This will start up the DB and stroom (in migrate mode) as required
+- import_role:
+    name: stack/migrate_stroom
+  vars:
+    stack_install_root_dir: "{{ stack_dir_to }}"
+    stack_version: "{{ stroom_version_to }}"
+  tags:
+    - migrate_stack
+
+  # If the migration fails, the logs can also be found in the logs dir
+  # of the stack
