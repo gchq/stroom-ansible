@@ -1,4 +1,10 @@
 ---
+
+############################################################################################
+#  TODO: Needs updating to work the latest v7 and mysql 8, see dump_2_source_db_migration  #
+############################################################################################
+
+
 ansible_connection: ssh
 
 # The user that ansible will connect as, must have sudo rights to 'sudo su -'.
