@@ -1,0 +1,91 @@
+---
+
+# Use a set dir rather than a temporay one to save us having to download a big archive
+# again and again in testing.
+
+- name: Ensure downloads directory exists 
+  file:
+    path: "{{ downloads_dir }}"
+    state: directory
+
+- name: Ensure directory {{ stack_bin_dir }} exists
+  file:
+    path: "{{ stack_bin_dir }}"
+    owner: "{{ stroom_user }}"
+    mode: "u=rwX,g=,o="
+    state: directory
+
+- name: Ensure directory {{ stack_volumes_dir }} exists
+  file:
+    path: "{{ stack_volumes_dir }}"
+    owner: "{{ stroom_user }}"
+    mode: "u=rwX,g=,o="
+    state: directory
+
+  # Download the release archive onto the controller then copy it out to
+  # the remotes. This means the remotes don't need to be able to reach the
+  # download url. Also the controller needs it for updating config.
+- name: "Block of tasks to run once on the controller"
+  delegate_to: 127.0.0.1
+  connection: local
+  become: false
+  run_once: true
+  block:
+
+  - name: "Ensure downloads directory exists on the controller"
+    file:
+      path: "{{ downloads_dir }}"
+      state: directory
+
+    # Download and unpack the archive on the ansible controller.
+  - name: "Download stack release archive to the controller {{ _stroom_stack_archive_url }}"
+    get_url:
+      url: "{{ _stroom_stack_archive_url }}"
+      dest: "{{ downloads_dir }}/"
+      checksum: "sha256:{{ _stroom_stack_archive_url }}.sha256"
+    register: _downloaded_archive_info
+
+  # ---- END OF LOCAL BLOCK ----
+
+- name: "Copy stack release archive {{ _downloaded_archive_info.dest }} from controller to {{ downloads_dir }} on remote" 
+  copy:
+    src: "{{ _downloaded_archive_info.dest }}"
+    dest: "{{ downloads_dir }}/"
+    remote_src: false
+
+  # Unpack the archive but transform the locations of the 'bin' and volumes
+  # dirs to provide a more sensible structure, i.e
+  # ./stroom_proxy/stroom_proxy-v6.0.32
+  # ./stroom_proxy/volumes
+  # becomes
+  # ./stroom_proxy/v6.0.32/bin
+  # ./stroom_proxy/v6.0.32/volumes
+- name: "Unpack stack distribution tar into {{ stack_version_base_dir }}"
+  command: >-
+    tar
+    -xv
+    --transform 's,^\./{{ _stack_archive_relative_bin_dir }},./{{ _stack_archive_transformed_relative_bin_dir }},' 
+    --transform 's,^\./{{ _stack_archive_relative_volumes_dir }},./{{ _stack_archive_transformed_relative_volumes_dir }},' 
+    --show-transformed-names
+    -f {{ _downloaded_archive_info.dest }}
+    --directory {{ stack_install_root_dir }}/
+
+# Commented out till the never tag works correctly
+#- name: "Delete archive {{ _downloaded_archive_info.dest }}"
+  #file:
+    #path: "{{ _downloaded_archive_info.dest }}"
+    #state: absent
+  #tags:
+    #- never # TODO this doesn't seem to be working
+    #- delete_download
+
+  # TODO The files in the volumes dir need to be accessed by the user inside
+  # the container which may have a different uid to the host user, thus we
+  # need to open up read to g and o
+- name: Change permissions for {{ stack_volumes_dir }}
+  file:
+    path: "{{ stack_volumes_dir }}"
+    owner: "{{ stroom_user }}"
+    mode: "u=rwX,g=rX,o=rX"
+    recurse: true
+

@@ -3,6 +3,7 @@
 - name: 'Check mandatory variables are defined'
   assert:
     that:
+      - downloads_dir is defined
       - local_config_dir is defined
       - stack_env_vars is defined
       - stack_install_root_dir is defined
@@ -10,24 +11,17 @@
       - stack_version is defined
       - stroom_user is defined
 
-  # Set the HOST_IP variable to the inventory hostname
-- import_role:
-    name: stack/set_host_ip
-  tags:
-    - deploy
-    - configure
+- name: "Apply the local .env.j2 template {{ local_templated_env_file_path }} to {{ stack_env_var_file }}"
+  template:
+    src: "{{ local_templated_env_file_path }}"
+    dest: "{{ stack_env_var_file }}"
+    mode: "u=rw,g=r,o=r"
+    backup: true
+  when: local_templated_env_file_path is defined
 
-# NOTE: It is debatable if we configure the file like this or use a jinja template file
-# If we use templates then we need to maintain the template in this repo.
-# For real deployments where a clone/fork of this repo is used, jinja templates
-# would probably make more sense, and be a load faster.
-
-  # Set all the env vars in the stack env file
-- import_role:
-    name: stack/set_env_vars_values
-  tags:
-    - deploy
-    - configure
+- name: "Apply the templated env file supplied in the stack release"
+  when: local_templated_env_file_path is undefined
+  include_tasks: apply_supplied_env_file_template.yml
 
 - debug:
     msg:
@@ -40,6 +34,7 @@
 - name: "Check if {{ config_files_and_templates_dir }} exists on the Ansible controller"
   local_action: stat path={{ config_files_and_templates_dir }}
   become: false
+  run_once: true
   register: _config_files_and_templates_dir_info
   tags:
     - deploy
@@ -92,21 +87,5 @@
   tags:
     - deploy
     - configure
-
-
-#- name: Get absolute path 
-  #command: "realpath {{ local_config_dir }}"
-  #register: absolute_path
-
-## Services config
-
-#- name: Update the local env file from the inventory
-  #command: "python3 ./scripts/update_env_file.py {{ absolute_path.stdout }}/{{ stack_name }}"
-
-#- name: Update the local upstream files from the inventory
-  #command: "python3 ./scripts/update_upstream_files.py {{ absolute_path.stdout }}/{{ stack_name }}"
-  
-#- name: Update the local server.conf file from the inventory
-  #command: "python3 ./scripts/update_server_conf.py {{ absolute_path.stdout }}/{{ stack_name }}"
 
 

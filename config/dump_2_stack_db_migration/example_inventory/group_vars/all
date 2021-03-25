@@ -74,22 +74,25 @@ db_dumps:
 
 # Key/value pairs to set in the stack env file.  These will replace existing
 # values in the env file or add a new line if the name doesn't already exist.
-stack_env_vars:
 
-  STROOM_CONTENT_PACK_IMPORT_ENABLED: "false"
+
+# All stack_env_ variables are used for substitution in the .env.j2 file that
+# comes bundled with the stack
 
   # Uncomment this if you have a DNS server, else the containers can't resolve it
-  HOST_IP: "{{ hostvars['stroom-dump-2-stack-db-migration-host']['public_ip_address'] 
+stack_env_host_ip: "{{ hostvars['stroom-dump-2-stack-db-migration-host']['public_ip_address'] 
     | default(hostvars['stroom-dump-2-stack-db-migration-host']['inventory_hostname'])}}"
 
-  # MYSQL_DOCKER_REPO: "mysql"
-  # STROOM_AUTH_SERVICE_DOCKER_REPO: "gchq/stroom-auth-service"
-  # STROOM_AUTH_UI_DOCKER_REPO: "gchq/stroom-auth-ui"
-  # STROOM_DOCKER_REPO: "gchq/stroom"
-  # STROOM_LOG_SENDER_DOCKER_REPO: "gchq/stroom-log-sender"
-  # STROOM_NGINX_DOCKER_REPO: "gchq/stroom-nginx"
-  # STROOM_PROXY_DOCKER_REPO: "gchq/stroom-proxy"
-  # STROOM_UI_DOCKER_REPO: "gchq/stroom-ui"
+stack_env_stroom_content_pack_import_enabled: "false"
+
+# MYSQL_DOCKER_REPO: "mysql"
+# STROOM_AUTH_SERVICE_DOCKER_REPO: "gchq/stroom-auth-service"
+# STROOM_AUTH_UI_DOCKER_REPO: "gchq/stroom-auth-ui"
+# STROOM_DOCKER_REPO: "gchq/stroom"
+# STROOM_LOG_SENDER_DOCKER_REPO: "gchq/stroom-log-sender"
+# STROOM_NGINX_DOCKER_REPO: "gchq/stroom-nginx"
+# STROOM_PROXY_DOCKER_REPO: "gchq/stroom-proxy"
+# STROOM_UI_DOCKER_REPO: "gchq/stroom-ui"
 
 # If you have no internet connection then you may want to set some of the following
 

@@ -5,7 +5,7 @@ ansible_connection: ssh
 # The user should have passwordless sudo and an ssh key pair that has already
 # been set up on the remote host(s). The ssh key to use can be set on the command line
 # using '--private-key=~/.ssh/my_private_key_id_rsa'
-ansible_user: vagrant
+ansible_user: centos
 
 # The name of the stack to deploy
 stack_name: "stroom_core_test"
@@ -34,41 +34,43 @@ remove_development_certificates: false
 # If you have DNS in place then either hard code it here or get it from the inventory file
 # in a similar way to this. If you have no DNS then use an IP that is resolvable from
 # outside the host and from inside the containers.
-nginx_advertised_host: "{{ hostvars[groups['stroom_core_stack'][0]]['public_ip_address'] }}"
+# public_ip_address can be added to the inventory to allow this to work with vagrant locally when there is no DNS
+nginx_advertised_host: "{{ hostvars[groups['stroom_core_stack'][0]]['public_ip_address'] | default(inventory_hostname) }}"
 
 # Key/value pairs to set in the stack env file.  These will replace existing
 # values in the env file or add a new line if the name doesn't already exist.
 # It is debatable if we should hold a jinja2 template for this file or use this
 # apporach
-stack_env_vars:
 
-  HOST_IP: "{{ nginx_advertised_host }}"
+stack_env_host_ip: "{{ nginx_advertised_host }}"
+stack_env_db_host_ip: "{{ nginx_advertised_host }}"
+stack_env_nginx_advertised_host: "{{ nginx_advertised_host }}"
+stack_env_docker_host_hostname: "{{ nginx_advertised_host }}"
+stack_env_docker_host_ip: "{{ nginx_advertised_host }}"
 
-  NGINX_ADVERTISED_HOST: "{{ nginx_advertised_host }}"
+#stack_env_nginx_ssl_certificate_key: "example.server.key"
+#stack_env_nginx_ssl_certificate: "example.server.cert"
+#stack_env_nginx_ssl_ca_certificate: "example.ca.cert"
 
-  #NGINX_SSL_CERTIFICATE_KEY: "example.server.key"
-  #NGINX_SSL_CERTIFICATE: "example.server.cert"
-  #NGINX_SSL_CA_CERTIFICATE: "example.ca.cert"
+#stack_env_stroom_nginx_docker_repo: "gchq/stroom-nginx"
+#stack_env_stroom_proxy_docker_repo: "gchq/stroom-proxy"
 
-  #STROOM_NGINX_DOCKER_REPO: "gchq/stroom-nginx"
-  #STROOM_PROXY_DOCKER_REPO: "gchq/stroom-proxy"
+#stack_env_stroom_proxy_remote_client_keystore_password: "a new password"
+#stack_env_stroom_proxy_remote_client_keystore_path: "/stroom-proxy/certs/example.client.jks"
 
-  #STROOM_PROXY_REMOTE_CLIENT_KEYSTORE_PASSWORD: "a new password"
-  #STROOM_PROXY_REMOTE_CLIENT_KEYSTORE_PATH: "/stroom-proxy/certs/example.client.jks"
+#stack_env_stroom_proxy_remote_client_truststore_password: "a new password"
+#stack_env_stroom_proxy_remote_client_truststore_path: "/stroom-proxy/certs/example.ca.jks"
 
-  #STROOM_PROXY_REMOTE_CLIENT_TRUSTSTORE_PASSWORD: "a new password"
-  #STROOM_PROXY_REMOTE_CLIENT_TRUSTSTORE_PATH: "/stroom-proxy/certs/example.ca.jks"
+#stack_env_stroom_proxy_remote_feed_status_api_key: "eyJhbG......ciOwd7Q"
+#stack_env_stroom_proxy_remote_feed_status_url: "https://downstream-stroom-or-proxy.some.domain/api/proxy/feedStatus/v1"
 
-  #STROOM_PROXY_REMOTE_FEED_STATUS_API_KEY: "eyJhbG......ciOwd7Q"
-  #STROOM_PROXY_REMOTE_FEED_STATUS_URL: "https://downstream-stroom-or-proxy.some.domain/api/proxy/feedStatus/v1"
-
-  #STROOM_PROXY_REMOTE_FORWARD_URL: "https://downstream-stroom-or-proxy.some.domain/stroom/datafeed"
+#stack_env_stroom_proxy_remote_forward_url: "https://downstream-stroom-or-proxy.some.domain/stroom/datafeed"
 
   ## Use same (key|trust)store for client and forwarding
-  #STROOM_PROXY_REMOTE_FORWARDING_KEYSTORE_PASSWORD: "a new password"
-  #STROOM_PROXY_REMOTE_FORWARDING_KEYSTORE_PATH: "/stroom-proxy/certs/example.client.jks"
+#stack_env_stroom_proxy_remote_forwarding_keystore_password: "a new password"
+#stack_env_stroom_proxy_remote_forwarding_keystore_path: "/stroom-proxy/certs/example.client.jks"
 
-  #STROOM_PROXY_REMOTE_FORWARDING_TRUSTSTORE_PASSWORD: "a new password"
-  #STROOM_PROXY_REMOTE_FORWARDING_TRUSTSTORE_PATH: "/stroom-proxy/certs/example.ca.jks"
+#stack_env_stroom_proxy_remote_forwarding_truststore_password: "a new password"
+#stack_env_stroom_proxy_remote_forwarding_truststore_path: "/stroom-proxy/certs/example.ca.jks"
 
 # vim: set filetype=yaml shiftwidth=2 tabstop=2 expandtab:
