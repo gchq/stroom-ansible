@@ -11,7 +11,7 @@ ansible_user: centos
 stack_name: "stroom_core_test"
 
 # The version of the stack to deploy
-stack_version: "v6.0.32-3"
+stack_version: "v7.0-beta.96-2"
 
 # The path on a file server where the stack archive file can be found
 stroom_stack_archive_url_base: "https://github.com/gchq/stroom-resources/releases/download/stroom-stacks-{{ stack_version }}"
@@ -30,8 +30,11 @@ stack_install_root_dir: "/home/{{ stroom_user }}"
 # Set to true to delete all the self signed development certificates
 remove_development_certificates: false
 
-# The hostname of the nginx API gateway
-#nginx_advertised_host: "{{ hostvars[groups['stroom_remote_proxy_stack'][0]]['inventory_hostname'] }}"
+# The public hostname of the nginx API gateway
+# If you have DNS in place then either hard code it here or get it from the inventory file
+# in a similar way to this. If you have no DNS then use an IP that is resolvable from
+# outside the host and from inside the containers.
+nginx_advertised_host: "{{ hostvars[groups['stroom_core_stack'][0]]['public_ip_address'] }}"
 
 # Key/value pairs to set in the stack env file.  These will replace existing
 # values in the env file or add a new line if the name doesn't already exist.

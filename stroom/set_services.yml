@@ -8,7 +8,11 @@
     - ../global_variables.yml
     - ../config/user_settings.yml
   vars:
-    services_to_run: nginx stroom-auth-service stroom-auth-ui stroom-log-sender
+    services_to_run: 
+      - nginx 
+      - stroom-auth-service 
+      - stroom-auth-ui 
+      - stroom-log-sender
   roles:
     - roles/stack/set_active_services
 
@@ -20,7 +24,10 @@
     - ../global_variables.yml
     - ../config/user_settings.yml
   vars:
-    services_to_run: stroom stroom-proxy-local stroom-log-sender
+    services_to_run: 
+      - stroom
+      - stroom-proxy-local
+      - stroom-log-sender
   roles:
     - roles/stack/set_active_services
 
@@ -32,7 +39,8 @@
     - ../global_variables.yml
     - ../config/user_settings.yml
   vars:
-    services_to_run: stroom-all-dbs
+    services_to_run: 
+      - stroom-all-dbs
   roles:
     - roles/stack/set_active_services
 

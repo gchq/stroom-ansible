@@ -11,7 +11,7 @@ ansible_user: centos
 stack_name: "stroom_proxy"
 
 # The version of the stack to deploy
-stack_version: "v6.0.32-3"
+stack_version: "v7.0-.beta.26-2"
 
 # The local directory where the stack configuration is kept. This configuration
 # will be pushed out to the proxy hosts. This directory should be under source

@@ -1,0 +1,2 @@
+# Ignore sql scripts as they should be obtained from the appropriate release
+*.sql

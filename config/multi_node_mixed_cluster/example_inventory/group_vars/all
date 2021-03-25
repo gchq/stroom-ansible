@@ -13,12 +13,12 @@ environment_name: "Test Stroom"
 # The name of the stack to deploy
 stack_name: "stroom_services"
 
-stroom_version: "v6.0.27"
+stroom_version: "v7.0-.beta.26"
 
 stroom_proxy_version: "{{ stroom_version }}"
 
 # The version of the stack to deploy
-stack_version: "{{ stroom_version }}-1"
+stack_version: "{{ stroom_version }}-2"
 
 # The path on a file server where the stack archive file can be found
 stroom_stack_archive_url_base: "https://github.com/gchq/stroom-resources/releases/download/stroom-stacks-{{ stack_version }}"

@@ -111,7 +111,11 @@
     - import_role:
         name: stack/set_active_services
       vars:
-        services_to_run: "nginx stroom-all-dbs stroom-auth-service stroom-auth-ui"
+        services_to_run: 
+          - nginx 
+          - stroom-all-dbs 
+          - stroom-auth-service 
+          - stroom-auth-ui
         stack_install_root_dir: "{{ stack_dir_from }}"
         stack_version: "{{ stroom_version_from }}"
 
@@ -157,7 +161,11 @@
     - import_role:
         name: stack/set_active_services
       vars:
-        services_to_run: "nginx stroom-all-dbs stroom-auth-service stroom-ui"
+        services_to_run: 
+          - nginx 
+          - stroom-all-dbs 
+          - stroom-auth-service 
+          - stroom-ui
         stack_install_root_dir: "{{ stack_dir_to }}"
         stack_version: "{{ stroom_version_to }}"
 

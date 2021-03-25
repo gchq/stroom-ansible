@@ -9,6 +9,7 @@
   get_url: 
     url: "https://dev.mysql.com/get/{{ mysql_repo_rpm_file }}"
     dest: "/tmp/{{ mysql_repo_rpm_file }}"
+    timeout: 120
 
 - name: Install mysql repo package {{ mysql_repo_rpm_file }}
   become: true
