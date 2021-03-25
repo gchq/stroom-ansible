@@ -37,7 +37,7 @@ remove_development_certificates: false
 # comes bundled with the stack
 
 # Uncomment this if you have a DNS server, else the containers can't resolve it
-stack_env_host_ip: "{{ inventory_hostname }}"
+stack_env_host_ip: "{{ hostvars[groups['stroom_remote_proxy_stack'][0]]['public_ip_address'] | default(inventory_hostname) }}"
 
 # The key/cert/ca files used by nginx
 # Must exist in files_and_templates/volumes/nginx/certs

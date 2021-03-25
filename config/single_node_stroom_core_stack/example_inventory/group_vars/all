@@ -34,16 +34,19 @@ remove_development_certificates: false
 # If you have DNS in place then either hard code it here or get it from the inventory file
 # in a similar way to this. If you have no DNS then use an IP that is resolvable from
 # outside the host and from inside the containers.
-nginx_advertised_host: "{{ hostvars[groups['stroom_core_stack'][0]]['public_ip_address'] }}"
+# public_ip_address can be added to the inventory to allow this to work with vagrant locally when there is no DNS
+nginx_advertised_host: "{{ hostvars[groups['stroom_core_stack'][0]]['public_ip_address'] | default(inventory_hostname) }}"
 
 # Key/value pairs to set in the stack env file.  These will replace existing
 # values in the env file or add a new line if the name doesn't already exist.
 # It is debatable if we should hold a jinja2 template for this file or use this
 # apporach
 
-#stack_env_host_ip: "{{ nginx_advertised_host }}"
-
-#stack_env_nginx_advertised_host: "{{ nginx_advertised_host }}"
+stack_env_host_ip: "{{ nginx_advertised_host }}"
+stack_env_db_host_ip: "{{ nginx_advertised_host }}"
+stack_env_nginx_advertised_host: "{{ nginx_advertised_host }}"
+stack_env_docker_host_hostname: "{{ nginx_advertised_host }}"
+stack_env_docker_host_ip: "{{ nginx_advertised_host }}"
 
 #stack_env_nginx_ssl_certificate_key: "example.server.key"
 #stack_env_nginx_ssl_certificate: "example.server.cert"

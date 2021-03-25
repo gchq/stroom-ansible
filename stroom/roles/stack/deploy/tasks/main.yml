@@ -10,7 +10,7 @@
 
 - debug:
     msg:
-      - "Deploying/configuring stroom-proxy in {{ stack_install_root_dir }} as user {{ stroom_user }}"
+      - "Deploying/configuring stack in {{ stack_install_root_dir }} as user {{ stroom_user }}"
   tags:
     - deploy
     - configure
@@ -20,7 +20,7 @@
   become_user: "{{ stroom_user }}"
   block:
 
-########### DEPLOY VANILLA REMOTE PROXY STACK  ###########
+########### DEPLOY VANILLA STACK  ###########
 
     - import_role:
         name: stack/download
