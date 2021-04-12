@@ -11,8 +11,8 @@ stroom_user: "stroomuser"
 
 # We are working from a DB import, but setting the from
 # version means we get the right DBs to import into.
-stroom_version_from: "v6.1.28"
-stroom_version_to: "v7.0-beta.96-2"
+stroom_version_from: "v6.1.32"
+stroom_version_to: "v7.0-beta.102"
 
 # The path on a file server where the stack archive file can be found
 stroom_stack_archive_url_base: "https://github.com/gchq/stroom-resources/releases/download/stroom-stacks-{{ stack_version }}"
@@ -57,17 +57,17 @@ db_stats_password: stroompassword1
 # Define the locations of the dump files and the creds for the DBs
 db_dumps:
 
-  - filename: stroom_v6.1.28_20210312143513.sql.gz
+  - filename: stroom_v6.1.32_20210412155906.sql.gz
     db_name: "{{ db_stroom }}"
     username: "{{ db_stroom_user }}"
     password: "{{ db_stroom_password }}"
 
-  - filename: stats_v6.1.28_20210312143513.sql.gz
+  - filename: stats_v6.1.32_20210412155906.sql.gz
     db_name: "{{ db_stats }}"
     username: "{{ db_stats_user }}"
     password: "{{ db_stats_password }}"
 
-  - filename: auth_v6.1.28_20210312143513.sql.gz
+  - filename: auth_v6.1.32_20210412155906.sql.gz
     db_name: "{{ db_auth }}"
     username: "{{ db_auth_user }}"
     password: "{{ db_auth_password }}"
