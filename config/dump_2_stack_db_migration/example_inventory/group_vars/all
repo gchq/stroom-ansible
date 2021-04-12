@@ -82,6 +82,11 @@ stack_env_vars:
   HOST_IP: "{{ hostvars['stroom-dump-2-stack-db-migration-host']['public_ip_address'] 
     | default(hostvars['stroom-dump-2-stack-db-migration-host']['inventory_hostname'])}}"
 
+  # Ensure the db passwords for the stack match those defined above
+  STROOM_AUTH_DB_PASSWORD:  "{{ db_auth_password }}"
+  STROOM_DB_PASSWORD:  "{{ db_stroom_password }}"
+  STROOM_STATS_DB_PASSWORD:  "{{ db_stats_password }}"
+
   # MYSQL_DOCKER_REPO: "mysql"
   # STROOM_AUTH_SERVICE_DOCKER_REPO: "gchq/stroom-auth-service"
   # STROOM_AUTH_UI_DOCKER_REPO: "gchq/stroom-auth-ui"
