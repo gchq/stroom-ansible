@@ -111,7 +111,7 @@
 
 - name: "Export/import the renamed auth tables into stroom DB"
   shell: >-
-    ./backup_databases.sh -m . auth && ./restore_database.sh -f -m stroom auth_*.sql.gz
+    ./backup_databases.sh -m . {{ db_auth }} && ./restore_database.sh -f -m {{ db_stroom }} {{ db_auth }}_*.sql.gz
   args:
     chdir: "{{ stack_dir_to }}/{{ stack_name }}/{{ stack_name }}-{{ stack_version }}"
     executable: "/bin/bash"

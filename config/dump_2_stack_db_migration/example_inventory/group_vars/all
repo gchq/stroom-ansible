@@ -83,10 +83,13 @@ stack_env_vars:
     | default(hostvars['stroom-dump-2-stack-db-migration-host']['inventory_hostname'])}}"
 
   # Ensure the db creds for the stack match those defined above
+  STROOM_DB_NAME:  "{{ db_stroom }}"
   STROOM_DB_PASSWORD:  "{{ db_stroom_password }}"
   STROOM_DB_USERNAME:  "{{ db_stroom_user }}"
+  STROOM_STATS_DB_NAME:  "{{ db_stats }}"
   STROOM_STATS_DB_PASSWORD:  "{{ db_stats_password }}"
   STROOM_STATS_DB_USERNAME:  "{{ db_stats_user }}"
+  STROOM_AUTH_DB_NAME:  "{{ db_auth }}"
   STROOM_AUTH_DB_PASSWORD:  "{{ db_auth_password }}"
   STROOM_AUTH_DB_USERNAME:  "{{ db_auth_user }}"
 
