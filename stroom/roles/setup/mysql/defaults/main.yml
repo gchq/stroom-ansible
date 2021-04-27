@@ -8,19 +8,19 @@ stroom_db_root_password: "my-secret-pw"
 
 stroom_databases:
 
-  - name: stroom
+  stroom:
     user: stroomuser
     password: stroompassword1
     privs: "stroom.*:ALL"
     host: "%"
 
-  - name: stats
+  stats:
     user: statsuser
     password: stroompassword1
     privs: "stats.*:ALL"
     host: "%"
 
-  - name: auth
+  auth:
     user: authuser
     password: stroompassword1
     privs: "auth.*:ALL"

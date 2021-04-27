@@ -110,20 +110,28 @@
     name: test 
     state: absent
 
+- name: Debug
+  debug: 
+    var: "{{ item }}" 
+    verbosity: 2
+  loop: "{{ stroom_databases | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+
 - name: Create mysql databases
   mysql_db: 
-    name: "{{ item.name }}" 
+    name: "{{ item.key }}" 
     state: present
-  loop: "{{ stroom_databases | flatten(levels=1) }}"
+  loop: "{{ stroom_databases | dict2items }}"
   loop_control:
-      label: "{{ item.name }}"
+    label: "{{ item.key }}"
 
 - name: Setup MySQL users
   mysql_user:
-    name: "{{ item.user }}"
-    password: "{{ item.password | default('stroompassword1') }}"
-    host: "{{ item.host | default('%') }}"
-    priv: "{{ item.privs | default(item.name + '.*:ALL') }}"
-  loop: "{{ stroom_databases | flatten(levels=1) }}"
+    name: "{{ item.value.user }}"
+    password: "{{ item.value.password | default('stroompassword1') }}"
+    host: "{{ item.value.host | default('%') }}"
+    priv: "{{ item.value.privs | default(item.key + '.*:ALL') }}"
+  loop: "{{ stroom_databases | dict2items }}"
   loop_control:
-    label: "{{ item.name }}, {{ item.user }}, {{ item.host | default('%') }}, {{ item.privs | default(item.name + '.*:ALL') }}"
+    label: "{{ item.key }}, {{ item.value.user }}, {{ item.value.host | default('%') }}, {{ item.value.privs | default(item.key + '.*:ALL') }}"

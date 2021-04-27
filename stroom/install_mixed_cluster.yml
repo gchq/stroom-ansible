@@ -38,3 +38,32 @@
 
     - import_role:
         name: non_docker_proxy/deploy
+
+########### One of stroom_and_proxy HOSTS  ###########
+
+  # TODO start up services stack then start up one stroom node to build the DB
+  # In v7 we could just run the migrate.sh script.
+
+#- hosts:
+    #- stroom_and_proxy[0]
+  #become: true
+  #become_user: "{{ stroom_user }}"
+  #tasks:
+
+    #- import_role:
+        #name: 
+
+########### stroom_database HOSTS  ###########
+
+- name: "Initialise database"
+  hosts:
+    - stroom_database
+  gather_facts: true
+  tasks:
+
+    - import_role:
+        name: db_init/nodes
+      tags:
+        - deploy
+        - configure
+        - db_init

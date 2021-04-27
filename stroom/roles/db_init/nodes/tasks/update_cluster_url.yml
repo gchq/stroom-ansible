@@ -1,0 +1,53 @@
+---
+
+# This assumes the stroom node name is the same as the ansible host name
+
+- debug:
+    msg: 
+    - "Node name: {{ hostvars[item]['inventory_hostname_short'] }}"
+    - "User: {{ stroom_databases[stroom_database_name]['user'] }}"
+
+- name: "Checking if node {{ item }} has a cluster URL set in the database"
+  shell: 
+    cmd: >
+      echo "select count(*) from ND where NAME='{{ hostvars[item]['inventory_hostname_short'] }}' and CLSTR_URL is not null;"
+      | mysql 
+      -s 
+      -u {{ db_username }} 
+      -p'{{ db_password }}'
+      {{ stroom_database_name }}
+  changed_when: false
+  register: query_info
+
+- name: "Set cluster call url for node {{ item }}"
+  when: query_info.stdout == '0'
+  block:
+
+  - name: "Create temp file"
+    tempfile:
+      state: file
+      prefix: stroom_db_init_create_node_
+      suffix: .sql
+    register: temp_sql_file_info
+
+    # TODO need a conditional alternative for stroom v7
+  - name: "Copy template onto remote host, into tempfile"
+    template:
+      src: "{{ db_init_files_and_templates_dir }}/create_node_record_v6.sql.j2"
+      dest: temp_sql_file_info.path
+    vars:
+      stroom_hostname: "{{ hostvars[item]['inventory_hostname'] }}"
+      stroom_node_name: "{{ hostvars[item]['inventory_hostname_short'] }}"
+
+  - name: "Execute temp sql file {{ temp_sql_file_info }}"
+    mysql_db:
+      state: import
+      name: "{{ stroom_database_name }}"
+      login_user: "{{ db_username }}"
+      login_password: "{{ db_password }}"
+      target: temp_sql_file_info.path
+
+  - name: "Delete temp sql file {{ temp_sql_file_info.path }}"
+    file:
+      path: temp_sql_file_info.path
+      state: absent

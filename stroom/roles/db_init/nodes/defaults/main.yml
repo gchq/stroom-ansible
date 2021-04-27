@@ -1,0 +1,8 @@
+---
+
+stroom_database_name: "stroom"
+stroom_app_port: 8080
+db_username: "{{ stroom_databases[stroom_database_name]['user'] }}"
+db_password: "{{ stroom_databases[stroom_database_name]['password'] }}"
+
+db_init_files_and_templates_dir: "{{ local_config_dir }}/files_and_templates/db_init_scripts"

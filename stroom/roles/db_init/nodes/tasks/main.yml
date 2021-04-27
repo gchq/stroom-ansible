@@ -1,0 +1,5 @@
+---
+
+- name: "Loop over Stroom nodes"
+  include_tasks: update_cluster_url.yml
+  loop: "{{ groups['stroom_and_proxy'] }}"
