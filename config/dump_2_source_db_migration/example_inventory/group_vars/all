@@ -17,7 +17,7 @@ ansible_user: vagrant
 stroom_version_from: "v6.0.32"
 # This is used for the services stack and should be the most recent release to
 # the git hash below
-stroom_version_to: "v7.0-beta.20"
+stroom_version_to: "v7.0-beta.118"
 
 # The git tag or commit hash to migrate to
 stroom_source_git_tag_or_hash_to: "851735f"
@@ -25,7 +25,7 @@ stroom_source_git_tag_or_hash_to: "851735f"
 # The path on a file server where the stack archive file can be found
 stroom_stack_archive_url_base: "https://github.com/gchq/stroom-resources/releases/download/stroom-stacks-{{ stack_version }}"
 
-stroom_7_java_version: "12"
+stroom_7_java_version: "16"
 java_version_to: "{{ stroom_7_java_version }}"
 
 migration_dir: "/home/{{stroom_user}}/migration-{{ stroom_version_from }}-{{ stroom_version_to }}"

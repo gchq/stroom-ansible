@@ -10,13 +10,13 @@ ansible_user: vagrant
 # This is used for both the services stack and the git tag of the stroom source
 stroom_version_from: "v6.0.32"
 # This is used for the services stack and should be the latest stack release
-stroom_version_to: "v7.0-beta.17"
+stroom_version_to: "v7.0-beta.118"
 
 # The git tag or commit hash to migrate to
 stroom_source_git_tag_or_hash_to: "0b67d6e"
 
 stroom_6_java_version: "8"
-stroom_7_java_version: "12"
+stroom_7_java_version: "16"
 java_version_from: "{{ stroom_6_java_version }}"
 java_version_to: "{{ stroom_7_java_version }}"
 
