@@ -15,12 +15,13 @@
 # For real deployments where a clone/fork of this repo is used, jinja templates
 # would probably make more sense, and be a load faster.
 
+  # TODO stroom.conf is no more in v7, needs removing
   # Set all the env vars in the stack env file
-- import_role:
-    name: non_docker_stroom/set_stroom_conf_values
-  tags:
-    - deploy
-    - configure
+#- import_role:
+    #name: non_docker_stroom/set_stroom_conf_values
+  #tags:
+    #- deploy
+    #- configure
 
   # Some instances of IP_ADDRESS are not nginx_advertised_host, so they must be explicitly set
   # in set_stroom_conf_values above
