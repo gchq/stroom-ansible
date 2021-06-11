@@ -7,12 +7,14 @@ all:
           # Set public_ip_address to the hosts public IP
           # address when testing without a DNS server
           #public_ip_address: 192.168.100.11
+          #java_opts: "-Xms512m -Xmx2048m"
         stroom-and-proxy-host-2:
           #public_ip_address: 192.168.100.12
     stroom_services_stack:
       hosts:
         stroom-services-stack-host:
           #public_ip_address: 192.168.100.13
+          #java_opts: "-Xms512m -Xmx2048m"
     stroom_database:
       hosts:
         stroom-database-host:
