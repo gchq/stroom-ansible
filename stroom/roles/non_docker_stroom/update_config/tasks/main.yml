@@ -64,8 +64,8 @@
     label: "{{ item.path }}"
   when: _stroom_config_files_and_templates_dir_info.stat.exists 
         and item.state == 'file' 
-        and item.path is not match ".*\.j2$"
-        and item.path is not match ".*\.gitkeep$" # Ignore .gitkeep files used to maintain empty dirs
+        and item.path is not match('.*\.j2$')
+        and item.path is not match('.*\.gitkeep$') # Ignore .gitkeep files used to maintain empty dirs
   tags:
     - deploy
     - configure
@@ -85,16 +85,11 @@
     label: "{{ item.path }}"
   when: _stroom_config_files_and_templates_dir_info.stat.exists 
         and item.state == 'file' 
-        and item.path is match ".*\.j2$"
-        and item.path is not match ".*\.gitkeep$" # Ignore .gitkeep files used to maintain empty dirs
+        and item.path is match('.*\.j2$')
+        and item.path is not match('.*\.gitkeep$') # Ignore .gitkeep files used to maintain empty dirs
   tags:
     - deploy
     - configure
-
-
-
-
-
 
 # Needed for calling python, TODO use script module
 #- name: Get absolute path 
