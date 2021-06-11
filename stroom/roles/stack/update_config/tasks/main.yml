@@ -93,7 +93,6 @@
     - deploy
     - configure
 
-
 #- name: Get absolute path 
   #command: "realpath {{ local_config_dir }}"
   #register: absolute_path
