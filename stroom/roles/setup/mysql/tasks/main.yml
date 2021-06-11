@@ -50,7 +50,10 @@
   copy:
     src: my.cnf
     dest: /etc/my.cnf
-  notify: Restart mysql
+  # TODO Commented out notify as any change to the .cnf file will trigger a DB restart.
+  #   While this may be desirable in dev/test it is very bad to have the DB go down without
+  #   shutting stroom down properly first.
+  # notify: Restart mysql
 
 - name: Ensure mysqld service is running
   become: true
@@ -76,6 +79,7 @@
     login_password: "{{ stroom_db_root_password }}"
     state: present
     check_implicit_admin: true
+    # login_unix_socket: /var/run/mysqld/mysqld.sock
 
 - name: Copy .my.cnf file with root password credentials
   become: true
@@ -121,7 +125,7 @@
 - name: Setup MySQL users
   mysql_user:
     name: "{{ item.user }}"
-    password: "{{ item.password | default('stroompassword1') }}"
+    password: "{{ item.password | default('StroomPassword1?') }}"
     host: "{{ item.host | default('%') }}"
     priv: "{{ item.privs | default(item.name + '.*:ALL') }}"
   loop: "{{ stroom_databases | flatten(levels=1) }}"

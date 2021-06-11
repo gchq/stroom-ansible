@@ -126,9 +126,8 @@ appConfig:
     connection:
       jdbcDriverClassName: "com.mysql.cj.jdbc.Driver"
       jdbcDriverUrl: "jdbc:mysql://{{ db_host }}:{{ db_port }}/stroom?useUnicode=yes&characterEncoding=UTF-8"
-      # TODO get uname/pword from group vars all
-      jdbcDriverUsername: "stroomuser"
-      jdbcDriverPassword: "stroompassword1"
+      jdbcDriverUsername: "{{ stroom_db_username }}"
+      jdbcDriverPassword: "{{ stroom_db_password }}"
   contentPackImport:
     enabled: false
   job:
@@ -137,7 +136,7 @@ appConfig:
     executionInterval: "10s"
   node:
     # The name for the node, should be unique to each node in the cluster
-    name: "node1a"
+    name: "{{ inventory_hostname_short }}"
   # The address of the this node for inter-node communication
   nodeUri:
     hostname: "{{ inventory_hostname }}"
@@ -165,9 +164,8 @@ appConfig:
         connection:
           jdbcDriverClassName: "com.mysql.cj.jdbc.Driver"
           jdbcDriverUrl: "jdbc:mysql://{{ db_host }}:{{ db_port }}/stats?useUnicode=yes&characterEncoding=UTF-8"
-          # TODO get uname/pword from group vars all
-          jdbcDriverUsername: "statsuser"
-          jdbcDriverPassword: "stroompassword1"
+          jdbcDriverUsername: "{{ stats_db_username }}"
+          jdbcDriverPassword: "{{ stats_db_password }}"
 
 # vim: set filetype=yaml tabstop=2 shiftwidth=2 expandtab:
 

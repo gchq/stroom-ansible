@@ -63,20 +63,26 @@ db_host: "{{ hostvars[groups['stroom_database'][0]]['public_ip_address']
 db_port: 3306
 
 # Database credentials
-stroom_db_root_password: "my-secret-pw"
+stroom_db_root_password: "StroomPassword1?_root"
+stroom_db_username: "stroomuser"
+stroom_db_password: "StroomPassword1?"
+stats_db_username: "statsuser"
+stats_db_password: "StroomPassword1?"
+
+# All the databases/users that will be created
 stroom_databases:
 
   - name: stroom
-    user: stroomuser
-    password: stroompassword1
+    user: "{{ stroom_db_username }}"
+    password: "{{ stroom_db_password }}"
+    privs: "stroom.*:ALL"
+    host: "%"
 
   - name: stats
-    user: statsuser
-    password: stroompassword1
-
-  - name: auth
-    user: authuser
-    password: stroompassword1
+    user: "{{ stats_db_username }}"
+    password: "{{ stats_db_password }}"
+    privs: "stats.*:ALL"
+    host: "%"
 
 # Key/value pairs to set in the stack env file.  These will replace existing
 # values in the env file or add a new line if the name doesn't already exist.
