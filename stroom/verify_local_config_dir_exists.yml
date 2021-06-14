@@ -1,8 +1,7 @@
 ---
 - hosts:
     - localhost
-  gather_facts: false
-  vars:
+  gather_facts: true
   tasks:
 
     - name: 'Check mandatory variables are defined'
@@ -25,4 +24,7 @@
       assert:
         that:
           - _local_config_dir_info.stat.exists == true
+
+    - import_role:
+        name: roles/setup/localhost 
 
