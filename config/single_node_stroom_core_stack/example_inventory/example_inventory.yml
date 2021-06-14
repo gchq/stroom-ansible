@@ -3,4 +3,5 @@ all:
   children:
     stroom_core_stack:
       hosts:
-        stroom-core-stack-host
+        stroom-core-stack-host:
+          public_ip_address: 192.168.100.20 
