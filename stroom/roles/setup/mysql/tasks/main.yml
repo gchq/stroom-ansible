@@ -58,7 +58,7 @@
 - name: Ensure mysqld service is running
   become: true
   service: 
-    name: mysqld 
+    name: mysqld@{{ db_instance_name }}
     state: started 
     enabled: true
 
@@ -74,12 +74,14 @@
     name: root 
     host: localhost 
     priv: "*.*:ALL,GRANT"
-    password: "{{ stroom_db_root_password }}"
+    password: "{{ db_root_password }}"
+    login_user: root
     login_host: localhost
-    login_password: "{{ stroom_db_root_password }}"
+    login_password: "{{ db_root_password }}"
     state: present
     check_implicit_admin: true
-    # login_unix_socket: /var/run/mysqld/mysqld.sock
+    # login_unix_socket: /var/run/mysqld/mysqld.sock  
+    login_unix_socket: "{{ db_local_socket }}"
 
 - name: Copy .my.cnf file with root password credentials
   become: true
@@ -95,6 +97,7 @@
     name: root 
     host: "{{ item }}" 
     password: "{{ stroom_db_root_password }}"
+    login_unix_socket: "{{ db_local_socket }}"
   loop:
     - "{{ ansible_hostname }}"
     - 127.0.0.1
@@ -105,6 +108,7 @@
     name: '' 
     host: "{{ item }}" 
     state: absent
+    login_unix_socket: "{{ db_local_socket }}"
   loop:
     - localhost
     - "{{ inventory_hostname }}"
@@ -128,6 +132,7 @@
     password: "{{ item.password | default('StroomPassword1?') }}"
     host: "{{ item.host | default('%') }}"
     priv: "{{ item.privs | default(item.name + '.*:ALL') }}"
+    login_unix_socket: "{{ db_local_socket }}"
   loop: "{{ stroom_databases | flatten(levels=1) }}"
   loop_control:
     label: "{{ item.name }}, {{ item.user }}, {{ item.host | default('%') }}, {{ item.privs | default(item.name + '.*:ALL') }}"

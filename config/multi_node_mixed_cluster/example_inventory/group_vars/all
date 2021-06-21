@@ -57,17 +57,25 @@ remove_development_certificates: false
 nginx_advertised_host: "{{ hostvars[groups['stroom_services_stack'][0]]['public_ip_address'] 
   | default(hostvars[groups['stroom_services_stack'][0]]['inventory_hostname'])}}"
 
-# The hostname of the database server
-db_host: "{{ hostvars[groups['stroom_database'][0]]['public_ip_address'] 
+# The hostname of the stroom database server
+stroom_db_host: "{{ hostvars[groups['stroom_database'][0]]['public_ip_address'] 
   | default(hostvars[groups['stroom_database'][0]]['inventory_hostname']) }}"
-db_port: 3306
+# stroom_db_port: "{{hostvars[groups['stroom_database'][0]]['mysql_port'] }}"  
+# stroom_db_port: "{{ mysql_port }}"  # Was 3306
+stroom_db_port: "{{hostvars[groups['stroom_database'][0]]['mysql_port'] | default('3306') }}"  
+
+# The hostname of the stats database server
+stats_db_host: "{{ hostvars[groups['stroom_stats_database'][0]]['public_ip_address'] 
+  | default(hostvars[groups['stroom_stats_database'][0]]['inventory_hostname']) }}"
+# stats_db_port: "{{ mysql_port }}"  
+stats_db_port: "{{hostvars[groups['stroom_stats_database'][0]]['mysql_port'] | default('3307') }}"  
 
 # Database credentials
-stroom_db_root_password: "StroomPassword1?_root"
+#stroom_db_root_password: "StroomPassword1?_root"
 stroom_db_username: "stroomuser"
-stroom_db_password: "StroomPassword1?"
+stroom_db_password: "Stroompassword1!"
 stats_db_username: "statsuser"
-stats_db_password: "StroomPassword1?"
+stats_db_password: "Stroompassword1!"
 
 # All the databases/users that will be created
 stroom_databases:
@@ -95,9 +103,9 @@ stack_env_vars:
   DOCKER_HOST_HOSTNAME: "{{ inventory_hostname }}"
   DOCKER_HOST_IP: "{{ public_ip_address | default(ansible_default_ipv4 | default(ansible_all_ipv4_addresses[0])) }}"
 
-  DB_HOST_IP: "{{ db_host }}"
-  STROOM_AUTH_DB_HOST: "{{ db_host }}"
-  STROOM_AUTH_DB_PORT: "{{ db_port }}"
+  DB_HOST_IP: "{{ stroom_db_host }}"
+  STROOM_AUTH_DB_HOST: "{{ stroom_db_host }}"
+  STROOM_AUTH_DB_PORT: "{{ stroom_db_port }}"
 
   NGINX_ADVERTISED_HOST: "{{ nginx_advertised_host }}"
 
@@ -143,10 +151,10 @@ stack_env_vars:
     #value: "{{ environment_name }}"
 
   #- key: stroom.jdbcDriverUrl
-    #value: jdbc:mysql://{{ db_host }}:{{ db_port }}/stroom?useUnicode=yes&characterEncoding=UTF-8
+    #value: jdbc:mysql://{{ stroom_db_host }}:{{ stroom_db_port }}/stroom?useUnicode=yes&characterEncoding=UTF-8
 
   #- key: stroom.statistics.sql.jdbcDriverUrl
-    #value: jdbc:mysql://{{ db_host }}:{{ db_port }}/stats?useUnicode=yes&characterEncoding=UTF-8
+    #value: jdbc:mysql://{{ stats_db_host }}:{{ stats_db_port }}/stats?useUnicode=yes&characterEncoding=UTF-8
 
     ## This should be set to the value of "stroomServiceUser's" token in Tools => API Keys
     ## TODO the value below should be the default but won't be until 6.0.28

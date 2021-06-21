@@ -34,7 +34,6 @@
         immediate: true
         state: enabled
       loop:
-        - "{{ stroom_all_dbs_port | default(3307) }}"
         - "{{ stroom_app_port | default(8080) }}"
         - "{{ stroom_proxy_local_app_port | default(8090) }}"
         - "{{ stroom_auth_service_app_port | default(8099) }}"
@@ -42,6 +41,35 @@
         - "{{ stroom_auth_ui_https_port | default(9443) }}"
       notify:
         - Restart docker
+        
+    - name: Opening mySQL stack TCP port to public zone in firewalld
+      firewalld:
+        port: "{{ item }}/tcp"
+        zone: public
+        permanent: true
+        immediate: true
+        state: enabled
+      loop:
+        - "{{ stroom_all_dbs_port | default(3307) }}"
+      notify:
+        - Restart docker
+      when: 
+        - mixed_cluster == 'false' or   mixed_cluster is not defined      # is false or not defined
+
+    - name: Opening mySQL cluster Stroom DB TCP port to public zone in firewalld
+      firewalld:
+        port: "{{ item }}/tcp"
+        zone: public
+        permanent: true
+        immediate: true
+        state: enabled
+      loop:
+        - "{{ stroom_db_port | default(3306) }}"
+      notify:
+        - Restart docker
+      when: 
+        - mixed_cluster is defined
+        - mixed_cluster == 'true' # is true
 
       # TODO The ports we need are dependant on what is in the stack
       # so we ought to only open the required ports
@@ -96,6 +124,7 @@
   become: true
   hosts:
     - stroom_database
+    - stroom_stats_database
   tags:
     - install_mysql
   tasks:
@@ -105,7 +134,7 @@
 
     - name: Open port for MySQL
       firewalld:
-        service: mysql
+        port: "{{ mysql_port }}/tcp" # Was  service: mysql
         zone: public
         permanent: true
         immediate: true
