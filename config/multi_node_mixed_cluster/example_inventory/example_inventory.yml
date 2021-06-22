@@ -23,7 +23,7 @@ all:
           #public_ip_address: 192.168.100.14
           #mysql_port:3306
           #db_instance_name: "stroom"
-          #db_root_password:"StroomPassword1?_root"
+          #db_root_password: "StroomPassword1?_root"
           #db_local_socket: "/var/run/mysqld/mysqld.sock"
     stroom_stats_database:
       hosts:
@@ -32,5 +32,5 @@ all:
           #public_ip_address: 192.168.100.15
           #mysql_port:3307
           #db_instance_name: "stats"
-          #db_root_password:"StroomPassword1?_root"
+          #db_root_password: "StroomPassword1?_root"
           #db_local_socket: "/var/run/mysqld/mysqld.sock"
