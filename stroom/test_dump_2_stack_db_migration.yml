@@ -69,7 +69,7 @@
     ################### SET UP & RUN FROM VERSION ###################
 
     - import_role:
-        name: stack/deploy
+        name: stack/deploy_v6
       vars:
         stack_version: "{{ stroom_version_from }}"
         stack_install_root_dir: "{{ stack_dir_from }}"

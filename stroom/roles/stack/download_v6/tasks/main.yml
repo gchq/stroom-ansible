@@ -1,0 +1,140 @@
+- name: 'Check mandatory variables are defined'
+  assert:
+    that:
+      - downloads_dir | default('') | trim != ''
+      - stack_bin_dir | default('') | trim != ''
+      - stack_install_root_dir | default('') | trim != ''
+      - stack_name | default('') | trim != ''
+      - stack_version | default('') | trim != ''
+      - stack_volumes_dir | default('') | trim != ''
+
+- name: Ensure install directory exists
+  file:
+    path: "{{ stack_install_root_dir }}/{{ stack_name }}"
+    owner: "{{ stroom_user }}"
+    mode: "u=rwX,g=,o="
+    state: directory
+
+- name: "See if {{ stack_volumes_dir }} exists"
+  stat:
+    path: "{{ stack_volumes_dir }}"
+  register: _stack_volumes_dir_info
+
+- name: "See if {{ stack_bin_dir }} exists"
+  stat:
+    path: "{{ stack_bin_dir }}"
+  register: _stack_bin_dir_info
+
+- name: "Download archive {{ _stroom_stack_archive_url }}" 
+  when: _stack_volumes_dir_info.stat.exists == false
+        or _stack_bin_dir_info.stat.exists == false
+  block:
+
+    # Use a set dir rather than a temporay one to save us having to download a big archive
+    # again and again in testing.
+    - name: Ensure downloads directory exists
+      file:
+        path: "{{ downloads_dir }}"
+        state: directory
+
+    # It is debatable whether we should download to local then push to remotes or just
+    # let the remotes each download it as we do here.
+    - name: Download stack
+      get_url:
+        url: "{{ _stroom_stack_archive_url }}"
+        dest: "{{ downloads_dir }}/"
+        checksum: "sha256:{{ _stroom_stack_archive_url }}.sha256"
+        timeout: 120
+      register: _downloaded_archive_info
+
+    - name: Create temporary directory to unpack the archive into
+      tempfile:
+        state: directory
+        prefix: stroom_stack_unpack_
+      register: _stack_unpack_tmp_dir_info
+
+    - debug:
+        msg:
+          - "_stack_unpack_tmp_dir_info: {{ _stack_unpack_tmp_dir_info.path }}"
+        verbosity: 2
+
+      # FIXME: I can't get the unarchive module to work on macOS or Ubuntu. Ansible complains about /bin/tar not being able
+      # to handle the archive. It untars manually without problems, so I'l just do that.
+    - name: "Unpack stack distribution tar into {{ _stack_unpack_tmp_dir_info.path }}"
+      command: >-
+        tar
+        -xv
+        -f {{ _downloaded_archive_info.dest }}
+        --directory {{ _stack_unpack_tmp_dir_info.path }}/
+
+    #- name: Unpack the stack tar file 
+      #unarchive:
+        #src: "{{ _downloaded_archive_info.dest }}"
+        #dest:  "{{ downloads_dir }}"
+        #remote_src: true
+
+    - name: "Delete archive {{ _downloaded_archive_info.dest }}"
+      file:
+        path: "{{ _downloaded_archive_info.dest }}"
+        state: absent
+      tags:
+        - never # TODO this doesn't seem to be working
+        - delete_download
+
+    # --END OF BLOCK--
+
+  # Relying on the archive having been downloaded above
+  # We may have a volumes dir from a previous release that we want to keep
+- name: "Copy stack volumes dir to {{ stack_volumes_dir }}" 
+  copy:
+    src: "{{ _stack_unpack_tmp_dir_info.path }}/{{ _stack_relative_volumes_dir }}"
+    dest: "{{ stack_install_root_dir }}/{{ stack_name }}/"
+    remote_src: true
+    force: false # Don't copy if it is already there
+  when: _stack_volumes_dir_info.stat.exists == false
+
+  # TODO The files in the volumes dir need to be accessed by the user inside
+  # the container which may have a different uid to the host user, thus we
+  # need to open up read to g and o
+- name: Change permissions for {{ stack_volumes_dir }}
+  file:
+    path: "{{ stack_volumes_dir }}"
+    owner: "{{ stroom_user }}"
+    mode: "u=rwX,g=rX,o=rX"
+    recurse: true
+  when: _stack_volumes_dir_info.stat.exists == false
+
+  # Relying on the archive having been downloaded above
+- name: "Copy stack bin dir to {{ stack_bin_dir }}" 
+  copy:
+    src: "{{ _stack_unpack_tmp_dir_info.path }}/{{ _stack_relative_bin_dir }}"
+    dest: "{{ stack_install_root_dir }}/{{ stack_name }}/"
+    remote_src: true
+    force: false # Don't copy if it is already there
+  when: _stack_bin_dir_info.stat.exists == false
+
+- name: Change permissions for {{ stack_bin_dir }}
+  file:
+    path: "{{ stack_bin_dir }}"
+    owner: "{{ stroom_user }}"
+    mode: "u=rwX,g=,o="
+    recurse: true
+  when: _stack_bin_dir_info.stat.exists == false
+
+- name: Create a symlink for 'latest'
+  file:
+    state: link
+    force: true
+    src: "{{ stack_name }}-{{ stack_version }}" # relative to dest
+    dest: "{{ _stack_install_latest_link }}" # absolute
+
+- debug:
+    var: _stack_unpack_tmp_dir_info | default('undefined')
+
+- name: "Delete temporary directory"
+  file:
+    path: "{{ _stack_unpack_tmp_dir_info.path }}"
+    state: absent
+  when: _stack_volumes_dir_info.stat.exists == false
+        or _stack_bin_dir_info.stat.exists == false
+        and _stack_unpack_tmp_dir_info is defined

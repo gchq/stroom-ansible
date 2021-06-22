@@ -1,0 +1,112 @@
+---
+
+- name: 'Check mandatory variables are defined'
+  assert:
+    that:
+      - local_config_dir is defined
+      - stack_env_vars is defined
+      - stack_install_root_dir is defined
+      - stack_name is defined
+      - stack_version is defined
+      - stroom_user is defined
+
+  # Set the HOST_IP variable to the inventory hostname
+- import_role:
+    name: stack/set_host_ip
+  tags:
+    - deploy
+    - configure
+
+# NOTE: It is debatable if we configure the file like this or use a jinja template file
+# If we use templates then we need to maintain the template in this repo.
+# For real deployments where a clone/fork of this repo is used, jinja templates
+# would probably make more sense, and be a load faster.
+
+  # Set all the env vars in the stack env file
+- import_role:
+    name: stack/set_env_vars_values
+  tags:
+    - deploy
+    - configure
+
+- debug:
+    msg:
+      - "config_files_and_templates_dir: {{ config_files_and_templates_dir }}"
+    verbosity: 2
+  tags:
+    - deploy
+    - configure
+
+- name: "Check if {{ config_files_and_templates_dir }} exists on the Ansible controller"
+  local_action: stat path={{ config_files_and_templates_dir }}
+  become: false
+  register: _config_files_and_templates_dir_info
+  tags:
+    - deploy
+    - configure
+
+  # Copies any files (except *.j2 files) as they are to the remote.
+  # Mirrors the directory structure.
+  # Will only add/update files on the remote, not delete.
+  # To make deletion happen we would need to have all of the volumes dir
+  # locally.
+  # TODO The files in the volumes dir need to be accessed by the user inside
+  # the container which may have a different uid to the host user, thus we
+  # need to open up read to g and o
+- name: "Copy static files from {{ config_files_and_templates_dir }}/ to {{ stack_volumes_dir }}/"
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ stack_volumes_dir }}/{{ item.path }}"
+    mode: "u=rw,g=r,o=r"
+    backup: true
+  with_filetree: "{{ config_files_and_templates_dir }}/"
+  loop_control:
+    label: "{{ item.path }}"
+  when: _config_files_and_templates_dir_info.stat.exists 
+        and item.state == 'file' 
+        and item.path is not match('.*\.j2$')
+        and item.path is not match('.*\.gitkeep$') # Ignore .gitkeep files used to maintain empty dirs
+  tags:
+    - deploy
+    - configure
+
+  # Copies and templates any *.j2 files found in the tree, removing the .j2 extension.
+  # Mirrors the directory structure.
+  # Will only add/update files on the remote, not delete.
+  # TODO The files in the volumes dir need to be accessed by the user inside
+  # the container which may have a different uid to the host user, thus we
+  # need to open up read to g and o
+- name: "Copy and template .j2 files from {{ config_files_and_templates_dir }}/ to {{ stack_volumes_dir }}/"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ stack_volumes_dir }}/{{ item.path | regex_replace('.j2$','') }}"
+    mode: "u=rw,g=r,o=r"
+    backup: true
+  with_filetree: "{{ config_files_and_templates_dir }}/"
+  loop_control:
+    label: "{{ item.path }}"
+  when: _config_files_and_templates_dir_info.stat.exists 
+        and item.state == 'file' 
+        and item.path is match('.*\.j2$')
+        and item.path is not match('.*\.gitkeep$') # Ignore .gitkeep files used to maintain empty dirs
+  tags:
+    - deploy
+    - configure
+
+
+#- name: Get absolute path 
+  #command: "realpath {{ local_config_dir }}"
+  #register: absolute_path
+
+## Services config
+
+#- name: Update the local env file from the inventory
+  #command: "python3 ./scripts/update_env_file.py {{ absolute_path.stdout }}/{{ stack_name }}"
+
+#- name: Update the local upstream files from the inventory
+  #command: "python3 ./scripts/update_upstream_files.py {{ absolute_path.stdout }}/{{ stack_name }}"
+  
+#- name: Update the local server.conf file from the inventory
+  #command: "python3 ./scripts/update_server_conf.py {{ absolute_path.stdout }}/{{ stack_name }}"
+
+

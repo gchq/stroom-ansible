@@ -1,0 +1,12 @@
+---
+
+_stroom_stack_archive_filename: "{{ stack_name }}-{{ stack_version}}.tar.gz"
+
+_stroom_stack_archive_url: "{{ stroom_stack_archive_url_base }}/{{ _stroom_stack_archive_filename }}"
+
+
+_stack_relative_bin_dir: "{{ stack_name }}/{{ stack_name }}-{{ stack_version }}"
+
+_stack_relative_volumes_dir: "{{ stack_name }}/volumes"
+
+_stack_install_latest_link: "{{ stack_install_root_dir }}/{{ stack_name }}/latest"

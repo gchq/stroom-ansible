@@ -1,0 +1,11 @@
+---
+
+# Temporary location where the archive files are downloaded to.
+# They will not be deleted to save downloding again.
+downloads_dir: "/tmp/stroom_downloads"
+
+# The path where the stack will be extracted to
+stack_install_root_dir: "~"
+
+# The path on a file server where the stack archive file can be found
+stroom_stack_archive_url_base: "https://github.com/gchq/stroom-resources/releases/download/stroom-stacks-{{ stack_version }}"
