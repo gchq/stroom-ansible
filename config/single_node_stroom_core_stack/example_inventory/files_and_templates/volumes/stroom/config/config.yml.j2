@@ -129,8 +129,8 @@ appConfig:
     executionInterval: "10s"
   node:
     # The name for the node, should be unique to each node in the cluster
-    #name: "{{ inventory_hostname_short  }}"
-    name: "node1a"
+    name: "{{ inventory_hostname_short  }}"
+    #name: "node1a"
   # The address of the this node for inter-node communication
   nodeUri:
     hostname: "${STROOM_HOST:-localhost}"
