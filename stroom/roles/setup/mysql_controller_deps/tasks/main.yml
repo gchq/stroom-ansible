@@ -2,6 +2,12 @@
 
 - name: 'Un-install default CentOS 7 mariadb packages, install mysql repo and mysql client packages '
   block:
+    - debug:
+        msg:
+          - "mysql_yum_repo_url: {{ mysql_yum_repo_url }}"
+          - "use_mysql_yum_repo_file_url: {{ use_mysql_yum_repo_file_url}}"
+          - "mysql_yum_repo_file_path: {{ mysql_yum_repo_file_path }}"
+        verbosity: 2
     - name: 'YUM un-install any default mariadb packages '
       ansible.builtin.yum:
         name: "{{ packages }}"
@@ -18,7 +24,16 @@
         name: "{{ mysql_yum_repo_url }}"
         state: present
       register: result
-      when: not _mysql_repofile_result.stat.exists
+      when: 
+        - not  _mysql_repofile_result.stat.exists 
+        - use_mysql_yum_repo_file_url == true
+    - name: install fallback copy of local mysql-community yum repo templayed file
+      template:
+        src: mysql-community.repo.j2
+        dest: "{{ mysql_yum_repo_file_path }}"
+      when:  
+        - not  _mysql_repofile_result.stat.exists 
+        - use_mysql_yum_repo_file_url == false  
     - name: 'Install mysql-community-client package and dependancies '
       ansible.builtin.yum:
         name: "{{ packages }}"
