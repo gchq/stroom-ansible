@@ -27,6 +27,12 @@ stroom_user: "stroomuser"
 # The directory where stroom-proxy will be installed on the remote host
 stack_install_root_dir: "/home/{{ stroom_user }}"
 
+# Set to true, to specify using the mysql-community-client (v8.0) repo on the internet
+use_mysql_yum_repo_file_url: true
+
+# Location to a different mysql-community-client (v8.0) repo used in the templated mysql-community.repo file
+mysql_yum_repo_base_url: "https://repo.mysql.com/yum/mysql-8.0-community/el/7/$basearch/"
+
 # Set to true to delete all the self signed development certificates
 remove_development_certificates: false
 
@@ -45,6 +51,11 @@ stack_env_vars:
   HOST_IP: "{{ nginx_advertised_host }}"
 
   NGINX_ADVERTISED_HOST: "{{ nginx_advertised_host }}"
+
+  #STROOM_NODE: "{{ inventory_hostname }}"
+  #DOCKER_HOST_HOSTNAME: "{{ inventory_hostname }}"
+
+  #DOCKER_HOST_IP: "{{ public_ip_address | default(ansible_default_ipv4) }}"
 
   #NGINX_SSL_CERTIFICATE_KEY: "example.server.key"
   #NGINX_SSL_CERTIFICATE: "example.server.cert"
