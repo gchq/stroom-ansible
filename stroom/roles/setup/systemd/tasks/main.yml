@@ -23,13 +23,13 @@
   debug:
     msg: "{{ stroom_service_on_boot }}" 
 
-- name: SystemD Service enable:
+- name: SystemD Service enable
   when: stroom_service_on_boot is defined
   become: true
   systemd:
     enabled: "{{ stroom_service_on_boot }}"
 
-- name: SystemD Service start:
+- name: SystemD Service start
   when: stroom_service_state is defined
   become: true
   systemd:
