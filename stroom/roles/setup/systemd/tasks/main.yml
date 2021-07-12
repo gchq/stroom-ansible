@@ -1,0 +1,33 @@
+---
+
+- name: 'Check mandatory variables are defined'
+  assert:
+    that:
+      - stroom_user is defined
+      - stack_name is defined
+      - stack_version is defined
+      - stack_install_root_dir is defined
+      - stroom_service_on_boot
+
+- name: SystemD Service File
+  become: true
+  vars:
+    stroom_version:  "{{ stack_version }}"
+    stroom_install_root_dir: "{{ stack_install_root_dir }}/{{ stack_name }}/{{ stack_name }}-{{ stack_version }}"
+  template:
+    src: "templates/etc/systemd/system/stroom.service.j2"
+    dest: "/etc/systemd/system/stroom.service"
+
+- name: SystemD Service enable
+  when: stroom_service_on_boot is defined
+  become: true
+  systemd:
+    name: stroom
+    enabled: "{{ stroom_service_on_boot }}"
+
+- name: SystemD Service start
+  when: stroom_service_state is defined
+  become: true
+  systemd:
+    name: stroom
+    state: "{{ stroom_service_state }}"
