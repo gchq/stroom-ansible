@@ -7,7 +7,6 @@
       - stack_name is defined
       - stack_version is defined
       - stack_install_root_dir is defined
-#      - stroom_service_state is defined
       - stroom_service_on_boot
 
 - name: SystemD Service File
