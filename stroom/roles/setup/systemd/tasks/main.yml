@@ -10,6 +10,7 @@
 
 
 - name: SystemD Service File
+  become: true
   vars:
     stroom_version:  "{{ stack_version }}"
     stroom_install_root_dir: "{{ stack_install_root_dir }}/{{ stack_name }}/{{ stack_name }}-{{ stack_version }}"
