@@ -1,13 +1,13 @@
 [Unit]
-Description=STROOM {{ stroom_version }}
+Description=STROOM {{ stroom_version }}.
 After=docker.service
 
 [Service]
 Type=forking
 PIDFile=/run/stroom-container.pid
-ExecStart=-{{ stack_dir }}/start.sh
+ExecStart=-{{ stroom_install_root_dir }}/start.sh
 ExecStartPost=/bin/bash -c "/usr/bin/docker inspect -f={{"{{.State.Pid}}"}} stroom >/run/stroom-container.pid"
-ExecStop={{ stack_dir }}/stop.sh
+ExecStop={{ stroom_install_root_dir }}/stop.sh
 TimeoutSec=240
 
 [Install]
