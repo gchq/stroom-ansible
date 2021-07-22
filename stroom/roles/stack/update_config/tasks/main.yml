@@ -45,39 +45,6 @@
     - deploy
     - configure
 
-#- debug:
-    #msg:
-      #- "inventory_dir: {{ inventory_dir }}"
-      #- "config_files_and_templates_dir: {{ config_files_and_templates_dir }}"
-      #- "real config_files_and_templates_dir: {{ config_files_and_templates_dir | realpath() }}"
-      #- "state: {{ item.state }}"
-      #- "root: {{ item.root }}"
-      #- "root 2: {{ item.root + (item.path | dirname()) }}"
-      #- ""
-      #- "path: {{ item.path }}"
-      #- "real path: {{ item.path | realpath() }}"
-      #- "real path 2: {{ item.path | relpath(config_files_and_templates_dir | realpath()) }}"
-      #- "real path 3: {{ item.path | relpath(config_files_and_templates_dir | realpath()) | realpath() }}"
-      #- ""
-      #- "src: {{ item.src }}" 
-      #- "real src: {{ item.src | realpath() }}"
-      #- "real src 2: {{ item.src | relpath(config_files_and_templates_dir | realpath()) }}"
-      #- "real src 3: {{ item.src | relpath(config_files_and_templates_dir | realpath()) | realpath() }}"
-      #- ""
-      #- "rel path: {{ item.path | relpath(config_files_and_templates_dir) }}"
-      #- "combined: {{ item.src | relpath(config_files_and_templates_dir | realpath()) | realpath() }}"
-    #verbosity: 2
-  #with_filetree: "{{ config_files_and_templates_dir }}/"
-  #loop_control:
-    #label: "{{ item.path }}"
-  #when: _config_files_and_templates_dir_info.stat.exists 
-        #and (item.state == 'file' or item.state == 'link')
-        #and item.path is not match('.*\.j2$')
-        #and item.path is not match('.*\.gitkeep$') # Ignore .gitkeep files used to maintain empty dirs
-  #tags:
-    #- deploy
-    #- configure
-
   # Copies any files (except *.j2 files) as they are to the remote.
   # Will also follow symlinks on the controller
   # Mirrors the directory structure.
