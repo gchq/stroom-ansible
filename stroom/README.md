@@ -70,6 +70,9 @@ These are the host groups that are used in the Ansible inventory.
 * stroom_core_stack - A single node stroom stack running all of the core application.
 * stroom_services_stack - Nginx, auth* and log-sender running in a docker stack.
 * stroom_dbs_stack - Mysql running in a docker.
+* stroom - Stroom running without docker.
+* stroom_ui - Stroom running without docker, able to be configured differently to above.
+* stroom_with_proxy - Stroom and local legacy proxy running without docker. Ansible with not update proxy but configure stroom correctly.
 * stroom_and_proxy - Stroom and local proxy running without docker.
 * stroom_database - Mysql running outside of docker for stroom & auth databases.
 * stroom_stats_database - Mysql running outside of docker for stats database.
