@@ -1,7 +1,25 @@
 ---
 all:
   children:
-    stroom_and_proxy:
+    stroom:                                    # Used for processing nodes
+      hosts:
+        stroom-host-1:
+          #public_ip_address: 192.168.100.10
+        stroom-host-2:
+          #public_ip_address: 192.168.100.20
+    stroom_ui:                                 # Used fot non-proxy nodes but with different parameters to above 
+      hosts:
+        stroom-ui-host-1:
+          #public_ip_address: 192.168.100.16
+        stroom-ui-host-2:
+          #public_ip_address: 192.168.100.19
+    stroom_with_proxy:                         # Used for nodes with legacy proxy
+      hosts:
+        stroom-with-proxy-host-1:
+          #public_ip_address: 192.168.100.17
+        stroom-with-proxy-host-2:
+          #public_ip_address: 192.168.100.18
+    stroom_and_proxy:                          # Used for nodes with proxy 
       hosts:
         stroom-and-proxy-host-1:
           # Set public_ip_address to the hosts public IP

@@ -97,6 +97,9 @@
 - name: Setup hosts with java
   become: true
   hosts:
+    - stroom
+    - stroom_ui
+    - stroom_with_proxy
     - stroom_and_proxy
   vars:
     # Set java_version based on the stroom version
