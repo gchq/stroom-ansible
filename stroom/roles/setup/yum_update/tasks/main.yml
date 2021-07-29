@@ -13,7 +13,7 @@
 - name: restart system to reboot to newest kernel
   become: true
   shell: "sleep 5 && reboot"
-  async: 1
+  async: "{{ ansible_check_mode | ternary( 0, 1 ) }}"   # Fix to allow check mode to work
   poll: 0
   tags:
     - never
