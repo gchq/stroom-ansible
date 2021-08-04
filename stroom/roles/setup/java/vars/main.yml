@@ -43,7 +43,7 @@ java_yum_package: "{{ _java[java_version | int].jre | default([]) }}"
 java_jdk_yum_package: "{{ _java[java_version | int].jdk | default([]) }}"
 
 # Java 12,13,14,15,16 stuff
-java_archive_filename: "{{ _java[java_version | int].targz | default([]) }}"
+java_archive_filename: "{{ _java[java_version | int].tar.gz | default([]) }}"
 java_archive_url: "{{ _java[java_version | int].url | default([]) }}"
 java_archive_directory: "{{ _java[java_version | int].directory | default([]) }}"
 java_archive_sha256_url: "{{ java_archive_url }}.sha256"
