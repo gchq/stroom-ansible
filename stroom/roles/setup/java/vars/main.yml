@@ -29,12 +29,12 @@ _java:
     home_dir: "{{ java_unarchive_dest }}/jdk-14.0.2"
   15:
     targz: "openjdk-15.0.2_linux-x64_bin.tar.gz"
-    url: "https://download.java.net/java/GA/jdk15.0.2/0d1cfde4252546c6931946de8db48ee2/7/GPL/openjdk-15.0.2_linux-x64_bin.tar.gz"
+    url: "{{ java_15_alt_url | default('https://download.java.net/java/GA/jdk15.0.2/0d1cfde4252546c6931946de8db48ee2/7/GPL/openjdk-15.0.2_linux-x64_bin.tar.gz') }}"
     directory: "jdk-15.0.2"
     home_dir: "{{ java_unarchive_dest }}/jdk-15.0.2"
   16:
     targz: "openjdk-16.0.1_linux-x64_bin.tar.gz"
-    url: "https://download.java.net/java/GA/jdk16.0.1/7147401fd7354114ac51ef3e1328291f/9/GPL/openjdk-16.0.1_linux-x64_bin.tar.gz"
+    url: "{{ java_16_alt_url | default('https://download.java.net/java/GA/jdk16.0.1/7147401fd7354114ac51ef3e1328291f/9/GPL/openjdk-16.0.1_linux-x64_bin.tar.gz') }}"
     directory: "jdk-16.0.1"
     home_dir: "{{ java_unarchive_dest }}/jdk-16.0.1"
 
