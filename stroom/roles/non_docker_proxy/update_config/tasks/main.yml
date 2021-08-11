@@ -25,7 +25,7 @@
 - name: Copy static files from {{ stroom_proxy_config_files_and_templates_dir }}
         to {{ stroom_proxy_home_dir }}/
   copy:
-    src: "{{ config_files_and_templates_dir }}/{{ item.path }}"
+    src: "{{ stroom_proxy_config_files_and_templates_dir }}/{{ item.path }}"
     dest: "{{ stroom_proxy_home_dir }}/{{ item.path }}"
     mode: "u=rw,g=,o="
     backup: true
