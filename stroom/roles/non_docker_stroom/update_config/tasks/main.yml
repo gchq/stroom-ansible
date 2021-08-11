@@ -61,9 +61,9 @@
     backup: true
   with_filetree: "{{ stroom_config_files_and_templates_dir }}/"
   loop_control:
-    label: "{{ item.path }}"
+    label: "{{ item.path }} (type: {{ item.state }}, source: {{ item.src | default('N/A') }})"
   when: _stroom_config_files_and_templates_dir_info.stat.exists 
-        and item.state == 'file' 
+        and (item.state == 'file' or item.state == 'link')
         and item.path is not match('.*\.j2$')
         and item.path is not match('.*\.gitkeep$') # Ignore .gitkeep files used to maintain empty dirs
   tags:
@@ -82,9 +82,9 @@
     backup: true
   with_filetree: "{{ stroom_config_files_and_templates_dir }}/"
   loop_control:
-    label: "{{ item.path }} (type: {{ item.state }}, source: {{ item.src | default('N/A') }})"
+    label: "{{ item.path }}"
   when: _stroom_config_files_and_templates_dir_info.stat.exists 
-        and (item.state == 'file' or item.state == 'link')
+        and item.state == 'file'
         and item.path is match('.*\.j2$')
         and item.path is not match('.*\.gitkeep$') # Ignore .gitkeep files used to maintain empty dirs
   tags:
