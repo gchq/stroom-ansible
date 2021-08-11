@@ -48,6 +48,7 @@
     - configure
 
   # Copies any files (except *.j2 files) as they are to the remote.
+  # Will also follow symlinks on the controller
   # Mirrors the directory structure.
   # Will only add/update files on the remote, not delete.
   # To make deletion happen we would need to have all of the files
@@ -55,7 +56,7 @@
 - name: Copy static files from {{ stroom_config_files_and_templates_dir }}/
         to {{ stroom_home_dir }}/
   copy:
-    src: "{{ item.src }}/"
+    src: "{{ config_files_and_templates_dir }}/{{ item.path }}"
     dest: "{{ stroom_home_dir }}/{{ item.path }}"
     mode: "u=rw,g=,o="
     backup: true
@@ -82,7 +83,7 @@
     backup: true
   with_filetree: "{{ stroom_config_files_and_templates_dir }}/"
   loop_control:
-    label: "{{ item.path }}"
+    label: "{{ item.path }} (type: {{ item.state }}, source: {{ item.src | default('N/A') }})"
   when: _stroom_config_files_and_templates_dir_info.stat.exists 
         and item.state == 'file'
         and item.path is match('.*\.j2$')
