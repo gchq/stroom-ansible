@@ -33,10 +33,14 @@ _java:
     directory: "jdk-15.0.2"
     home_dir: "{{ java_unarchive_dest }}/jdk-15.0.2"
   16:
-    targz: "openjdk-16.0.1_linux-x64_bin.tar.gz"
-    url: "{{ java_16_alt_url | default('https://download.java.net/java/GA/jdk16.0.1/7147401fd7354114ac51ef3e1328291f/9/GPL/openjdk-16.0.1_linux-x64_bin.tar.gz') }}"
-    directory: "jdk-16.0.1"
-    home_dir: "{{ java_unarchive_dest }}/jdk-16.0.1"
+#   targz: "openjdk-16.0.1_linux-x64_bin.tar.gz"
+#   url: "{{ java_16_alt_url | default('https://download.java.net/java/GA/jdk16.0.1/7147401fd7354114ac51ef3e1328291f/9/GPL/openjdk-16.0.1_linux-x64_bin.tar.gz') }}"
+#   directory: "jdk-16.0.1"
+#   home_dir: "{{ java_unarchive_dest }}/jdk-16.0.1"
+    targz: "openjdk-16.0.2_linux-x64_bin.tar.gz"
+    url: "{{ java_16_alt_url | default('https://download.java.net/java/GA/jdk16.0.2/d4a915d82b4c4fbb9bde534da945d746/7/GPL/openjdk-16.0.2_linux-x64_bin.tar.gz') }}"
+    directory: "jdk-16.0.2"
+    home_dir: "{{ java_unarchive_dest }}/jdk-16.0.2"
 
 # Java 6,7,8,11 stuff
 java_yum_package: "{{ _java[java_version | int].jre | default([]) }}"

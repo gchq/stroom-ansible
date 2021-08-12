@@ -27,7 +27,7 @@
       when: 
         - not  _mysql_repofile_result.stat.exists 
         - use_mysql_yum_repo_file_url == true
-    - name: install fallback copy of local mysql-community yum repo templayed file
+    - name: install fallback copy of local mysql-community yum repo templated file
       template:
         src: mysql-community.repo.j2
         dest: "{{ mysql_yum_repo_file_path }}"
