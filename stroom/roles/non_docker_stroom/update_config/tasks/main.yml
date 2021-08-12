@@ -10,6 +10,16 @@
     - deploy
     - configure
 
+- name: Copy certs/ dir to {{ stroom_install_root_dir }}/stroom/
+  copy:
+    src: "{{ local_config_dir }}/certs"
+    dest: "{{ stroom_install_root_dir }}/stroom/"
+    local_follow: no
+    follow: yes
+  tags:
+    - deploy
+    - configure
+    
 # NOTE: It is debatable if we configure the file like this or use a jinja template file
 # If we use templates then we need to maintain the template in this repo.
 # For real deployments where a clone/fork of this repo is used, jinja templates
