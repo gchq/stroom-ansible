@@ -10,6 +10,16 @@
     - deploy
     - configure
 
+- name: Copy certs/ dir to {{ stroom_install_root_dir }}/stroom/
+  copy:
+    src: "{{ local_config_dir }}/certs"
+    dest: "{{ stroom_install_root_dir }}/stroom/"
+    local_follow: no
+    follow: yes
+  tags:
+    - deploy
+    - configure
+    
 # NOTE: It is debatable if we configure the file like this or use a jinja template file
 # If we use templates then we need to maintain the template in this repo.
 # For real deployments where a clone/fork of this repo is used, jinja templates
@@ -48,6 +58,7 @@
     - configure
 
   # Copies any files (except *.j2 files) as they are to the remote.
+  # Will also follow symlinks on the controller
   # Mirrors the directory structure.
   # Will only add/update files on the remote, not delete.
   # To make deletion happen we would need to have all of the files
@@ -55,15 +66,15 @@
 - name: Copy static files from {{ stroom_config_files_and_templates_dir }}/
         to {{ stroom_home_dir }}/
   copy:
-    src: "{{ item.src }}/"
+    src: "{{ stroom_config_files_and_templates_dir }}/{{ item.path }}"
     dest: "{{ stroom_home_dir }}/{{ item.path }}"
     mode: "u=rw,g=,o="
     backup: true
   with_filetree: "{{ stroom_config_files_and_templates_dir }}/"
   loop_control:
-    label: "{{ item.path }}"
+    label: "{{ item.path }} (type: {{ item.state }}, source: {{ item.src | default('N/A') }})"
   when: _stroom_config_files_and_templates_dir_info.stat.exists 
-        and item.state == 'file' 
+        and (item.state == 'file' or item.state == 'link')
         and item.path is not match('.*\.j2$')
         and item.path is not match('.*\.gitkeep$') # Ignore .gitkeep files used to maintain empty dirs
   tags:
@@ -84,7 +95,7 @@
   loop_control:
     label: "{{ item.path }} (type: {{ item.state }}, source: {{ item.src | default('N/A') }})"
   when: _stroom_config_files_and_templates_dir_info.stat.exists 
-        and (item.state == 'file' or item.state == 'link')
+        and item.state == 'file'
         and item.path is match('.*\.j2$')
         and item.path is not match('.*\.gitkeep$') # Ignore .gitkeep files used to maintain empty dirs
   tags:
