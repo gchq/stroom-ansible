@@ -8,6 +8,16 @@
     - deploy
     - configure
 
+- name: Copy certs/ dir to {{ stroom_proxy_install_root_dir }}/stroom-proxy/
+  copy:
+    src: "{{ local_config_dir }}/certs"
+    dest: "{{ stroom_proxy_install_root_dir }}/stroom-proxy/"
+    local_follow: no
+    follow: yes
+  tags:
+    - deploy
+    - configure
+    
 - name: "Check if {{ stroom_proxy_config_files_and_templates_dir }} exists on the Ansible controller"
   local_action: stat path={{ stroom_proxy_config_files_and_templates_dir }}
   become: false
