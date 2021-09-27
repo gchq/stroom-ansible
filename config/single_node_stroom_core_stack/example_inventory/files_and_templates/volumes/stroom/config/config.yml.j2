@@ -125,7 +125,7 @@ appConfig:
     enabled: ${STROOM_CONTENT_PACK_IMPORT_ENABLED:-false}
   job:
     enabled: true
-    enableDistributedJobsOnBootstrap: ${STROOM_DISTRIBUTED_JOBS_ENABLED_ON_BOOTSTRAP:-true}
+    enableJobsOnBootstrap: ${STROOM_JOBS_ENABLED_ON_BOOTSTRAP:-true}
     executionInterval: "10s"
   node:
     # The name for the node, should be unique to each node in the cluster
