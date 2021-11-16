@@ -87,7 +87,7 @@ These are the host groups that are used in the Ansible inventory.
 
 
 
-This directory contains the ansible scripts necessary for setting up a multi-node Stroom v6.0.
+This directory contains the ansible scripts necessary for setting up a multi-node Stroom v7.0.
 
 ## Assumptions and caveats
 
@@ -134,7 +134,7 @@ You also need the host name of the database machine.
 The following all need the database host name
  - `./conf/stroom_services/stroom_services.env` - update:
    - `STROOM_AUTH_DB_HOST`
- - `./conf/stroom_and_proxy/stroom_and_proxy.en`v - update:
+ - `./conf/stroom_and_proxy/stroom_and_proxy.env` - update:
    - `STROOM_DB_HOST`
    - `STROOM_STAT_SDB_HOST`
 
