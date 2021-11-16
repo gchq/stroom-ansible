@@ -103,6 +103,9 @@ stroom_databases:
     privs: "stats.*:ALL"
     host: "%"
 
+# Whether to configure systemd to start stroom on boot
+stroom_service_on_boot: false
+
 # Key/value pairs to set in the stack env file.  These will replace existing
 # values in the env file or add a new line if the name doesn't already exist.
 # It is debatable if we should hold a jinja2 template for this file or use this
