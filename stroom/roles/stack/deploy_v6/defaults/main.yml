@@ -1,0 +1,6 @@
+---
+stack_bin_dir: "{{ stack_install_root_dir }}/{{ stack_name }}/{{ stack_name }}-{{ stack_version }}"
+stack_config_dir: "{{ stack_install_root_dir }}/{{ stack_name }}/{{ stack_name }}-{{ stack_version }}/config"
+stack_volumes_dir: "{{ stack_install_root_dir }}/{{ stack_name }}/volumes"
+stack_env_var_file: "{{ stack_config_dir }}/{{ stack_name }}.env"
+stack_env_vars: {}

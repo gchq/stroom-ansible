@@ -1,0 +1,5 @@
+mysql_repofile_path: "/etc/yum.repos.d/mysql-community.repo"
+use_mysql_yum_repo_file_url: true
+mysql_yum_repo_file_path: /etc/yum.repos.d/mysql-community.repo
+mysql_yum_repo_url:  "https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm"
+mysql_yum_repo_base_url: "https://repo.mysql.com/yum/mysql-8.0-community/el/7/x86_64/" 

@@ -7,7 +7,9 @@
 ################### SETUP HOST(S) ###################
 
 - name: Setup stroom hosts
-  import_playbook: ./setup_stroom_hosts.yml
+  import_playbook: ./setup_stroom_hosts.yml  
+  vars: 
+    mixed_cluster: 'true' 
   tags:
     - setup
 
@@ -24,6 +26,20 @@
       tags:
         - deploy
 
+########### stroom HOSTS  ###########
+
+- hosts:
+    - stroom
+    - stroom_ui
+    - stroom_with_proxy
+  gather_facts: true # Needed for yum stuff
+  become: true
+  become_user: "{{ stroom_user }}"
+  tasks:
+
+    - import_role:
+        name: non_docker_stroom/deploy
+
 ########### stroom and proxy HOSTS  ###########
 
 - hosts:
@@ -38,3 +54,4 @@
 
     - import_role:
         name: non_docker_proxy/deploy
+

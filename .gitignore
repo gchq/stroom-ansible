@@ -9,3 +9,7 @@ venv/
 
 # Vagrant config is auto generated.
 .vagrant
+
+/config/multi_node_mixed_cluster/example_inventory/test_inventory.yml
+
+/config/single_node_stroom_core_stack/example_inventory/test_inventory.yml

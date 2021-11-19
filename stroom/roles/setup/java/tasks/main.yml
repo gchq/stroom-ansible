@@ -68,7 +68,17 @@
         src: "{{ downloads_dir }}/{{ java_archive_filename }}"
         #src: "{{ downloads_dir }}/{{ java_archive[java_version].targz }}"
         dest:  "{{ java_unarchive_dest }}"
+        owner: "root"
+        group: "root"
         remote_src: true
+
+    - name: Copy jdk_home.sh to /etc/profile.d so all users have JAVA_HOME and path set
+      become: true
+      template: 
+        src: templates/jdk_home.sh.j2
+        dest: /etc/profile.d/jdk_home.sh
+        owner: root 
+        mode: 0644
 
   vars:
     #sha256_url: "{{ java_archive[java_version].url }}.sha256"

@@ -1,0 +1,168 @@
+
+# Stroom configuration file
+# =========================
+
+# For information on the structure of this configuration file see:
+# https://www.dropwizard.io/en/latest/manual/configuration.html
+# For information on the logback logFormat strings see:
+# http://logback.qos.ch/manual/layouts.html
+
+# This configuration file was made for the zip distribution.
+
+# This section is the DropWizard configuration for Stroom
+
+server:
+  applicationContextPath: "/"
+  adminContextPath: "/stroomAdmin"
+  applicationConnectors:
+    - type: http
+      port: 8080
+  adminConnectors:
+    - type: http
+      port: 8081
+
+  requestLog:
+    appenders:
+      # Log appender for the web server request logging
+    - type: file
+      currentLogFilename: logs/access/access.log
+      threshold: ALL
+      queueSize: 256
+      discardingThreshold: 0
+      archive: true
+      # Rolled and gzipped every minute
+      archivedLogFilenamePattern: logs/access/access-%d{yyyy-MM-dd'T'HH:mm}.log.gz
+      archivedFileCount: 100
+      timeZone: UTC
+      logFormat: '%h %l "%u" [%t] "%r" %s %b "%i{Referer}" "%i{User-Agent}" %D'
+
+logging:
+  level: "WARN"
+  loggers:
+    stroom: INFO
+    io.dropwizard: INFO
+    org.eclipse.jetty: INFO
+    org.glassfish: INFO
+    org.glassfish.jersey: INFO
+    # Comment this out if you want logging of the REST request/responses
+    # NOT recommended for production environments as it is very verbose
+    org.glassfish.jersey.logging.LoggingFeature: "OFF"
+    #    org.glassfish.jersey.server.ServerRuntime.Responder: INFO
+    #    org.glassfish.jersey.server.validation.internal.ValidationExceptionMapper: FINER
+    org.flywaydb: INFO
+    # Logger and appender for audit logs
+    "event-logger":
+      level: INFO
+      additive: false
+      appenders:
+        - type: file
+          currentLogFilename: logs/user/user.log
+          threshold: ALL
+          queueSize: 256
+          discardingThreshold: 0
+          archive: true
+          # Rolled every minute
+          archivedLogFilenamePattern: logs/user/user-%d{yyyy-MM-dd'T'HH:mm}.log
+          archivedFileCount: 100
+          timeZone: UTC
+          logFormat: "%msg%n"
+    # Logger and appender for the flyway DB migration SQL output
+    org.flywaydb.core.internal.sqlscript:
+      level: DEBUG
+      additive: false
+      appenders:
+        - type: file
+          currentLogFilename: logs/migration/migration.log
+          threshold: ALL
+          queueSize: 256
+          discardingThreshold: 0
+          archive: true
+          # Rolled every day
+          archivedLogFilenamePattern: logs/migration/migration-%d{yyyy-MM-dd}.log
+          archivedFileCount: 10
+          timeZone: UTC
+          logFormat: "%-6level [%d{\"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'\",UTC}] [%t] %logger - %X{code} %msg %n"
+
+  appenders:
+
+    # Minute rolled files for stroom/datafeed, will be curl'd/deleted by stroom-log-sender
+  - type: file
+    currentLogFilename: logs/app/app.log
+    threshold: ALL
+    queueSize: 256
+    discardingThreshold: 0
+    archive: true
+    # Rolled and gzipped every minute
+    archivedLogFilenamePattern: logs/app/app-%d{yyyy-MM-dd'T'HH:mm}.log.gz
+    # One week using minute files
+    archivedFileCount: 10080
+    timeZone: UTC
+    logFormat: "%-6level [%d{\"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'\",UTC}] [%t] %logger - %X{code} %msg %n"
+
+
+  # Size rolled logs for admins (10x100M), not curl'd to stroom
+  - type: file
+    currentLogFilename: logs/app.log
+    threshold: ALL
+    queueSize: 256
+    discardingThreshold: 0
+    archive: true
+    archivedLogFilenamePattern: logs/app-%i.log
+    archivedFileCount: 10
+    maxFileSize: "100MB"
+    timeZone: UTC
+    logFormat: "%-6level [%d{\"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'\",UTC}] [%t] %logger - %X{code} %msg %n"
+
+
+# This section contains the Stroom configuration properties
+# For more information see:
+# https://gchq.github.io/stroom-docs/user-guide/properties.html
+
+appConfig:
+  commonDbDetails:
+    connection:
+      jdbcDriverClassName: "com.mysql.cj.jdbc.Driver"
+      jdbcDriverUrl: "jdbc:mysql://{{ stroom_db_host }}:{{ stroom_db_port }}/stroom?useUnicode=yes&characterEncoding=UTF-8"
+      jdbcDriverUsername: "{{ stroom_db_username }}"
+      jdbcDriverPassword: "{{ stroom_db_password }}"
+  contentPackImport:
+    enabled: false
+  job:
+    enabled: true
+    enableDistributedJobsOnBootstrap: true
+    executionInterval: "10s"
+  node:
+    # The name for the node, should be unique to each node in the cluster
+    name: "{{ inventory_hostname_short }}"
+  # The address of the this node for inter-node communication
+  nodeUri:
+    hostname: "{{ inventory_hostname }}"
+  path:
+    home: "{{ stroom_home_dir }}"
+    temp: "{{ stroom_temp_dir }}"
+  # The public address for stroom, typically the public address of nginx
+  publicUri:
+    hostname: "{{ nginx_advertised_host }}"
+    port: "443"
+  security:
+    authentication:
+      preventLogin: false
+    identity:
+      useDefaultOpenIdCredentials: "false"
+  serviceDiscovery:
+    enabled: "false"
+  statistics:
+    hbase:
+      kafkaConfigUuid:
+    internal:
+      enabledStoreTypes: [ "StatisticStore" ]
+    sql:
+      db:
+        connection:
+          jdbcDriverClassName: "com.mysql.cj.jdbc.Driver"
+          jdbcDriverUrl: "jdbc:mysql://{{ stats_db_host }}:{{ stats_db_port }}/stats?useUnicode=yes&characterEncoding=UTF-8"
+          jdbcDriverUsername: "{{ stats_db_username }}"
+          jdbcDriverPassword: "{{ stats_db_password }}"
+
+# vim: set filetype=yaml tabstop=2 shiftwidth=2 expandtab:
+

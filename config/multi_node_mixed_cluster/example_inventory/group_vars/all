@@ -13,12 +13,12 @@ environment_name: "Test Stroom"
 # The name of the stack to deploy
 stack_name: "stroom_services"
 
-stroom_version: "v7.0-.beta.26"
+stroom_version: "v7.0-beta.137"
 
 stroom_proxy_version: "{{ stroom_version }}"
 
 # The version of the stack to deploy
-stack_version: "{{ stroom_version }}-2"
+stack_version: "{{ stroom_version }}"
 
 # The path on a file server where the stack archive file can be found
 stroom_stack_archive_url_base: "https://github.com/gchq/stroom-resources/releases/download/stroom-stacks-{{ stack_version }}"
@@ -34,6 +34,17 @@ stroom_user: "stroomuser"
 
 # The directory where the stack will be installed on the remote host
 stack_install_root_dir: "/home/{{ stroom_user }}"
+
+# Location to alternative OpenJDK repo 
+# java_15_alt_url: "https://download.java.net/java/GA/jdk15.0.2/0d1cfde4252546c6931946de8db48ee2/7/GPL/openjdk-15.0.2_linux-x64_bin.tar.gz"
+# java_16_alt_url: "https://download.java.net/java/GA/jdk16.0.1/7147401fd7354114ac51ef3e1328291f/9/GPL/openjdk-16.0.1_linux-x64_bin.tar.gz"
+# java_16_alt_url: "https://download.java.net/java/GA/jdk16.0.2/d4a915d82b4c4fbb9bde534da945d746/7/GPL/openjdk-16.0.2_linux-x64_bin.tar.gz"
+
+# Set to true, to specify using the mysql-community-client (v8.0) repo on the internet
+use_mysql_yum_repo_file_url: true
+
+# Location to a different mysql-community-client (v8.0) repo used in the templated mysql-community.repo file
+mysql_yum_repo_base_url: "https://repo.mysql.com/yum/mysql-8.0-community/el/7/$basearch/"
 
 # The directory where stroom will be installed on the remote host
 stroom_install_root_dir: "{{ stack_install_root_dir }}"
@@ -57,26 +68,43 @@ remove_development_certificates: false
 nginx_advertised_host: "{{ hostvars[groups['stroom_services_stack'][0]]['public_ip_address'] 
   | default(hostvars[groups['stroom_services_stack'][0]]['inventory_hostname'])}}"
 
-# The hostname of the database server
-db_host: "{{ hostvars[groups['stroom_database'][0]]['public_ip_address'] 
+# The hostname of the stroom database server
+stroom_db_host: "{{ hostvars[groups['stroom_database'][0]]['public_ip_address'] 
   | default(hostvars[groups['stroom_database'][0]]['inventory_hostname']) }}"
-db_port: 3306
+# stroom_db_port: "{{hostvars[groups['stroom_database'][0]]['mysql_port'] }}"  
+# stroom_db_port: "{{ mysql_port }}"  # Was 3306
+stroom_db_port: "{{hostvars[groups['stroom_database'][0]]['mysql_port'] | default('3306') }}"  
+
+# The hostname of the stats database server
+stats_db_host: "{{ hostvars[groups['stroom_stats_database'][0]]['public_ip_address'] 
+  | default(hostvars[groups['stroom_stats_database'][0]]['inventory_hostname']) }}"
+# stats_db_port: "{{ mysql_port }}"  
+stats_db_port: "{{hostvars[groups['stroom_stats_database'][0]]['mysql_port'] | default('3307') }}"  
 
 # Database credentials
-stroom_db_root_password: "my-secret-pw"
+#stroom_db_root_password: "StroomPassword1?_root"
+stroom_db_username: "stroomuser"
+stroom_db_password: "Stroompassword1!"
+stats_db_username: "statsuser"
+stats_db_password: "Stroompassword1!"
+
+# All the databases/users that will be created
 stroom_databases:
 
   - name: stroom
-    user: stroomuser
-    password: stroompassword1
+    user: "{{ stroom_db_username }}"
+    password: "{{ stroom_db_password }}"
+    privs: "stroom.*:ALL"
+    host: "%"
 
   - name: stats
-    user: statsuser
-    password: stroompassword1
+    user: "{{ stats_db_username }}"
+    password: "{{ stats_db_password }}"
+    privs: "stats.*:ALL"
+    host: "%"
 
-  - name: auth
-    user: authuser
-    password: stroompassword1
+# Whether to configure systemd to start stroom on boot
+stroom_service_on_boot: false
 
 # Key/value pairs to set in the stack env file.  These will replace existing
 # values in the env file or add a new line if the name doesn't already exist.
@@ -89,9 +117,9 @@ stack_env_vars:
   DOCKER_HOST_HOSTNAME: "{{ inventory_hostname }}"
   DOCKER_HOST_IP: "{{ public_ip_address | default(ansible_default_ipv4 | default(ansible_all_ipv4_addresses[0])) }}"
 
-  DB_HOST_IP: "{{ db_host }}"
-  STROOM_AUTH_DB_HOST: "{{ db_host }}"
-  STROOM_AUTH_DB_PORT: "{{ db_port }}"
+  DB_HOST_IP: "{{ stroom_db_host }}"
+  STROOM_AUTH_DB_HOST: "{{ stroom_db_host }}"
+  STROOM_AUTH_DB_PORT: "{{ stroom_db_port }}"
 
   NGINX_ADVERTISED_HOST: "{{ nginx_advertised_host }}"
 
@@ -120,75 +148,77 @@ stack_env_vars:
   #STROOM_PROXY_LOCAL_FORWARDING_TRUSTSTORE_PATH: "/stroom-proxy/certs/example.ca.jks"
 
 
-# TODO maybe move to the appropriate host group vars file
+# TODO stroom.conf is no more in v7 so instead we need a jinja2 template in 
+# files_and_templates/stroom/config that contains everything we want
+
 # Values for the stroom.conf file
 # These could be acheived with a jinja template
-stroom_conf_values:
+#stroom_conf_values:
 
-  - key: stroom.temp
-    value: "{{ stroom_temp_dir }}"
+  #- key: stroom.temp
+    #value: "{{ stroom_temp_dir }}"
 
-  - key: stroom.node
-    value: "{{ inventory_hostname_short }}"
+  #- key: stroom.node
+    #value: "{{ inventory_hostname_short }}"
 
-  - key: stroom.htmlTitle
-    value: "{{ environment_name }}"
+  #- key: stroom.htmlTitle
+    #value: "{{ environment_name }}"
 
-  - key: stroom.jdbcDriverUrl
-    value: jdbc:mysql://{{ db_host }}:{{ db_port }}/stroom?useUnicode=yes&characterEncoding=UTF-8
+  #- key: stroom.jdbcDriverUrl
+    #value: jdbc:mysql://{{ stroom_db_host }}:{{ stroom_db_port }}/stroom?useUnicode=yes&characterEncoding=UTF-8
 
-  - key: stroom.statistics.sql.jdbcDriverUrl
-    value: jdbc:mysql://{{ db_host }}:{{ db_port }}/stats?useUnicode=yes&characterEncoding=UTF-8
+  #- key: stroom.statistics.sql.jdbcDriverUrl
+    #value: jdbc:mysql://{{ stats_db_host }}:{{ stats_db_port }}/stats?useUnicode=yes&characterEncoding=UTF-8
 
-    # This should be set to the value of "stroomServiceUser's" token in Tools => API Keys
-    # TODO the value below should be the default but won't be until 6.0.28
-  - key: stroom.security.apiToken
-    value: "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlzcyI6InN0cm9vbSIsImF1ZCI6IlBabkpyOGtIUktxbmxKUlFUaFNJIn0.qT5jdPWBpN9me0L3OqUT0VFT2mvVX9mCp0gPFyTVg8DkFTPLLYIuXjOslvrllJDBbqefEtqS9OwQs3RmRnZxror676stTP6JHN76YqJWj2yJYyJGuggbXjZnfTiZGO3SOxl5FP4nmRRvPxA3XqV9kippKBpHfqm5RuTpFTU8uses2iaHFm7lY4zXmKDmwVizXybBQBtpxrBNQkeQjQyg7UFkpsRO8-PmIdbTldRhGlud5VpntwI1_ahwOzK-einUJQOWrcOBmXAMPRYBI6tSLT1xS_c5XpFX1Rxoj3FGjI-Myqp_2Nt_lZuQ3h-0Qh8WkZMnWQ76G7CKawXzRAwd7Q"
+    ## This should be set to the value of "stroomServiceUser's" token in Tools => API Keys
+    ## TODO the value below should be the default but won't be until 6.0.28
+  #- key: stroom.security.apiToken
+    #value: "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlzcyI6InN0cm9vbSIsImF1ZCI6IlBabkpyOGtIUktxbmxKUlFUaFNJIn0.qT5jdPWBpN9me0L3OqUT0VFT2mvVX9mCp0gPFyTVg8DkFTPLLYIuXjOslvrllJDBbqefEtqS9OwQs3RmRnZxror676stTP6JHN76YqJWj2yJYyJGuggbXjZnfTiZGO3SOxl5FP4nmRRvPxA3XqV9kippKBpHfqm5RuTpFTU8uses2iaHFm7lY4zXmKDmwVizXybBQBtpxrBNQkeQjQyg7UFkpsRO8-PmIdbTldRhGlud5VpntwI1_ahwOzK-einUJQOWrcOBmXAMPRYBI6tSLT1xS_c5XpFX1Rxoj3FGjI-Myqp_2Nt_lZuQ3h-0Qh8WkZMnWQ76G7CKawXzRAwd7Q"
 
-  - key: stroom.serviceDiscovery.simpleLookup.basePath
-    value: http://localhost:8080
+  #- key: stroom.serviceDiscovery.simpleLookup.basePath
+    #value: http://localhost:8080
 
-    # Not using kafka yet, so set to blank to stop it trying to connect
-  - key: stroom.connectors.kafka.default.bootstrap.servers
-    value: ""
+    ## Not using kafka yet, so set to blank to stop it trying to connect
+  #- key: stroom.connectors.kafka.default.bootstrap.servers
+    #value: ""
 
-  - key: stroom.advertisedUrl
-    value: https://{{ nginx_advertised_host }}
-  - key: stroom.auth.services.url
-    value: https://{{ nginx_advertised_host }}/api/auth
-  - key: stroom.auth.authentication.service.url
-    value: https://{{ nginx_advertised_host }}/api/auth/authentication/v1
-  - key: stroom.users.ui.url
-    value: https://{{ nginx_advertised_host }}/s/users
-  - key: stroom.apikeys.ui.url
-    value: https://{{ nginx_advertised_host }}/s/tokens
-  - key: stroom.changepassword.url
-    value: https://{{ nginx_advertised_host }}/s/changepassword
-  - key: stroom.url.dashboard
-    value: http://{{ nginx_advertised_host }}/stroom/dashboard.jsp
+  #- key: stroom.advertisedUrl
+    #value: https://{{ nginx_advertised_host }}
+  #- key: stroom.auth.services.url
+    #value: https://{{ nginx_advertised_host }}/api/auth
+  #- key: stroom.auth.authentication.service.url
+    #value: https://{{ nginx_advertised_host }}/api/auth/authentication/v1
+  #- key: stroom.users.ui.url
+    #value: https://{{ nginx_advertised_host }}/s/users
+  #- key: stroom.apikeys.ui.url
+    #value: https://{{ nginx_advertised_host }}/s/tokens
+  #- key: stroom.changepassword.url
+    #value: https://{{ nginx_advertised_host }}/s/changepassword
+  #- key: stroom.url.dashboard
+    #value: http://{{ nginx_advertised_host }}/stroom/dashboard.jsp
 
-    # Settings these stops stroom trying to send internal stats to stroom-stats
-  - key: stroom.internalstatistics.benchmarkCluster.docRefs
-    value: docRef(StatisticStore,946a88c6-a59a-11e6-bdc4-0242ac110002,Benchmark-Cluster Test)
-  - key: stroom.internalstatistics.pipelineStreamProcessor.docRefs
-    value: docRef(StatisticStore,946a80fc-a59a-11e6-bdc4-0242ac110002,PipelineStreamProcessor)
-  - key: stroom.internalstatistics.metaDataStreamSize.docRefs
-    value: docRef(StatisticStore,946a8814-a59a-11e6-bdc4-0242ac110002,Meta Data-Stream Size)
-  - key: stroom.internalstatistics.eventsPerSecond.docRefs
-    value: docRef(StatisticStore,a9936548-2572-448b-9d5b-8543052c4d92,EPS)
-  - key: stroom.internalstatistics.cpu.docRefs
-    value: docRef(StatisticStore,af08c4a7-ee7c-44e4-8f5e-e9c6be280434,CPU)
-  - key: stroom.internalstatistics.metaDataStreamsReceived.docRefs
-    value: docRef(StatisticStore,946a87bc-a59a-11e6-bdc4-0242ac110002,Meta Data-Streams Received)
-  - key: stroom.internalstatistics.streamTaskQueueSize.docRefs
-    value: docRef(StatisticStore,946a7f0f-a59a-11e6-bdc4-0242ac110002,Stream Task Queue Size)
-  - key: stroom.internalstatistics.volumes.docRefs
-    value: docRef(StatisticStore,ac4d8d10-6f75-4946-9708-18b8cb42a5a3,Volumes)
-  - key: stroom.internalstatistics.memory.docRefs
-    value: docRef(StatisticStore,77c09ccb-e251-4ca5-bca0-56a842654397,Memory)
-  - key: stroom.internalstatistics.heapHistogramInstances.docRefs
-    value: docRef(StatisticStore,e4f243b8-2c70-4d6e-9d5a-16466bf8764f,Heap Histogram Instances)
-  - key: stroom.internalstatistics.heapHistogramBytes.docRefs
-    value: docRef(StatisticStore,934a1600-b456-49bf-9aea-f1e84025febd,Heap Histogram Bytes)
+    ## Settings these stops stroom trying to send internal stats to stroom-stats
+  #- key: stroom.internalstatistics.benchmarkCluster.docRefs
+    #value: docRef(StatisticStore,946a88c6-a59a-11e6-bdc4-0242ac110002,Benchmark-Cluster Test)
+  #- key: stroom.internalstatistics.pipelineStreamProcessor.docRefs
+    #value: docRef(StatisticStore,946a80fc-a59a-11e6-bdc4-0242ac110002,PipelineStreamProcessor)
+  #- key: stroom.internalstatistics.metaDataStreamSize.docRefs
+    #value: docRef(StatisticStore,946a8814-a59a-11e6-bdc4-0242ac110002,Meta Data-Stream Size)
+  #- key: stroom.internalstatistics.eventsPerSecond.docRefs
+    #value: docRef(StatisticStore,a9936548-2572-448b-9d5b-8543052c4d92,EPS)
+  #- key: stroom.internalstatistics.cpu.docRefs
+    #value: docRef(StatisticStore,af08c4a7-ee7c-44e4-8f5e-e9c6be280434,CPU)
+  #- key: stroom.internalstatistics.metaDataStreamsReceived.docRefs
+    #value: docRef(StatisticStore,946a87bc-a59a-11e6-bdc4-0242ac110002,Meta Data-Streams Received)
+  #- key: stroom.internalstatistics.streamTaskQueueSize.docRefs
+    #value: docRef(StatisticStore,946a7f0f-a59a-11e6-bdc4-0242ac110002,Stream Task Queue Size)
+  #- key: stroom.internalstatistics.volumes.docRefs
+    #value: docRef(StatisticStore,ac4d8d10-6f75-4946-9708-18b8cb42a5a3,Volumes)
+  #- key: stroom.internalstatistics.memory.docRefs
+    #value: docRef(StatisticStore,77c09ccb-e251-4ca5-bca0-56a842654397,Memory)
+  #- key: stroom.internalstatistics.heapHistogramInstances.docRefs
+    #value: docRef(StatisticStore,e4f243b8-2c70-4d6e-9d5a-16466bf8764f,Heap Histogram Instances)
+  #- key: stroom.internalstatistics.heapHistogramBytes.docRefs
+    #value: docRef(StatisticStore,934a1600-b456-49bf-9aea-f1e84025febd,Heap Histogram Bytes)
 
 # vim: set filetype=yaml shiftwidth=2 tabstop=2 expandtab:

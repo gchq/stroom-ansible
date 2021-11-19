@@ -1,28 +1,22 @@
 mysql_repo_version: "80"
-mysql_repo_target_version: "56"
+mysql_repo_target_version: "80"
 mysql_repo_rpm_file: "mysql{{ mysql_repo_version }}-community-release-el7-3.noarch.rpm"
 mysql_repo_local_install: "/etc/yum.repos.d/mysql-community.repo"
-mysql_port: "3306"
+# mysql_port: "3306" # Replaced by variable listed in config/multi_node_mixed_cluster/example_inventory/example_inventory.yml
 
-stroom_db_root_password: "my-secret-pw"
+stroom_db_root_password: "Str00m-DB" # Replaced by variable listed in config/multi_node_mixed_cluster/example_inventory/example_inventory.yml
 
 stroom_databases:
 
   - name: stroom
     user: stroomuser
-    password: stroompassword1
+    password: StroomPassword1?
     privs: "stroom.*:ALL"
     host: "%"
 
   - name: stats
     user: statsuser
-    password: stroompassword1
+    password: StroomPassword1?
     privs: "stats.*:ALL"
-    host: "%"
-
-  - name: auth
-    user: authuser
-    password: stroompassword1
-    privs: "auth.*:ALL"
     host: "%"
 

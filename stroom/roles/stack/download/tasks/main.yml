@@ -2,7 +2,7 @@
   assert:
     that:
       - downloads_dir | default('') | trim != ''
-      - stack_bin_dir | default('') | trim != ''
+      - stack_home_dir | default('') | trim != ''
       - stack_install_root_dir | default('') | trim != ''
       - stack_name | default('') | trim != ''
       - stack_version | default('') | trim != ''
@@ -15,19 +15,18 @@
     mode: "u=rwX,g=,o="
     state: directory
 
-- name: "See if {{ stack_volumes_dir }} exists"
-  stat:
-    path: "{{ stack_volumes_dir }}"
-  register: _stack_volumes_dir_info
+#- name: "See if {{ stack_volumes_dir }} exists"
+  #stat:
+    #path: "{{ stack_volumes_dir }}"
+  #register: _stack_volumes_dir_info
 
-- name: "See if {{ stack_bin_dir }} exists"
+- name: "See if {{ stack_home_dir }} exists"
   stat:
-    path: "{{ stack_bin_dir }}"
-  register: _stack_bin_dir_info
+    path: "{{ stack_home_dir }}"
+  register: _stack_home_dir_info
 
 - name: "Download archive {{ _stroom_stack_archive_url }}" 
-  when: _stack_volumes_dir_info.stat.exists == false
-        or _stack_bin_dir_info.stat.exists == false
+  when: _stack_home_dir_info.stat.exists == false
   block:
 
     # Use a set dir rather than a temporay one to save us having to download a big archive
@@ -84,14 +83,21 @@
     # --END OF BLOCK--
 
   # Relying on the archive having been downloaded above
-  # We may have a volumes dir from a previous release that we want to keep
-- name: "Copy stack volumes dir to {{ stack_volumes_dir }}" 
+- name: "Copy stack home dir to {{ stack_home_dir }}" 
   copy:
-    src: "{{ _stack_unpack_tmp_dir_info.path }}/{{ _stack_relative_volumes_dir }}"
+    src: "{{ _stack_unpack_tmp_dir_info.path }}/{{ stack_name }}-{{ stack_version }}"
     dest: "{{ stack_install_root_dir }}/{{ stack_name }}/"
     remote_src: true
     force: false # Don't copy if it is already there
-  when: _stack_volumes_dir_info.stat.exists == false
+  when: _stack_home_dir_info.stat.exists == false
+
+- name: Change permissions for {{ stack_home_dir }}
+  file:
+    path: "{{ stack_home_dir }}"
+    owner: "{{ stroom_user }}"
+    mode: "u=rwX,g=,o="
+    recurse: true
+  when: _stack_home_dir_info.stat.exists == false
 
   # TODO The files in the volumes dir need to be accessed by the user inside
   # the container which may have a different uid to the host user, thus we
@@ -102,24 +108,7 @@
     owner: "{{ stroom_user }}"
     mode: "u=rwX,g=rX,o=rX"
     recurse: true
-  when: _stack_volumes_dir_info.stat.exists == false
-
-  # Relying on the archive having been downloaded above
-- name: "Copy stack bin dir to {{ stack_bin_dir }}" 
-  copy:
-    src: "{{ _stack_unpack_tmp_dir_info.path }}/{{ _stack_relative_bin_dir }}"
-    dest: "{{ stack_install_root_dir }}/{{ stack_name }}/"
-    remote_src: true
-    force: false # Don't copy if it is already there
-  when: _stack_bin_dir_info.stat.exists == false
-
-- name: Change permissions for {{ stack_bin_dir }}
-  file:
-    path: "{{ stack_bin_dir }}"
-    owner: "{{ stroom_user }}"
-    mode: "u=rwX,g=,o="
-    recurse: true
-  when: _stack_bin_dir_info.stat.exists == false
+  when: _stack_home_dir_info.stat.exists == false
 
 - name: Create a symlink for 'latest'
   file:
@@ -135,6 +124,5 @@
   file:
     path: "{{ _stack_unpack_tmp_dir_info.path }}"
     state: absent
-  when: _stack_volumes_dir_info.stat.exists == false
-        or _stack_bin_dir_info.stat.exists == false
+  when: _stack_home_dir_info.stat.exists == false
         and _stack_unpack_tmp_dir_info is defined

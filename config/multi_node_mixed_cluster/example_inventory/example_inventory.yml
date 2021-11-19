@@ -1,19 +1,54 @@
 ---
 all:
   children:
-    stroom_and_proxy:
+    stroom:                                    # Used for processing nodes
+      hosts:
+        stroom-host-1:
+          #public_ip_address: 192.168.100.10
+        stroom-host-2:
+          #public_ip_address: 192.168.100.20
+    stroom_ui:                                 # Used fot non-proxy nodes but with different parameters to above 
+      hosts:
+        stroom-ui-host-1:
+          #public_ip_address: 192.168.100.16
+        stroom-ui-host-2:
+          #public_ip_address: 192.168.100.19
+    stroom_with_proxy:                         # Used for nodes with legacy proxy
+      hosts:
+        stroom-with-proxy-host-1:
+          #public_ip_address: 192.168.100.17
+        stroom-with-proxy-host-2:
+          #public_ip_address: 192.168.100.18
+    stroom_and_proxy:                          # Used for nodes with proxy 
       hosts:
         stroom-and-proxy-host-1:
           # Set public_ip_address to the hosts public IP
           # address when testing without a DNS server
           #public_ip_address: 192.168.100.11
+          #java_opts: "-Xms512m -Xmx2048m"
         stroom-and-proxy-host-2:
           #public_ip_address: 192.168.100.12
+          #java_opts: "-Xms512m -Xmx2048m"
     stroom_services_stack:
       hosts:
         stroom-services-stack-host:
           #public_ip_address: 192.168.100.13
+          #java_opts: "-Xms512m -Xmx2048m"
     stroom_database:
       hosts:
         stroom-database-host:
+          #ansible_host: 192.168.100.14        # Need to specify FQDN as ansible host else Ansible will not pick up the separate DB instances on the same host 
           #public_ip_address: 192.168.100.14
+          #mysql_port:3306
+          #db_instance_name: "stroom"
+          #db_root_password: "StroomPassword1?_root"
+          #db_local_socket: "/var/run/mysqld/mysqld.sock"
+    stroom_stats_database:
+      hosts:
+        stroom-stats_database-host:
+          #ansible_host: 192.168.100.15        # Need to specify FQDN as ansible host else Ansible will not pick up the separate DB instances on the same host 
+          #public_ip_address: 192.168.100.15
+          #mysql_port:3307
+          #db_instance_name: "stats"
+          #db_root_password: "StroomPassword1?_root"
+          #db_local_socket: "/var/run/mysqld/mysqld.sock"

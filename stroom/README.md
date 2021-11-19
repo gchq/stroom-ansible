@@ -70,8 +70,12 @@ These are the host groups that are used in the Ansible inventory.
 * stroom_core_stack - A single node stroom stack running all of the core application.
 * stroom_services_stack - Nginx, auth* and log-sender running in a docker stack.
 * stroom_dbs_stack - Mysql running in a docker.
+* stroom - Stroom running without docker.
+* stroom_ui - Stroom running without docker, able to be configured differently to above.
+* stroom_with_proxy - Stroom and local legacy proxy running without docker. Ansible with not update proxy but configure stroom correctly.
 * stroom_and_proxy - Stroom and local proxy running without docker.
-* stroom_database - Mysql running outside of docker.
+* stroom_database - Mysql running outside of docker for stroom & auth databases.
+* stroom_stats_database - Mysql running outside of docker for stats database.
 * stroom_remote_proxy_stack - Nginx and stroom-proxy in a docker stack.
 
 
@@ -83,7 +87,7 @@ These are the host groups that are used in the Ansible inventory.
 
 
 
-This directory contains the ansible scripts necessary for setting up a multi-node Stroom v6.0.
+This directory contains the ansible scripts necessary for setting up a multi-node Stroom v7.0.
 
 ## Assumptions and caveats
 
@@ -130,7 +134,7 @@ You also need the host name of the database machine.
 The following all need the database host name
  - `./conf/stroom_services/stroom_services.env` - update:
    - `STROOM_AUTH_DB_HOST`
- - `./conf/stroom_and_proxy/stroom_and_proxy.en`v - update:
+ - `./conf/stroom_and_proxy/stroom_and_proxy.env` - update:
    - `STROOM_DB_HOST`
    - `STROOM_STAT_SDB_HOST`
 

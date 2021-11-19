@@ -22,14 +22,32 @@ _java:
     url: "https://download.java.net/java/GA/jdk13.0.1/cec27d702aa74d5a8630c65ae61e4305/9/GPL/openjdk-13.0.1_linux-x64_bin.tar.gz"
     directory: "jdk-13.0.1"
     home_dir: "{{ java_unarchive_dest }}/jdk-13.0.1"
-
+  14:
+    targz: "openjdk-14.0.2_linux-x64_bin.tar.gz"
+    url: "https://download.java.net/java/GA/jdk14.0.2/205943a0976c4ed48cb16f1043c5c647/12/GPL/openjdk-14.0.2_linux-x64_bin.tar.gz"
+    directory: "jdk-14.0.2"
+    home_dir: "{{ java_unarchive_dest }}/jdk-14.0.2"
+  15:
+    targz: "openjdk-15.0.2_linux-x64_bin.tar.gz"
+    url: "{{ java_15_alt_url | default('https://download.java.net/java/GA/jdk15.0.2/0d1cfde4252546c6931946de8db48ee2/7/GPL/openjdk-15.0.2_linux-x64_bin.tar.gz') }}"
+    directory: "jdk-15.0.2"
+    home_dir: "{{ java_unarchive_dest }}/jdk-15.0.2"
+  16:
+#   targz: "openjdk-16.0.1_linux-x64_bin.tar.gz"
+#   url: "{{ java_16_alt_url | default('https://download.java.net/java/GA/jdk16.0.1/7147401fd7354114ac51ef3e1328291f/9/GPL/openjdk-16.0.1_linux-x64_bin.tar.gz') }}"
+#   directory: "jdk-16.0.1"
+#   home_dir: "{{ java_unarchive_dest }}/jdk-16.0.1"
+    targz: "openjdk-16.0.2_linux-x64_bin.tar.gz"
+    url: "{{ java_16_alt_url | default('https://download.java.net/java/GA/jdk16.0.2/d4a915d82b4c4fbb9bde534da945d746/7/GPL/openjdk-16.0.2_linux-x64_bin.tar.gz') }}"
+    directory: "jdk-16.0.2"
+    home_dir: "{{ java_unarchive_dest }}/jdk-16.0.2"
 
 # Java 6,7,8,11 stuff
 java_yum_package: "{{ _java[java_version | int].jre | default([]) }}"
 java_jdk_yum_package: "{{ _java[java_version | int].jdk | default([]) }}"
 
-# Java 12 stuff
-java_archive_filename: "{{ _java[java_version | int].targz | default([]) }}"
+# Java 12,13,14,15,16 stuff
+java_archive_filename: "{{ _java[java_version | int].tar.gz | default([]) }}"
 java_archive_url: "{{ _java[java_version | int].url | default([]) }}"
 java_archive_directory: "{{ _java[java_version | int].directory | default([]) }}"
 java_archive_sha256_url: "{{ java_archive_url }}.sha256"

@@ -11,7 +11,7 @@ ansible_user: vagrant
 stack_name: "stroom_core_test"
 
 # The version of the stack to deploy
-stack_version: "v7.0-beta.96-2"
+stack_version: "v7.0-beta.137"
 
 # The path on a file server where the stack archive file can be found
 stroom_stack_archive_url_base: "https://github.com/gchq/stroom-resources/releases/download/stroom-stacks-{{ stack_version }}"
@@ -27,6 +27,12 @@ stroom_user: "stroomuser"
 # The directory where stroom-proxy will be installed on the remote host
 stack_install_root_dir: "/home/{{ stroom_user }}"
 
+# Set to true, to specify using the mysql-community-client (v8.0) repo on the internet
+use_mysql_yum_repo_file_url: true
+
+# Location to a different mysql-community-client (v8.0) repo used in the templated mysql-community.repo file
+mysql_yum_repo_base_url: "https://repo.mysql.com/yum/mysql-8.0-community/el/7/$basearch/"
+
 # Set to true to delete all the self signed development certificates
 remove_development_certificates: false
 
@@ -35,6 +41,9 @@ remove_development_certificates: false
 # in a similar way to this. If you have no DNS then use an IP that is resolvable from
 # outside the host and from inside the containers.
 nginx_advertised_host: "{{ hostvars[groups['stroom_core_stack'][0]]['public_ip_address'] }}"
+
+# Whether to configure systemd to start stroom on boot
+stroom_service_on_boot: false
 
 # Key/value pairs to set in the stack env file.  These will replace existing
 # values in the env file or add a new line if the name doesn't already exist.
@@ -45,6 +54,11 @@ stack_env_vars:
   HOST_IP: "{{ nginx_advertised_host }}"
 
   NGINX_ADVERTISED_HOST: "{{ nginx_advertised_host }}"
+
+  #STROOM_NODE: "{{ inventory_hostname }}"
+  #DOCKER_HOST_HOSTNAME: "{{ inventory_hostname }}"
+
+  #DOCKER_HOST_IP: "{{ public_ip_address | default(ansible_default_ipv4) }}"
 
   #NGINX_SSL_CERTIFICATE_KEY: "example.server.key"
   #NGINX_SSL_CERTIFICATE: "example.server.cert"

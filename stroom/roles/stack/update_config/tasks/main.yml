@@ -46,6 +46,7 @@
     - configure
 
   # Copies any files (except *.j2 files) as they are to the remote.
+  # Will also follow symlinks on the controller
   # Mirrors the directory structure.
   # Will only add/update files on the remote, not delete.
   # To make deletion happen we would need to have all of the volumes dir
@@ -53,17 +54,18 @@
   # TODO The files in the volumes dir need to be accessed by the user inside
   # the container which may have a different uid to the host user, thus we
   # need to open up read to g and o
-- name: "Copy static files from {{ config_files_and_templates_dir }}/ to {{ stack_volumes_dir }}/"
+- name: "Copy static files from {{ config_files_and_templates_dir }}/ (local) to {{ stack_volumes_dir }}/"
   copy:
-    src: "{{ item.src }}"
+    src: "{{ config_files_and_templates_dir }}/{{ item.path }}"
     dest: "{{ stack_volumes_dir }}/{{ item.path }}"
     mode: "u=rw,g=r,o=r"
+    local_follow: true
     backup: true
   with_filetree: "{{ config_files_and_templates_dir }}/"
   loop_control:
-    label: "{{ item.path }}"
+    label: "{{ item.path }} (type: {{ item.state }}, source: {{ item.src | default('N/A') }})"
   when: _config_files_and_templates_dir_info.stat.exists 
-        and item.state == 'file' 
+        and (item.state == 'file' or item.state == 'link')
         and item.path is not match('.*\.j2$')
         and item.path is not match('.*\.gitkeep$') # Ignore .gitkeep files used to maintain empty dirs
   tags:
@@ -71,20 +73,22 @@
     - configure
 
   # Copies and templates any *.j2 files found in the tree, removing the .j2 extension.
+  # Will also follow symlinks on the controller
   # Mirrors the directory structure.
   # Will only add/update files on the remote, not delete.
   # TODO The files in the volumes dir need to be accessed by the user inside
   # the container which may have a different uid to the host user, thus we
   # need to open up read to g and o
-- name: "Copy and template .j2 files from {{ config_files_and_templates_dir }}/ to {{ stack_volumes_dir }}/"
+- name: "Copy and template .j2 files from {{ config_files_and_templates_dir }}/ (local) to {{ stack_volumes_dir }}/"
   template:
-    src: "{{ item.src }}"
+    src: "{{ config_files_and_templates_dir }}/{{ item.path }}"
     dest: "{{ stack_volumes_dir }}/{{ item.path | regex_replace('.j2$','') }}"
     mode: "u=rw,g=r,o=r"
     backup: true
+    local_follow: true
   with_filetree: "{{ config_files_and_templates_dir }}/"
   loop_control:
-    label: "{{ item.path }}"
+    label: "{{ item.path }} (type: {{ item.state }}, source: {{ item.src | default('N/A') }})"
   when: _config_files_and_templates_dir_info.stat.exists 
         and item.state == 'file' 
         and item.path is match('.*\.j2$')
@@ -92,7 +96,6 @@
   tags:
     - deploy
     - configure
-
 
 #- name: Get absolute path 
   #command: "realpath {{ local_config_dir }}"

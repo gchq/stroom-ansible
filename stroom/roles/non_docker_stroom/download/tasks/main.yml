@@ -49,7 +49,7 @@
 
     - name: Ensure logs directory exists
       file:
-        path:  "{{ stroom_home_dir }}/logs"
+        path:  "{{ stroom_app_home_dir | default(stroom_home_dir) }}/logs"
         state: directory
 
 ######## END OF BLOCK ######## 

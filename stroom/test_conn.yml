@@ -2,6 +2,7 @@
 - hosts:
     - all
     - stroom_database
+    - stroom_stats_database
     - ~stroom_.*
     - ~_.*_stack$
     - unknown_group

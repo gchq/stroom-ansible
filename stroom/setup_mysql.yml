@@ -1,6 +1,8 @@
 ---
 - name: Setup all hosts, installing dependencies such as docker
-  hosts: stroom_database
+  hosts: 
+    - stroom_database
+    - stroom_stats_database
   vars_files:
     - ./variables.yml
     - ../global_variables.yml

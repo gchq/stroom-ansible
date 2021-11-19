@@ -33,8 +33,8 @@ different OS would require changes.
 └── stroom # Ansible playbooks
     ├── roles # Ansible roles
     │   ├── build_stroom_source # Roles for running stroom java builds
-    │   ├── non_docker_proxy # Stroom outside of docker
-    │   ├── non_docker_stroom # Stroom-proxy outside of docker
+    │   ├── non_docker_proxy # Stroom-proxy outside of docker
+    │   ├── non_docker_stroom # Stroom outside of docker
     │   ├── setup # General host set up roles
     │   ├── stack # Roles for stroom docker stacks
     │   └── third_party # Any third party Ansible roles
@@ -206,8 +206,12 @@ The host groups that are used by the Ansible roles/plays are as follows.
   * `stroom_dbs_stack` - Mysql running in a docker.
   * `stroom_remote_proxy_stack` - Nginx and stroom-proxy in a docker stack.
 * Without Docker
+  * `stroom` - Stroom running without docker.
+  * `stroom_ui` - Stroom running without docker.
+  * `stroom_with_proxy` - Stroom and local legacy proxy running without docker.
   * `stroom_and_proxy` - Stroom and local proxy running without docker.
-  * `stroom_database` - Mysql running without docker.
+  * `stroom_database` - Mysql running without docker for stroom & auth databases.
+  * `stroom_stats_database` - Mysql running without docker for stats database.
 
 ### Group Vars
 
@@ -232,8 +236,8 @@ stack_env_vars:
   DOCKER_HOST_HOSTNAME: "{{ inventory_hostname }}"
   DOCKER_HOST_IP: "{{ public_ip_address | default(ansible_default_ipv4) }}"
 
-  DB_HOST_IP: "{{ db_host }}"
-  STROOM_AUTH_DB_HOST: "{{ db_host }}"
+  DB_HOST_IP: "{{ stroom_db_host }}"
+  STROOM_AUTH_DB_HOST: "{{ stroom_db_host }}"
 ```
 
 #### Stroom .conf File

@@ -36,6 +36,6 @@ service_dev_certs:
   - path: "{{ stack_volumes_dir }}/nginx/certs"
     files: "{{ server_cert_files }}"
 
-  - path: "{{ stack_bin_dir }}/certs"
+  - path: "{{ stack_home_dir }}/certs"
     files: "{{ client_cert_files }}"
 

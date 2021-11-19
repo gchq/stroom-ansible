@@ -1,5 +1,5 @@
 ---
 - name: Restart mysql
   service: 
-    name: mysql 
+    name: mysqld@{{ db_instance_name }} 
     state: restarted
