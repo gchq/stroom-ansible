@@ -23,13 +23,13 @@
         name: stack/deploy_v6
       tags:
         - deploy
-      when: stroom_version == ("^v6\.")         # When Stroom v6.x
+      when: stack_version == ("^v6\.")         # When Stroom v6.x
 
     - import_role:
         name: stack/deploy
       tags:
         - deploy
-      when: NOT stroom_version == ("^v6\.")     # When NOT Stroom v6.x, i.e. Stroom v7
+      when: stack_version != ("^v6\.")         # When NOT Stroom v6.x, i.e. Stroom v7
 
     - import_role:
         name: setup/systemd
