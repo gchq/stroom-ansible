@@ -42,7 +42,7 @@
         packages:
         - mysql-community-client 
   become: true
-  tags: 
-    - mysql_client
+# tags: 
+#   - install_mysql_client
   when: (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7" )
 

@@ -93,6 +93,19 @@
         name: docker 
         state: restarted
 
+- name: Install mysql client
+  become: true
+  hosts:
+    - stroom
+    - stroom_ui
+    - stroom_with_proxy
+    - stroom_and_proxy
+  tags: 
+    - install_mysql_client
+
+  tasks: 
+    - import_role:
+       name: roles/setup/mysql_controller_deps
 
 - name: Setup hosts with java
   become: true
