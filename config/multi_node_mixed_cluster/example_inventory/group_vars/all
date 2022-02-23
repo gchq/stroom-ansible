@@ -13,7 +13,7 @@ environment_name: "Test Stroom"
 # The name of the stack to deploy
 stack_name: "stroom_services"
 
-stroom_version: "v7.0-beta.137"
+stroom_version: "v7.0-beta.183"
 
 stroom_proxy_version: "{{ stroom_version }}"
 

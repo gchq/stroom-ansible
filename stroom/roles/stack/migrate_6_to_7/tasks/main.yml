@@ -76,9 +76,9 @@
   # Copy mig sql scripts to host
   # If this fails you need to add the scripts into the db_mig_scripts_dir
   # E.g. 
-  # wget https://raw.githubusercontent.com/gchq/stroom/v7.0-beta.96/scripts/v7_db_pre_migration_checks.sql
-  # wget https://raw.githubusercontent.com/gchq/stroom/v7.0-beta.96/scripts/v7_drop_unused_databases.sql
-  # wget https://raw.githubusercontent.com/gchq/stroom/v7.0-beta.96/scripts/v7_auth_db_table_rename.sql
+  # wget https://raw.githubusercontent.com/gchq/stroom/v7.0-beta.183/scripts/v7_db_pre_migration_checks.sql
+  # wget https://raw.githubusercontent.com/gchq/stroom/v7.0-beta.183/scripts/v7_drop_unused_databases.sql
+  # wget https://raw.githubusercontent.com/gchq/stroom/v7.0-beta.183/scripts/v7_auth_db_table_rename.sql
   # See TODO in group_vars/all
 - name: "Copy extra SQL migration scripts to the remote host"
   copy:
