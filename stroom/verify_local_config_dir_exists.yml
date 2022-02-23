@@ -24,7 +24,3 @@
       assert:
         that:
           - _local_config_dir_info.stat.exists == true
-
-    - import_role:
-        name: roles/setup/mysql_controller_deps
-
