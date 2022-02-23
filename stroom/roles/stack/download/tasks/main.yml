@@ -38,7 +38,7 @@
 
     # It is debatable whether we should download to local then push to remotes or just
     # let the remotes each download it as we do here.
-    - name: Download stack
+    - name: " Download stack ( {{ stack version}} )"
       get_url:
         url: "{{ _stroom_stack_archive_url }}"
         dest: "{{ downloads_dir }}/"
