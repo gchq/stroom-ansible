@@ -8,8 +8,10 @@
       - stack_version is defined
       - stack_install_root_dir is defined
       - stroom_service_on_boot is defined
+      - stroom_service_on_boot == stroom_service_on_boot | bool                      # variable boolean check
+      - stroom_service_state == ( 'started' | upper ) or ( 'stopped' | upper )  or 'reloaded' or 'restarted'  # variable validity check
 
-- name: SystemD Service File
+- name: "Copy default stroom systemd service file to /etc/systemd/system on node [ {{ inventory_hostname_short }} ] "
   become: true
   vars:
     stroom_version:  "{{ stack_version }}"
@@ -18,16 +20,21 @@
     src: "templates/etc/systemd/system/stroom.service.j2"
     dest: "/etc/systemd/system/stroom.service"
 
-- name: SystemD Service enable
+- name: Display stroom_service_on_boot &  stroom_service_state variables 
+  debug: 
+    msg: "{{ stroom_service_on_boot }}  |  {{ stroom_service_state }} "
+    verbosity: 2
+
+- name: "Enable stroom systemd service on node [ {{ inventory_hostname_short }} ] "
   when: stroom_service_on_boot is defined
   become: true
   systemd:
     name: stroom
     enabled: "{{ stroom_service_on_boot }}"
 
-- name: SystemD Service start
+- name: "Start (or check that started) stroom systemd service on node [ {{ inventory_hostname_short }} ]"
   when: stroom_service_state is defined
   become: true
   systemd:
     name: stroom
-    state: "{{ stroom_service_state }}"
+    state: "{{ stroom_service_state | lower }}"
