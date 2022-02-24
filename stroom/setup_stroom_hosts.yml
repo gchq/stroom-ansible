@@ -41,6 +41,8 @@
         - "{{ stroom_auth_ui_https_port | default(9443) }}"
       notify:
         - Restart docker
+      when: 
+        - remote_proxyNode == 'false'
         
     - name: Opening mySQL stack TCP port to public zone in firewalld
       firewalld:
@@ -55,6 +57,7 @@
         - Restart docker
       when: 
         - mixed_cluster == 'false' or   mixed_cluster is not defined      # is false or not defined
+        - remote_proxyNode == 'false'
 
     - name: Opening mySQL cluster Stroom DB TCP port to public zone in firewalld
       firewalld:

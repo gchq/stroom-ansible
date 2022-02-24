@@ -4,9 +4,18 @@
   assert:
     that:
       - stroom_user is defined
+      - remote_proxyNode is defined
+      - remote_proxyNode == remote_proxyNode | bool                # variable boolean check
 
 - import_role:
     name: setup/yum_update
+
+# Debug 
+- name: Check node is, or has a proxy 
+  debug: 
+    msg: " Node:- {{ inventory_hostname_short }}  Remote Proxy:- {{ remote_proxyNode }} "
+    verbosity: 2
+  register: remote_proxyNode_check_result
 
 # Install EPEL yum repo (for jq install)
 - name: Check if EPEL YUM repo is already configured.
