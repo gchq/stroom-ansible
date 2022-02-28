@@ -5,4 +5,4 @@
     path: "{{ stack_env_var_file }}"
     regexp: '^\s*#?\s*export\s+{{ item.key }}=.*'
     line: "export {{ item.key }}=\"{{ item.value }}\""
-
+  when: not ansible_check_mode

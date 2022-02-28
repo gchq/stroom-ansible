@@ -11,5 +11,5 @@
     path: "{{ stack_env_var_file }}"
     regexp: '^\s*#?\s*(export\s+)?HOST_IP=.*'
     line: "export HOST_IP=\"{{ public_ip_address | default(inventory_hostname) }}\""
-
+  when: not ansible_check_mode
 

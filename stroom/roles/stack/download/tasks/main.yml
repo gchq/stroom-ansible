@@ -80,6 +80,8 @@
         - never # TODO this doesn't seem to be working
         - delete_download
 
+  check_mode: no  # Task will be done in check_mode to ensure subsequent tasks 
+                  # complete sucessfully in check mode  
     # --END OF BLOCK--
 
   # Relying on the archive having been downloaded above
