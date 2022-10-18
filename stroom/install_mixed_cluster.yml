@@ -54,4 +54,15 @@
 
     - import_role:
         name: non_docker_proxy/deploy
+        
+########### stroom proxy HOSTS  ###########
 
+- hosts:
+    - stroom_proxy
+  gather_facts: true # Needed for yum stuff
+  become: true
+  become_user: "{{ stroom_user }}"
+  tasks:
+
+    - import_role:
+        name: non_docker_proxy/deploy   
