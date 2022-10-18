@@ -101,6 +101,7 @@
     - stroom_ui
     - stroom_with_proxy
     - stroom_and_proxy
+    - stroom_proxy
   vars:
     # Set java_version based on the stroom version
     # TODO Seeing InaccessibleObjectException when running j16 unless jvm arg --illegal-access=permit is used, so setting at j15 for now.

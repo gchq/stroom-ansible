@@ -74,6 +74,7 @@ These are the host groups that are used in the Ansible inventory.
 * stroom_ui - Stroom running without docker, able to be configured differently to above.
 * stroom_with_proxy - Stroom and local legacy proxy running without docker. Ansible with not update proxy but configure stroom correctly.
 * stroom_and_proxy - Stroom and local proxy running without docker.
+* stroom_proxy - Stroom Proxy running without docker.
 * stroom_database - Mysql running outside of docker for stroom & auth databases.
 * stroom_stats_database - Mysql running outside of docker for stats database.
 * stroom_remote_proxy_stack - Nginx and stroom-proxy in a docker stack.

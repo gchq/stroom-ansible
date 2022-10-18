@@ -210,6 +210,7 @@ The host groups that are used by the Ansible roles/plays are as follows.
   * `stroom_ui` - Stroom running without docker.
   * `stroom_with_proxy` - Stroom and local legacy proxy running without docker.
   * `stroom_and_proxy` - Stroom and local proxy running without docker.
+  * `stroom_proxy` - Stroom Proxy running without docker.
   * `stroom_database` - Mysql running without docker for stroom & auth databases.
   * `stroom_stats_database` - Mysql running without docker for stats database.
 
