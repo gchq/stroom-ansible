@@ -1,0 +1,14 @@
+[Unit]
+Description=Stroom Services Stack {{ stack_version }}.
+After=docker.service
+
+[Service]
+Type=forking
+PIDFile=/run/nginx-container.pid
+ExecStart=-{{ stack_home_dir }}/start.sh
+ExecStartPost=/bin/bash -c "/usr/bin/docker inspect -f={{"{{.State.Pid}}"}} nginx >/run/nginx-container.pid"
+ExecStop={{ stack_home_dir }}/stop.sh
+TimeoutSec=240
+
+[Install]
+WantedBy=multi-user.target

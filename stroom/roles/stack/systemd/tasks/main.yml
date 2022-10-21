@@ -6,26 +6,26 @@
       - stroom_user is defined
       - stack_name is defined
       - stack_version is defined
-      - stack_install_root_dir is defined
+      - stack_home_dir is defined
       - stroom_service_on_boot is defined
       - stroom_service_state is defined
 
 - name: SystemD Service File
   become: true
   become_user: root
-  vars:
-    stroom_version:  "{{ stack_version }}"
-    stroom_install_root_dir: "{{ stack_install_root_dir }}/{{ stack_name }}/{{ stack_name }}-{{ stack_version }}"
+#  vars:
+#    stroom_version:  "{{ stack_version }}"
+#    stroom_install_root_dir: "{{ stack_install_root_dir }}/{{ stack_name }}/{{ stack_name }}-{{ stack_version }}"
   template:
-    src: "templates/etc/systemd/system/stroom-stack.service.j2"
-    dest: "/etc/systemd/system/stroom-stack.service"
+    src: "templates/etc/systemd/system/stroom-services.service.j2"
+    dest: "/etc/systemd/system/stroom-services.service"
 
 - name: SystemD Service enable
   when: stroom_service_on_boot is defined
-  become: true
+  become: truestack
   become_user: root
   systemd:
-    name: stroom-stack
+    name: stroom-services
     enabled: "{{ stroom_service_on_boot }}"
 
 - name: SystemD Service start
@@ -33,5 +33,5 @@
   become: true
   become_user: root
   systemd:
-    name: stroom-stack
+    name: stroom-services
     state: "{{ stroom_service_state }}"
