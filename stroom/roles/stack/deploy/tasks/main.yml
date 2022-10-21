@@ -44,3 +44,9 @@
         - deploy
         - configure
 
+# Setup systemd service to run the stack
+- import_role:
+    name: stack/systemd
+  tags:
+    - deploy
+

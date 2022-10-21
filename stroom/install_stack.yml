@@ -24,7 +24,3 @@
       tags:
         - deploy
 
-    - import_role:
-        name: setup/systemd
-      tags:
-        - deploy
