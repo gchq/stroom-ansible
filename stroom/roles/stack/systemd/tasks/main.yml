@@ -22,7 +22,7 @@
 
 - name: SystemD Service enable
   when: stroom_service_on_boot is defined
-  become: truestack
+  become: true
   become_user: root
   systemd:
     name: stroom-services
