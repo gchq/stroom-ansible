@@ -18,3 +18,8 @@
   tags:
     - deploy
     - configure
+
+- import_role:
+    name: non_docker_stroom/systemd
+  tags:
+    - deploy

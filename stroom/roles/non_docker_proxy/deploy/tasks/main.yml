@@ -18,3 +18,8 @@
     - deploy
     - configure
 
+- import_role:
+    name: non_docker_proxy/systemd
+  tags:
+    - deploy
+

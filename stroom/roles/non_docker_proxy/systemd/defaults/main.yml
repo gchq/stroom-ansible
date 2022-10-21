@@ -1,0 +1,2 @@
+stroom_service_on_boot: true
+stroom_service_state: "started"
