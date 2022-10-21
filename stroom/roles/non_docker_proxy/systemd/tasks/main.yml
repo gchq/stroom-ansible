@@ -8,9 +8,11 @@
       - stroom_proxy_home_dir is defined
       - stroom_service_on_boot is defined
       - stroom_service_state is defined
+      - java_version is defined
 
 - name: SystemD Service File
   become: true
+  become_user: root
 #  vars:
 #    stroom_proxy_version:  "{{ stroom_proxy_version }}"
 #    stroom_proxy_home_dir: "{{ stroom_proxy_home_dir }}"
@@ -21,6 +23,7 @@
 - name: SystemD Service enable
   when: stroom_service_on_boot is defined
   become: true
+  become_user: root
   systemd:
     name: stroom-proxy
     enabled: "{{ stroom_service_on_boot }}"
@@ -28,6 +31,7 @@
 - name: SystemD Service start
   when: stroom_service_state is defined
   become: true
+  become_user: root
   systemd:
     name: stroom-proxy
     state: "{{ stroom_service_state }}"
