@@ -12,7 +12,13 @@ Type=simple
 
 Environment="JAVA_HOME={{ java_info[java_version].java_home_dir }}"
 WorkingDirectory={{ stroom_proxy_home_dir }}
-ExecStart={{ java_info[java_version].java_home_dir }}/bin/java -Xms512m -Xmx2048m -jar {{ stroom_proxy_home_dir }}/bin/stroom-proxy-app-all.jar server {{ stroom_proxy_home_dir }}/config/config.yml
+ExecStart={{ java_info[java_version].java_home_dir }}/bin/java \
+-Xms50m -Xmx2g \
+--add-opens java.base/java.nio=ALL-UNNAMED \
+--add-opens java.base/sun.nio.ch=ALL-UNNAMED \
+--add-opens java.base/java.lang=ALL-UNNAMED \
+-jar {{ stroom_proxy_home_dir }}/bin/stroom-proxy-app-all.jar \
+server {{ stroom_proxy_home_dir }}/config/config.yml
 ExecStop=/bin/kill -15 $MAINPID
 
 [Install]

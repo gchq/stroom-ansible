@@ -13,7 +13,7 @@ environment_name: "Test Stroom"
 # The name of the stack to deploy
 stack_name: "stroom_services"
 
-stroom_version: "v7.0.2"
+stroom_version: "v7.2-alpha.4"
 
 stroom_proxy_version: "{{ stroom_version }}"
 
@@ -39,6 +39,7 @@ stack_install_root_dir: "/home/{{ stroom_user }}"
 # java_15_alt_url: "https://download.java.net/java/GA/jdk15.0.2/0d1cfde4252546c6931946de8db48ee2/7/GPL/openjdk-15.0.2_linux-x64_bin.tar.gz"
 # java_16_alt_url: "https://download.java.net/java/GA/jdk16.0.1/7147401fd7354114ac51ef3e1328291f/9/GPL/openjdk-16.0.1_linux-x64_bin.tar.gz"
 # java_16_alt_url: "https://download.java.net/java/GA/jdk16.0.2/d4a915d82b4c4fbb9bde534da945d746/7/GPL/openjdk-16.0.2_linux-x64_bin.tar.gz"
+# java_17_alt_url: "https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-x64_bin.tar.gz"
 
 # Set to true, to specify using the mysql-community-client (v8.0) repo on the internet
 use_mysql_yum_repo_file_url: true

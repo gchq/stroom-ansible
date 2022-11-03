@@ -1,6 +1,6 @@
 ---
 # The version of java to install
-java_version: 8
+java_version: 17
 
 # Temporary location where the archive files are downloaded to.
 # They will not be deleted to save downloding again.

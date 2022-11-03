@@ -16,7 +16,7 @@ stroom_version_to: "v7.0-beta.137"
 stroom_source_git_tag_or_hash_to: "0b67d6e"
 
 stroom_6_java_version: "8"
-stroom_7_java_version: "15"
+stroom_7_java_version: "17"
 java_version_from: "{{ stroom_6_java_version }}"
 java_version_to: "{{ stroom_7_java_version }}"
 

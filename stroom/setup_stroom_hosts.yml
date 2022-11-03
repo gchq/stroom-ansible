@@ -104,8 +104,7 @@
     - stroom_proxy
   vars:
     # Set java_version based on the stroom version
-    # TODO Seeing InaccessibleObjectException when running j16 unless jvm arg --illegal-access=permit is used, so setting at j15 for now.
-    java_version: '{{ 8 if stroom_version is search("^v6\.") else 15 }}'
+    java_version: '{% if stroom_version is search("^v6\.") %}8{% elif stroom_version is search("^v7\.0") %}15{% else %}17{% endif %}'
   tags:
     - install_java
   tasks:

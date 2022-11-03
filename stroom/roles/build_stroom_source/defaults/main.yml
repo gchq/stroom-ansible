@@ -7,7 +7,7 @@ stroom_config_dir: "~/.stroom"
 source_dir: "{{ unpack_dir }}/{{ repo_name }}-{{ source_git_tag_or_hash }}"
 gradle_args: "clean build -x test -x integrationTest -x gwtCompile"
 git_repo: "https://github.com/gchq/stroom.git"
-java_version: 8
+java_version: 17
 
 # java_info is set as a fact in the java role
 gradle_java_home_path: "{{ java_info[java_version].java_home_dir }}"
