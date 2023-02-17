@@ -23,3 +23,8 @@
     name: non_docker_stroom/systemd
   tags:
     - deploy
+
+- name: 'Create admin user'
+  when: stroom_initial_admin_user is defined
+  run_once: true
+  command: "{{ java_info[java_version].java_home_dir }}/bin/java -jar {{ stroom_home_dir }}/bin/stroom-app-all.jar manage_users --createUser {{ stroom_initial_admin_user }} --createGroup Administrators --addToGroup {{ stroom_initial_admin_user }} Administrators --grantPermission Administrators Administrator {{ stroom_home_dir }}/config/config.yml"
