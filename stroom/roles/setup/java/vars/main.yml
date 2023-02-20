@@ -41,6 +41,12 @@ _java:
     url: "{{ java_16_alt_url | default('https://download.java.net/java/GA/jdk16.0.2/d4a915d82b4c4fbb9bde534da945d746/7/GPL/openjdk-16.0.2_linux-x64_bin.tar.gz') }}"
     directory: "jdk-16.0.2"
     home_dir: "{{ java_unarchive_dest }}/jdk-16.0.2"
+  17:
+    targz: "jdk-17.0.6_linux-aarch64_bin.tar.gz"
+    url: "{{ java_17_alt_url | default('https://download.oracle.com/java/17/archive/jdk-17.0.6_linux-aarch64_bin.tar.gz') }}"
+    directory: "jdk-17.0.6"
+    home_dir: "{{ java_unarchive_dest }}/jdk-17.0.6"
+
 
 # Java 6,7,8,11 stuff
 java_yum_package: "{{ _java[java_version | int].jre | default([]) }}"
