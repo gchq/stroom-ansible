@@ -19,14 +19,14 @@
     - deploy
     - configure
 
-- import_role:
-    name: non_docker_stroom/systemd
-  tags:
-    - deploy
-
 - name: 'Create Stroom admin users'
   when: stroom_initial_admin_users is defined
   changed_when: false # Revisit when Stroom CLI provides INFO on stdout (GH Issue 3263 refers)
   loop: "{{ stroom_initial_admin_users }}"
   run_once: true
   command: "{{ java_info[java_version].java_home_dir }}/bin/java -jar {{ stroom_home_dir }}/bin/stroom-app-all.jar manage_users --createUser {{ item }} --createGroup Administrators --addToGroup {{ item }} Administrators --grantPermission Administrators Administrator {{ stroom_home_dir }}/config/config.yml"
+
+- import_role:
+    name: non_docker_stroom/systemd
+  tags:
+    - deploy
