@@ -6,6 +6,8 @@
       - stroom_proxy_archive_filename is defined
       - stroom_proxy_install_root_dir is defined
       - stroom_proxy_url is defined
+  tags:
+    - proxy
 
 - debug:
     msg:
@@ -13,11 +15,15 @@
       - "stroom_proxy_archive_filename: {{ stroom_proxy_archive_filename }}"
       - "stroom_proxy_url: {{ stroom_proxy_url }}"
     verbosity: 2
+  tags:
+    -- proxy
 
 - name: "See if {{ stroom_proxy_home_dir }} exists"
   stat:
     path: "{{ stroom_proxy_home_dir }}"
   register: _stroom_proxy_home_dir_info
+  tags:
+    - proxy
 
 - name: Ensure directories exists
   file:
@@ -25,36 +31,36 @@
     state: directory
   loop:
     - "{{ downloads_dir }}"
+    - "{{ stroom_proxy_home_dir }}/config"
     - "{{ stroom_proxy_home_dir }}"
-    - "{{ stroom_proxy_home_dir }}" 
     - "{{ stroom_proxy_certs_dir }}"
     - "{{ stroom_proxy_content_dir }}"
     - "{{ stroom_proxy_logs_dir }}"
     - "{{ stroom_proxy_repo_dir }}"
+    - "{{ stroom_proxy_install_root_dir }}/stroom-proxy/{{ stroom_proxy_version }}"
+  tags:
+    -- proxy
 
-- name: "Download archive {{ _stroom_proxy_stack_archive_url }}" 
-  when: _stroom_proxy_home_dir_info.stat.exists == false
-  block:
+- name: Download stroom-proxy distribution {{ stroom_proxy_url }}
+  get_url:
+    url: "{{ stroom_proxy_url }}"
+    dest: "{{ downloads_dir }}/{{ stroom_proxy_archive_filename }}"
+    checksum: "sha256:{{ stroom_proxy_url }}.sha256"
+    timeout: 120
 
-    - name: Download stroom-proxy distribution {{ stroom_proxy_url }}
-      get_url:
-        url: "{{ stroom_proxy_url }}"
-        dest: "{{ downloads_dir }}/{{ stroom_proxy_archive_filename }}"
-        checksum: "sha256:{{ stroom_proxy_url }}.sha256"
-        timeout: 120
-
-    - name: Unpack Stroom-proxy's distribution zip
-      unarchive:
-        src: "{{ downloads_dir }}/{{ stroom_proxy_archive_filename }}"
-        dest:  "{{ stroom_proxy_home_dir }}"
-        remote_src: true
-
-######## END OF BLOCK ######## 
+- name: Unpack Stroom-proxy's distribution zip
+  unarchive:
+    src: "{{ downloads_dir }}/{{ stroom_proxy_archive_filename }}"
+    dest:  "{{ stroom_proxy_install_root_dir }}/stroom-proxy/{{ stroom_proxy_version }}"
+    remote_src: true
+  tags:
+    -- proxy
 
 - name: Create a symlink for 'latest'
   file:
     state: link
     force: true
-    src: "{{ stroom_proxy_version }}"
+    src: "{{ stroom_proxy_install_root_dir }}/stroom-proxy/{{ stroom_proxy_version }}"
     dest: "{{ stroom_proxy_install_root_dir }}/stroom-proxy/latest"
-
+  tags:
+    -- proxy

@@ -7,16 +7,27 @@
   tags:
     - deploy
     - configure
+    - proxy
+
+- name: Ensure directory {{ stroom_proxy_repo_dir }} exists
+  file:
+    path: "{{ stroom_proxy_repo_dir }}"
+    state: directory
+  tags:
+    - deploy
+    - configure
+    - proxy
+
 
 - name: Copy certs/ dir to {{ stroom_proxy_install_root_dir }}/stroom-proxy/
   copy:
     src: "{{ local_config_dir }}/certs"
-    dest: "{{ stroom_proxy_install_root_dir }}/stroom-proxy/"
+    dest: "{{ stroom_proxy_home_dir }}"
   tags:
     - deploy
     - configure
     - certs
-    
+
 - name: "Check if {{ stroom_proxy_config_files_and_templates_dir }} exists on the Ansible controller"
   local_action: stat path={{ stroom_proxy_config_files_and_templates_dir }}
   become: false
@@ -24,6 +35,7 @@
   tags:
     - deploy
     - configure
+    - proxy
 
   # Copies any files (except *.j2 files) as they are to the remote.
   # Will also follow symlinks on the controller
@@ -41,13 +53,14 @@
   with_filetree: "{{ stroom_proxy_config_files_and_templates_dir }}/"
   loop_control:
     label: "{{ item.path }} (type: {{ item.state }}, source: {{ item.src | default('N/A') }})"
-  when: _stroom_proxy_config_files_and_templates_dir_info.stat.exists 
+  when: _stroom_proxy_config_files_and_templates_dir_info.stat.exists
         and (item.state == 'file' or item.state == 'link')
         and item.path is not match('.*\.j2$')
         and item.path is not match('.*\.gitkeep$') # Ignore .gitkeep files used to maintain empty dirs
   tags:
     - deploy
     - configure
+    - proxy
 
   # Copies and templates any *.j2 files found in the tree, removing the .j2 extension.
   # Mirrors the directory structure.
@@ -62,13 +75,14 @@
   with_filetree: "{{ stroom_proxy_config_files_and_templates_dir }}/"
   loop_control:
     label: "{{ item.path }} (type: {{ item.state }}, source: {{ item.src | default('N/A') }})"
-  when: _stroom_proxy_config_files_and_templates_dir_info.stat.exists 
-        and item.state == 'file' 
+  when: _stroom_proxy_config_files_and_templates_dir_info.stat.exists
+        and item.state == 'file'
         and item.path is match('.*\.j2$')
         and item.path is not match('.*\.gitkeep$') # Ignore .gitkeep files used to maintain empty dirs
   tags:
     - deploy
     - configure
+    - proxy
 
   # Not used for proxy
 - name: Ensure directory {{ stroom_proxy_config_dir }}/stroom.conf does not exist
@@ -78,3 +92,4 @@
   tags:
     - deploy
     - configure
+    - proxy
