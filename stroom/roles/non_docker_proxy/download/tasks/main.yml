@@ -39,7 +39,9 @@
     - "{{ stroom_proxy_repo_dir }}"
     - "{{ stroom_proxy_install_root_dir }}/stroom-proxy/{{ stroom_proxy_version }}"
   tags:
-    -- proxy
+    - proxy
+    - configure
+    - deploy
 
 - name: Download stroom-proxy distribution {{ stroom_proxy_url }}
   get_url:
@@ -54,7 +56,8 @@
     dest:  "{{ stroom_proxy_install_root_dir }}/stroom-proxy/{{ stroom_proxy_version }}"
     remote_src: true
   tags:
-    -- proxy
+    - proxy
+
 
 - name: Create a symlink for 'latest'
   file:
@@ -63,4 +66,41 @@
     src: "{{ stroom_proxy_install_root_dir }}/stroom-proxy/{{ stroom_proxy_version }}"
     dest: "{{ stroom_proxy_install_root_dir }}/stroom-proxy/latest"
   tags:
-    -- proxy
+    - proxy
+    - deploy
+    - configure
+
+
+- name: Find downloaded config files on remote machine
+  find:
+    paths: "{{ stroom_proxy_install_root_dir }}/stroom-proxy/{{ stroom_proxy_version }}/config"
+  register: existing_config
+
+- name: Copy config from distro into {{ stroom_proxy_home_dir }}/config
+  copy:
+    src: "{{ item.path }}"
+    dest: "{{ stroom_proxy_home_dir }}/config/{{ item.path | basename }}"
+    mode: "u=rw,g=,o="
+    backup: false
+    remote_src: true
+  with_items: "{{ existing_config.files }}"
+  tags:
+    - deploy
+    - configure
+    - proxy
+
+- name: Remove downloaded config dir and its contents
+  file:
+    state: absent
+    path: "{{ stroom_proxy_install_root_dir }}/stroom-proxy/{{ stroom_proxy_version }}/config"
+
+- name: Replace downloaded config with symlink
+  file:
+    state: link
+    force: true
+    src: "{{ stroom_proxy_home_dir }}/config"
+    dest: "{{ stroom_proxy_install_root_dir }}/stroom-proxy/{{ stroom_proxy_version }}/config"
+  tags:
+    - deploy
+    - configure
+    - proxy
