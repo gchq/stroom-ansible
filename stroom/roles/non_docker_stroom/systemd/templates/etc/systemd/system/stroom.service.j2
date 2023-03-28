@@ -12,7 +12,7 @@ Type=simple
 
 Environment="JAVA_HOME={{ java_info[java_version].java_home_dir }}"
 WorkingDirectory={{ stroom_home_dir }}
-ExecStart={{ java_info[java_version].java_home_dir }}/bin/java -Xms512m -Xmx2048m -jar {{ stroom_home_dir }}/bin/stroom-app-all.jar server {{ stroom_home_dir }}/config/config.yml
+ExecStart={{ java_info[java_version].java_home_dir }}/bin/java {{ stroom_java_opts }} -jar {{ stroom_home_dir }}/bin/stroom-app-all.jar server {{ stroom_home_dir }}/config/config.yml
 ExecStop=/bin/kill -15 $MAINPID
 
 [Install]

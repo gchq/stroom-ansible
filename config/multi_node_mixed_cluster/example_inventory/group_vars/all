@@ -49,6 +49,9 @@ mysql_yum_repo_base_url: "https://repo.mysql.com/yum/mysql-8.0-community/el/7/$b
 # The directory where stroom will be installed on the remote host
 stroom_install_root_dir: "{{ stack_install_root_dir }}"
 
+stroom_java_opts: "-Xms512m -Xmx2048m --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED"
+stroom_proxy_java_opts: "-Xms512m -Xmx2048m --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED"
+
 # The directory where stroom-proxy will be installed on the remote host
 stroom_proxy_install_root_dir: "{{ stack_install_root_dir }}"
 
