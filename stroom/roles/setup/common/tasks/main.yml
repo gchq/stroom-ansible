@@ -48,8 +48,6 @@
       - iproute  # needed for the ip command used in our scripts
       - jq  # Used by some stroom scripts, handy for REST json munging
       - net-tools
-      - python  # Not sure we need it but just in case
-      - python3  # Not sure we need it but just in case
       - unzip
       - vim  # vi is not a mustard cutter
 
