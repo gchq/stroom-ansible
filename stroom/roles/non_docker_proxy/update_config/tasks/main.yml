@@ -84,8 +84,18 @@
     - configure
     - proxy
 
+  # Ensure repo directory is created
+- name: Ensure directory {{ stroom_proxy_repo_dir }} exists
+  file:
+    path: "{{ stroom_proxy_repo_dir }}"
+    state: directory
+  tags:
+    - deploy
+    - configure
+    - proxy
+
   # Not used for proxy
-- name: Ensure directory {{ stroom_proxy_config_dir }}/stroom.conf does not exist
+- name: Ensure file {{ stroom_proxy_config_dir }}/stroom.conf does not exist
   file:
     path: "{{ stroom_proxy_config_dir }}/stroom.conf"
     state: absent
