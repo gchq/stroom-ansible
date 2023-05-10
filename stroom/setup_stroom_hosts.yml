@@ -26,21 +26,21 @@
       # TODO The ports we need are dependant on what is in the stack
       # so we ought to only open the required ports
       # TODO Assumes the public zone is in use
-    - name: Opening TCP port to public zone in firewalld
-      firewalld:
-        port: "{{ item }}/tcp"
-        zone: public
-        permanent: true
-        immediate: true
-        state: enabled
-      loop:
-        - "{{ stroom_app_port | default(8080) }}"
-        - "{{ stroom_proxy_local_app_port | default(8090) }}"
-        - "{{ stroom_auth_service_app_port | default(8099) }}"
-        - "{{ stroom_proxy_remote_app_port | default(9090) }}"
-        - "{{ stroom_auth_ui_https_port | default(9443) }}"
-      notify:
-        - Restart docker
+    # - name: Opening TCP port to public zone in firewalld
+    #   firewalld:
+    #     port: "{{ item }}/tcp"
+    #     zone: public
+    #     permanent: true
+    #     immediate: true
+    #     state: enabled
+    #   loop:
+    #     - "{{ stroom_app_port | default(8080) }}"
+    #     - "{{ stroom_proxy_local_app_port | default(8090) }}"
+    #     - "{{ stroom_auth_service_app_port | default(8099) }}"
+    #     - "{{ stroom_proxy_remote_app_port | default(9090) }}"
+    #     - "{{ stroom_auth_ui_https_port | default(9443) }}"
+    #   notify:
+    #     - Restart docker
         
     - name: Opening mySQL stack TCP port to public zone in firewalld
       firewalld:
@@ -56,36 +56,36 @@
       when: 
         - mixed_cluster == 'false' or   mixed_cluster is not defined      # is false or not defined
 
-    - name: Opening mySQL cluster Stroom DB TCP port to public zone in firewalld
-      firewalld:
-        port: "{{ item }}/tcp"
-        zone: public
-        permanent: true
-        immediate: true
-        state: enabled
-      loop:
-        - "{{ stroom_db_port | default(3306) }}"
-      notify:
-        - Restart docker
-      when: 
-        - mixed_cluster is defined
-        - mixed_cluster == 'true' # is true
+    # - name: Opening mySQL cluster Stroom DB TCP port to public zone in firewalld
+    #   firewalld:
+    #     port: "{{ item }}/tcp"
+    #     zone: public
+    #     permanent: true
+    #     immediate: true
+    #     state: enabled
+    #   loop:
+    #     - "{{ stroom_db_port | default(3306) }}"
+    #   notify:
+    #     - Restart docker
+    #   when: 
+    #     - mixed_cluster is defined
+    #     - mixed_cluster == 'true' # is true
 
-      # TODO The ports we need are dependant on what is in the stack
-      # so we ought to only open the required ports
-      # TODO Assumes the public zone is in use
-    - name: Opening services to public zone in firewalld
-      firewalld:
-        service: "{{ item }}"
-        zone: public
-        permanent: true
-        immediate: true
-        state: enabled
-      loop:
-        - http # For nginx
-        - https # For nginx
-      notify:
-        - Restart docker
+    #   # TODO The ports we need are dependant on what is in the stack
+    #   # so we ought to only open the required ports
+    #   # TODO Assumes the public zone is in use
+    # - name: Opening services to public zone in firewalld
+    #   firewalld:
+    #     service: "{{ item }}"
+    #     zone: public
+    #     permanent: true
+    #     immediate: true
+    #     state: enabled
+    #   loop:
+    #     - http # For nginx
+    #     - https # For nginx
+    #   notify:
+    #     - Restart docker
 
   handlers:
     - name: Restart docker
@@ -113,16 +113,16 @@
     - import_role:
         name: roles/setup/java
 
-    - name: Opening TCP port to public zone
-      firewalld:
-        port: "{{ item }}/tcp"
-        zone: public
-        permanent: true
-        immediate: true
-        state: enabled
-      loop:
-        - "{{ stroom_app_port | default(8080) }}"
-        - "{{ stroom_proxy_app_port | default(8090) }}"
+    # - name: Opening TCP port to public zone
+    #   firewalld:
+    #     port: "{{ item }}/tcp"
+    #     zone: public
+    #     permanent: true
+    #     immediate: true
+    #     state: enabled
+    #   loop:
+    #     - "{{ stroom_app_port | default(8080) }}"
+    #     - "{{ stroom_proxy_app_port | default(8090) }}"
 
 - name: Setup hosts with mysql
   become: true
@@ -136,10 +136,10 @@
     - import_role:
         name: roles/setup/mysql
 
-    - name: Open port for MySQL
-      firewalld:
-        port: "{{ mysql_port }}/tcp" # Was  service: mysql
-        zone: public
-        permanent: true
-        immediate: true
-        state: enabled
+    # - name: Open port for MySQL
+    #   firewalld:
+    #     port: "{{ mysql_port }}/tcp" # Was  service: mysql
+    #     zone: public
+    #     permanent: true
+    #     immediate: true
+    #     state: enabled
