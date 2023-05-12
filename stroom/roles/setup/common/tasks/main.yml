@@ -41,7 +41,7 @@
       - bind-utils # for nslookup
       - coreutils  # realpath is used by some stroom scripts
       - curl
-      - firewalld.noarch # Needed as CentOS on AWS does not include firewall
+      # - firewalld.noarch # Needed as CentOS on AWS does not include firewall
       - git # Needed for migration testing, but useful to have
       - htop # Useful process monitoring
       - httpie  # Used by some stroom scripts
@@ -51,12 +51,12 @@
       - unzip
       - vim  # vi is not a mustard cutter
 
-- name: Ensure firewalld is running
-  become: true
-  service: 
-    name: firewalld 
-    state: started 
-    enabled: true
+# - name: Ensure firewalld is running
+#   become: true
+#   service: 
+#     name: firewalld 
+#     state: started 
+#     enabled: true
 
 - name: "Ensure we have user {{ stroom_user }} for running stroom software"
   become: true
