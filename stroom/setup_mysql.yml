@@ -10,10 +10,11 @@
   roles:
     - roles/setup/mysql
 
-# - name: Open port for MySQL
-#   become: true
-#   firewalld:
-#     port: "{{ mysql_port }}/tcp"
-#     zone: public
-#     permanent: true
-#     state: enabled
+- name: Open port for MySQL
+  when: no_firewalld is undefined
+  become: true
+  firewalld:
+    port: "{{ mysql_port }}/tcp"
+    zone: public
+    permanent: true
+    state: enabled
