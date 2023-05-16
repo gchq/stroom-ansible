@@ -36,7 +36,7 @@
   cron:
     name: "Add STROOM-ACCESS-EVENTS cronjob"
     state: present
-    minute: "*"
+    minute: "*/10"
     hour: "*"
     job: "{{ stroom_home_dir }}/bin/send_to_stroom.sh --cert {{ stroom_install_root_dir }}/stroom/certs/server.pem.crt --key {{ stroom_install_root_dir }}/stroom/certs/server.unencrypted.key --cacert {{ stroom_install_root_dir }}/stroom/certs/ca.pem.crt --delete-after-sending --file-regex '.*[a-z]+-[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}\\.log' --system STROOM --environment \"{{ environment_name }}\" {{ stroom_home_dir }}/logs/access/ STROOM-ACCESS-EVENTS https://{{nginx_advertised_host}}/stroom/noauth/datafeed >/dev/null 2>&1"
   tags:
@@ -61,7 +61,7 @@
     name: "Add STROOM-APP-EVENTS cronjob"
     state: present
     minute: "*"
-    hour: "*"
+    hour: "*/10"
     job: "{{ stroom_home_dir }}/bin/send_to_stroom.sh --secure --token-endpoint {{ oidc_token_endpoint }} --token-client-app-id {{ stroom_oidc_client_id }} --token-client-secret-filename {{ stroom_home_dir }}/config/clientSecret.txt --token-stroom-app-id {{ stroom_oidc_client_id }} --delete-after-sending --file-regex '.*[a-z]+-[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}\\.log' --system STROOM --environment \"{{ environment_name }}\" {{ stroom_home_dir }}/logs/app/ STROOM-APP-EVENTS https://{{nginx_advertised_host}}/stroom/noauth/datafeed >/dev/null 2>&1"
   tags:
     - deploy
@@ -72,7 +72,7 @@
   cron:
     name: "Add STROOM-ACCESS-EVENTS cronjob"
     state: present
-    minute: "*"
+    minute: "*/10"
     hour: "*"
     job: "{{ stroom_home_dir }}/bin/send_to_stroom.sh --secure --token-endpoint {{ oidc_token_endpoint }} --token-client-app-id {{ stroom_oidc_client_id }} --token-client-secret-filename {{ stroom_home_dir }}/config/clientSecret.txt --token-stroom-app-id {{ stroom_oidc_client_id }} --delete-after-sending --file-regex '.*[a-z]+-[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}\\.log' --system STROOM --environment \"{{ environment_name }}\" {{ stroom_home_dir }}/logs/access/ STROOM-ACCESS-EVENTS https://{{nginx_advertised_host}}/stroom/noauth/datafeed >/dev/null 2>&1"
   tags:
@@ -84,7 +84,7 @@
   cron:
     name: "Add STROOM-USER-EVENTS cronjob"
     state: present
-    minute: "*"
+    minute: "*/10"
     hour: "*"
     job: "{{ stroom_home_dir }}/bin/send_to_stroom.sh --secure --token-endpoint {{ oidc_token_endpoint }} --token-client-app-id {{ stroom_oidc_client_id }} --token-client-secret-filename {{ stroom_home_dir }}/config/clientSecret.txt --token-stroom-app-id {{ stroom_oidc_client_id }} --delete-after-sending --file-regex '.*[a-z]+-[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}\\.log' --system STROOM --environment \"{{ environment_name }}\" {{ stroom_home_dir }}/stroom/logs/user/ STROOM-USER-EVENTS https://{{nginx_advertised_host}}/stroom/noauth/datafeed >/dev/null 2>&1"
   tags:

@@ -19,6 +19,13 @@
   template:
     src: "templates/etc/systemd/system/stroom.service.j2"
     dest: "/etc/systemd/system/stroom.service"
+  notify:
+    - Stop Old Stroom Service
+    - Reload systemd Daemon
+
+# Force the old service to stop prior to starting the new one
+- name: Flush handlers
+  meta: flush_handlers
 
 - name: SystemD Service enable
   when: stroom_service_on_boot is defined
