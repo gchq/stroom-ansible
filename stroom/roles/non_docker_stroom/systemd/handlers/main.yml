@@ -13,4 +13,3 @@
   become_user: root
   systemd:
     daemon_reload: true
-~
