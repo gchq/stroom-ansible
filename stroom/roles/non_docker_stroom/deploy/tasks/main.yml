@@ -19,6 +19,14 @@
     - deploy
     - configure
 
+- name: Stop Stroom Service if running
+  when: stroom_service_state is defined
+  become: true
+  become_user: root
+  systemd:
+    name: stroom
+    state: stopped
+
 - name: 'Create Stroom admin users'
   when: stroom_initial_admin_users is defined
   changed_when: false # Revisit when Stroom CLI provides INFO on stdout (GH Issue 3263 refers)

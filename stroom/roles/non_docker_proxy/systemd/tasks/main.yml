@@ -10,6 +10,14 @@
       - stroom_service_state is defined
       - java_version is defined
 
+- name: Stop Stroom Proxy Service if running
+  when: stroom_service_state is defined
+  become: true
+  become_user: root
+  systemd:
+    name: stroom-proxy
+    state: stopped
+
 - name: SystemD Service File
   become: true
   become_user: root

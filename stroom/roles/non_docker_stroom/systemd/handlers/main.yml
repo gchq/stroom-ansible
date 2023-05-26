@@ -1,12 +1,13 @@
 ---
 
-- name: Stop Old Stroom Service
+- name: Stop Stroom Service
 #  listen: Reload Stroom Service
   become: true
   become_user: root
   systemd:
     name: stroom
-    state: started
+    state: stopped
+
 - name: Reload systemd Daemon
 #  listen: Reload Stroom Service
   become: true
