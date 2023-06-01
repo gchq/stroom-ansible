@@ -31,7 +31,6 @@
   when: stroom_service_on_boot is defined
   become: true
   become_user: root
-  register: stroom_service_installed
   systemd:
     name: stroom
     enabled: "{{ stroom_service_on_boot }}"

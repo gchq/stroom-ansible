@@ -20,7 +20,8 @@
     - configure
 
 - name: Stop Stroom Service if running
-  when: stroom_service_installed is defined and stroom_service_installed.rc == 0
+  when: stroom_service_on_boot is defined
+  ignore_errors: true # Service might not be installed yet
   become: true
   become_user: root
   systemd:
