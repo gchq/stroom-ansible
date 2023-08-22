@@ -30,11 +30,20 @@
         state: directory
 
     - name: Download stroom distribution {{ stroom_url }}
+      when: stroom_url is match("http.*")
       get_url:
         url: "{{ stroom_url }}"
         dest: "{{ downloads_dir }}/{{ stroom_archive_filename }}"
         checksum: "sha256:{{ stroom_url }}.sha256"
         timeout: 120
+
+    - name: Download stroom distribution from S3 {{ stroom_url }}
+      when: stroom_url is match("s3://.*")
+      amazon.aws.s3_object:
+        bucket: "{{ stroom_url.split('/').2 }}"
+        object: "{{ stroom_url | regex_replace('s3://[^/]+/') }}"
+        dest: "{{ downloads_dir }}/{{ stroom_archive_filename }}"
+        mode: get
 
     - name: Ensure install directory {{ stroom_home_dir }} exists
       file:
