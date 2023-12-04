@@ -46,6 +46,11 @@ _java:
     url: "{{ java_17_alt_url | default('https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-x64_bin.tar.gz') }}"
     directory: "jdk-17.0.2"
     home_dir: "{{ java_unarchive_dest }}/jdk-17.0.2"
+  21:
+    targz: "OpenJDK21U-jdk_x64_linux_hotspot_21.0.1_12.tar.gz"
+    url: "{{ java_21_alt_url | default('https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.1%2B12/OpenJDK21U-jdk_x64_linux_hotspot_21.0.1_12.tar.gz') }}"
+    directory: "jdk-21.0.1"
+    home_dir: "{{ java_unarchive_dest }}/jdk-21.0.1"
 
 
 # Java 6,7,8,11 stuff
@@ -56,7 +61,14 @@ java_jdk_yum_package: "{{ _java[java_version | int].jdk | default([]) }}"
 java_archive_filename: "{{ _java[java_version | int].tar.gz | default([]) }}"
 java_archive_url: "{{ _java[java_version | int].url | default([]) }}"
 java_archive_directory: "{{ _java[java_version | int].directory | default([]) }}"
-java_archive_sha256_url: "{{ java_archive_url }}.sha256"
+
+{% if java_version < 21 %}
+  java_archive_sha256_url: "{{ java_archive_url }}.sha256"
+{% else %}
+  java_archive_sha256_url: "{{ java_archive_url }}.sha256.txt"
+{% endif %}
+
 java_archive_sha256_value: "{{ lookup('url', java_archive_sha256_url) | default([]) }}"
+
 java_home_dir: "{{ _java[java_version | int].home_dir | default([]) }}"
 java_bin_dir: "{{ java_home_dir }}/bin"
