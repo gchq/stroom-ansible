@@ -44,20 +44,11 @@
     - deploy
 
 - name: Download stroom-proxy distribution {{ stroom_proxy_url }}
-  when: stroom_proxy_url is match("http.*")
   get_url:
     url: "{{ stroom_proxy_url }}"
     dest: "{{ downloads_dir }}/{{ stroom_proxy_archive_filename }}"
     checksum: "sha256:{{ stroom_proxy_url }}.sha256"
     timeout: 120
-
-- name: Download stroom-proxy distribution from S3 {{ stroom_proxy_url }}
-  when: stroom_proxy_url is match("s3://.*")
-  amazon.aws.s3_object:
-    bucket: "{{ stroom_proxy_url.split('/').2 }}"
-    object: "{{ stroom_proxy_url | regex_replace('s3://[^/]+/') }}"
-    dest: "{{ downloads_dir }}/{{ stroom_proxy_archive_filename }}"
-    mode: get
 
 - name: Unpack Stroom-proxy's distribution zip
   unarchive:
