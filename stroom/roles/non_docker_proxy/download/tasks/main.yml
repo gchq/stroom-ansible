@@ -6,6 +6,8 @@
       - stroom_proxy_archive_filename is defined
       - stroom_proxy_install_root_dir is defined
       - stroom_proxy_url is defined
+      - stroom_proxy_archive_checksum_type is defined
+      - stroom_proxy_archive_checksum_url is defined
   tags:
     - proxy
 
@@ -47,7 +49,7 @@
   get_url:
     url: "{{ stroom_proxy_url }}"
     dest: "{{ downloads_dir }}/{{ stroom_proxy_archive_filename }}"
-    checksum: "sha256:{{ stroom_proxy_url }}.sha256"
+    checksum: "{{ stroom_proxy_archive_checksum_type }}:{{ stroom_proxy_archive_checksum_url }}"
     timeout: 120
 
 - name: Unpack Stroom-proxy's distribution zip

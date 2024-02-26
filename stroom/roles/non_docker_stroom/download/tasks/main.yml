@@ -7,7 +7,9 @@
       - stroom_archive_filename is defined
       - stroom_install_root_dir is defined
       - stroom_url is defined
-
+      - stroom_archive_checksum_type is defined
+      - stroom_archive_checksum_url is defined
+      
 - debug:
     msg:
       - "downloads_dir: {{ downloads_dir }}"
@@ -33,7 +35,7 @@
       get_url:
         url: "{{ stroom_url }}"
         dest: "{{ downloads_dir }}/{{ stroom_archive_filename }}"
-        checksum: "sha256:{{ stroom_url }}.sha256"
+        checksum: "{{ stroom_archive_checksum_type }}:{{ stroom_archive_checksum_url }}"
         timeout: 120
 
     - name: Ensure install directory {{ stroom_home_dir }} exists
