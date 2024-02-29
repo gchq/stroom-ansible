@@ -1,8 +1,12 @@
 ---
 
-- name: Ensure directory {{ stroom_temp_dir }} exists
+- name: Discover temp directory
+  set_fact:
+    temp_dir: "{{ stroom_proxy_temp_dir | default (stroom_temp_dir) }}"
+
+- name: Ensure directory {{ temp_dir }} exists
   file:
-    path: "{{ stroom_temp_dir }}"
+    path: "{{ temp_dir }}"
     state: directory
   tags:
     - deploy
