@@ -4,7 +4,7 @@ Vagrant.configure("2") do |config|
 
   def get_ip()
     @ip_counter += 1
-    "192.168.102.#{@ip_counter}"
+    "192.168.56.#{@ip_counter}"
   end
 
   # TODO Only allows a host to belong to one group, but that should

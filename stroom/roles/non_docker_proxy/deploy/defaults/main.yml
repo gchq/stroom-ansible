@@ -1,6 +1,9 @@
 ---
-stroom_proxy_home_dir: "{{ stroom_proxy_install_root_dir }}/stroom-proxy/{{ stroom_proxy_version }}"
-stroom_proxy_repo_dir: "{{ stroom_proxy_install_root_dir }}/stroom-proxy/repo"
+# stroom_proxy_home_dir is the base for any relative paths used in proxy
+# Typically this is separate from the installation as it will contain state that spans
+# multiple proxy install versions, e.g. the repo and logs.
+stroom_proxy_home_dir: "{{ stroom_proxy_install_root_dir }}/proxy-home/"
+stroom_proxy_repo_dir: "{{ stroom_proxy_home_dir }}/repo"
 stroom_proxy_config_dir: "{{ stroom_proxy_home_dir }}/config"
 stroom_proxy_logs_dir: "{{ stroom_proxy_home_dir }}/logs"
 stroom_proxy_certs_dir: "{{ stroom_proxy_home_dir }}/certs"

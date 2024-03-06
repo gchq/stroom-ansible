@@ -3,7 +3,7 @@ Vagrant.configure("2") do |config|
   @ip_counter=10
   def get_ip()
     @ip_counter += 1
-    "192.168.100.#{@ip_counter}"
+    "192.168.56.#{@ip_counter}"
   end
 
   # A mixed economy deployment
@@ -13,12 +13,14 @@ Vagrant.configure("2") do |config|
     {
       :hostname => "stroom-and-proxy-host-1",
       :ip => get_ip(),
-      :group => "stroom_and_proxy"
+      :group => "stroom_and_proxy",
+      :node_name => "node1"
     },
     {
       :hostname => "stroom-and-proxy-host-2",
       :ip =>get_ip(),
-      :group => "stroom_and_proxy"
+      :group => "stroom_and_proxy",
+      :node_name => "node2"
     },
     {
       :hostname => "stroom-services-stack-host",
@@ -72,6 +74,7 @@ Vagrant.configure("2") do |config|
       # some funky port forwearding approach to connecting to the hosts
       ansible.host_vars[machine[:hostname]] = {
         "public_ip_address" => machine[:ip],
+        "stroom_node_name" => machine[:node_name],
       }
     end
 

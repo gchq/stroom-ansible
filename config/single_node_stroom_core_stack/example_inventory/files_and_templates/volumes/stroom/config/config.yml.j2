@@ -144,8 +144,10 @@ appConfig:
   security:
     authentication:
       preventLogin: false
+      openId:
+        identityProviderType: "TEST_CREDENTIALS"
     identity:
-      useDefaultOpenIdCredentials: "${USE_DEFAULT_OPEN_ID_CREDENTIALS:-false}"
+      #useDefaultOpenIdCredentials: "${USE_DEFAULT_OPEN_ID_CREDENTIALS:-false}"
   serviceDiscovery:
     enabled: "${STROOM_SERVICE_DISCOVERY_ENABLED:-false}"
     zookeeperUrl: "${STROOM_SERVICE_DISCOVERY_ZOOKEEPER_URL:-localhost:2181}"

@@ -5,8 +5,10 @@ all:
       hosts:
         stroom-host-1:
           #public_ip_address: 192.168.100.10
+          stroom_node_name: "node1"
         stroom-host-2:
           #public_ip_address: 192.168.100.20
+          stroom_node_name: "node2"
     stroom_ui:                                 # Used fot non-proxy nodes but with different parameters to above 
       hosts:
         stroom-ui-host-1:
@@ -17,8 +19,10 @@ all:
       hosts:
         stroom-with-proxy-host-1:
           #public_ip_address: 192.168.100.17
+          stroom_node_name: "node1"
         stroom-with-proxy-host-2:
           #public_ip_address: 192.168.100.18
+          stroom_node_name: "node2"
     stroom_and_proxy:                          # Used for nodes with proxy 
       hosts:
         stroom-and-proxy-host-1:
@@ -26,9 +30,11 @@ all:
           # address when testing without a DNS server
           #public_ip_address: 192.168.100.11
           #java_opts: "-Xms512m -Xmx2048m"
+          stroom_node_name: "node1"
         stroom-and-proxy-host-2:
           #public_ip_address: 192.168.100.12
           #java_opts: "-Xms512m -Xmx2048m"
+          stroom_node_name: "node2"
     stroom_services_stack:
       hosts:
         stroom-services-stack-host:
