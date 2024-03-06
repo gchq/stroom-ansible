@@ -62,8 +62,8 @@ java_archive_filename: "{{ _java[java_version | int].tar.gz | default([]) }}"
 java_archive_url: "{{ _java[java_version | int].url | default([]) }}"
 java_archive_directory: "{{ _java[java_version | int].directory | default([]) }}"
 
-java_archive_sha256_url: "{% if java_version < 21 %}{{ java_archive_url }}.sha256{% else %}{{ java_archive_url }}.sha256.txt{% endif %}"
-java_archive_sha256_value: "{% if java_version < 21 %}{{ lookup('url', java_archive_sha256_url) | default([]) }}{% else %}{{ lookup('url', java_archive_sha256_url).split(' ')[0] }}{% endif %}"
+java_archive_sha256_url: "{% if java_version | int < 21 %}{{ java_archive_url }}.sha256{% else %}{{ java_archive_url }}.sha256.txt{% endif %}"
+java_archive_sha256_value: "{% if java_version | int < 21 %}{{ lookup('url', java_archive_sha256_url) | default([]) }}{% else %}{{ lookup('url', java_archive_sha256_url).split(' ')[0] }}{% endif %}"
 
 java_home_dir: "{{ _java[java_version | int].home_dir | default([]) }}"
 java_bin_dir: "{{ java_home_dir }}/bin"
