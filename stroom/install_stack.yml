@@ -8,6 +8,8 @@
 
 - name: Setup stroom hosts
   import_playbook: ./setup_stroom_hosts.yml
+  vars: 
+    mixed_cluster: 'false' 
   tags:
     - setup
 
