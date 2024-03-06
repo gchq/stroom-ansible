@@ -7,6 +7,14 @@
       - stroom_proxy_version is defined
       - stroom_user is defined
 
+  # We need this so the systemd service knows where java is
+  # TODO need to stop it running twice as it gets run in setup/common
+- import_role:
+    name: setup/java
+  tags:
+    - deploy
+    - install_java
+
 - import_role:
     name: non_docker_proxy/download
   tags:
