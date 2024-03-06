@@ -13,14 +13,15 @@ environment_name: "Test Stroom"
 # The name of the stack to deploy
 stack_name: "stroom_services"
 
-stroom_version: "v7.3-beta.9"
+stroom_version: "v7.3-beta.11"
 
-java_version: 21
+java_version: "21"
 
-stroom_proxy_version: "{{ stroom_version }}"
+#stroom_proxy_version: "{{ stroom_version }}"
+stroom_proxy_version: "v7.0.32"
 
 # The version of the stack to deploy
-stack_version: "{{ stroom_version }}"
+stack_version: "{{ stroom_version }}-proxy-v7.0.32"
 
 # The path on a file server where the stack archive file can be found
 stroom_stack_archive_url_base: "https://github.com/gchq/stroom-resources/releases/download/stroom-stacks-{{ stack_version }}"
@@ -81,10 +82,12 @@ stroom_db_host: "{{ hostvars[groups['stroom_database'][0]]['public_ip_address']
 stroom_db_port: "{{hostvars[groups['stroom_database'][0]]['mysql_port'] | default('3306') }}"  
 
 # The hostname of the stats database server
-stats_db_host: "{{ hostvars[groups['stroom_stats_database'][0]]['public_ip_address'] 
-  | default(hostvars[groups['stroom_stats_database'][0]]['inventory_hostname']) }}"
+#stats_db_host: "{{ hostvars[groups['stroom_stats_database'][0]]['public_ip_address'] 
+  #| default(hostvars[groups['stroom_stats_database'][0]]['inventory_hostname']) }}"
+stats_db_host: "{{ stroom_db_host }}"
 # stats_db_port: "{{ mysql_port }}"  
-stats_db_port: "{{hostvars[groups['stroom_stats_database'][0]]['mysql_port'] | default('3307') }}"  
+#stats_db_port: "{{hostvars[groups['stroom_stats_database'][0]]['mysql_port'] | default('3307') }}"  
+stats_db_port: "{{ stroom_db_port }}"  
 
 # Database credentials
 #stroom_db_root_password: "StroomPassword1?_root"
