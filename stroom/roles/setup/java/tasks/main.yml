@@ -47,10 +47,16 @@
           - "java_archive_sha256_value: {{ java_archive_sha256_value }}"
         verbosity: 2
 
+    - name: Check if {{ java_home_dir }} exists
+      stat:
+        path: "{{ java_home_dir }}"
+      register: java_home_dir_stat
+
     - name: Ensure directory exists
       file:
         path: "{{ downloads_dir }}"
         state: directory
+      when: java_home_dir_stat.stat.exists == false
 
     - name: Download java .tar.gz from {{ java_archive_url | default('N/A')}}
       get_url:
@@ -61,6 +67,7 @@
         #checksum: "sha256:{{ sha256sum }}"
         checksum: "sha256:{{ java_archive_sha256_value }}"
         timeout: 120
+      when: java_home_dir_stat.stat.exists == false
 
     - name: Extract tar.gz
       become: true
@@ -68,9 +75,11 @@
         src: "{{ downloads_dir }}/{{ java_archive_filename }}"
         #src: "{{ downloads_dir }}/{{ java_archive[java_version].targz }}"
         dest:  "{{ java_unarchive_dest }}"
+        creates: "{{ java_home_dir }}"
         owner: "root"
         group: "root"
         remote_src: true
+      when: java_home_dir_stat.stat.exists == false
 
     - name: Copy jdk_home.sh to /etc/profile.d so all users have JAVA_HOME and path set
       become: true
