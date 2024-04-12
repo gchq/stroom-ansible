@@ -1,0 +1,16 @@
+---
+
+- name: Stop Stroom Proxy Service
+#  listen: Reload Stroom Proxy Service
+  become: true
+  become_user: root
+  systemd:
+    name: stroom-proxy
+    state: stopped
+
+- name: Reload systemd Daemon
+#  listen: Reload Stroom Service
+  become: true
+  become_user: root
+  systemd:
+    daemon_reload: true

@@ -27,18 +27,12 @@
 - name: Flush handlers
   meta: flush_handlers
 
-- name: SystemD Service enable
-  when: stroom_service_on_boot is defined
-  become: true
-  become_user: root
-  systemd:
-    name: stroom
-    enabled: "{{ stroom_service_on_boot }}"
-
-- name: SystemD Service start
+- name: SystemD Service start/enable
   when: stroom_service_state is defined
   become: true
   become_user: root
   systemd:
     name: stroom
     state: "{{ stroom_service_state }}"
+    enabled: "{{ stroom_service_on_boot }}"
+    

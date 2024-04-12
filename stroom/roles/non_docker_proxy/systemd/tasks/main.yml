@@ -10,15 +10,6 @@
       - stroom_service_state is defined
       - java_version is defined
 
-- name: Stop Stroom Proxy Service if running
-  when: stroom_service_state is defined
-  become: true
-  become_user: root
-  when: stroom_proxy_service_installed is defined and stroom_proxy_service_installed.rc == 0
-  systemd:
-    name: stroom-proxy
-    state: stopped
-
 - name: SystemD Service File
   become: true
   become_user: root
@@ -28,20 +19,20 @@
   template:
     src: "templates/etc/systemd/system/stroom-proxy.service.j2"
     dest: "/etc/systemd/system/stroom-proxy.service"
+  notify:
+    - Stop Stroom Proxy Service
+    - Reload systemd Daemon
 
-- name: SystemD Service enable
-  when: stroom_service_on_boot is defined
-  register: stroom_proxy_service_installed
-  become: true
-  become_user: root
-  systemd:
-    name: stroom-proxy
-    enabled: "{{ stroom_service_on_boot }}"
+# Force the old service to stop prior to starting the new one
+- name: Flush handlers
+  meta: flush_handlers
 
-- name: SystemD Service start
+- name: SystemD Service start/enable
   when: stroom_service_state is defined
   become: true
   become_user: root
   systemd:
     name: stroom-proxy
     state: "{{ stroom_service_state }}"
+    enabled: "{{ stroom_service_on_boot }}"
+
