@@ -11,7 +11,7 @@ ansible_user: vagrant
 stack_name: "stroom_core_test"
 
 # The version of the stack to deploy
-stack_version: "v7.4-beta.13-proxy-v7.0.32"
+stack_version: "v7.4.7-proxy-v7.0.32"
 
 # The path on a file server where the stack archive file can be found
 stroom_stack_archive_url_base: "https://github.com/gchq/stroom-resources/releases/download/stroom-stacks-{{ stack_version }}"
@@ -54,6 +54,10 @@ stack_env_vars:
   HOST_IP: "{{ nginx_advertised_host }}"
 
   NGINX_ADVERTISED_HOST: "{{ nginx_advertised_host }}"
+
+  # Install the content packs, so we have the feeds
+  # for log-sender to send to
+  STROOM_CONTENT_PACK_IMPORT_ENABLED: true
 
   #STROOM_NODE: "{{ inventory_hostname }}"
   #DOCKER_HOST_HOSTNAME: "{{ inventory_hostname }}"

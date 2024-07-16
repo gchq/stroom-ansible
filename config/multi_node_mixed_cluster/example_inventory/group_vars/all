@@ -13,7 +13,7 @@ environment_name: "Test Stroom"
 # The name of the stack to deploy
 stack_name: "stroom_services"
 
-stroom_version: "v7.0.2"
+stroom_version: "v7.4.7"
 
 stroom_proxy_version: "{{ stroom_version }}"
 
@@ -125,6 +125,10 @@ stack_env_vars:
   STROOM_AUTH_DB_PORT: "{{ stroom_db_port }}"
 
   NGINX_ADVERTISED_HOST: "{{ nginx_advertised_host }}"
+  #
+  # Install the content packs, so we have the feeds
+  # for log-sender to send to
+  STROOM_CONTENT_PACK_IMPORT_ENABLED: true
 
   # TODO these probably don't need to be set as they are mostly used
   # for nginx reverse proxying which we are doing via jinja templates
