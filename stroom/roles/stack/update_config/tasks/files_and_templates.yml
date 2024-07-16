@@ -1,0 +1,96 @@
+---
+# These tasks will copy/template the contents of dir {{ files_and_templates }}/{{ sub_dir_to_copy }}/
+# in the inventory into {{ stack_home_dir }}/{{ sub_dir_to_copy }}/ on the destination
+# All files ending .j2 are templated, otherwise are copied as static files.
+# The .j2 extension is removed on the destination.
+#
+# This means you don't need to change the ansible if there are new files you want copied over,
+# just put them in the right place in the inventory and they will be picked up.
+#
+# The following is an example dir structure in the inventory:
+#    ▾ example_inventory/
+#      ▾ files_and_templates/
+#        ▾ config/                   <- a {{ sub_dir_to_copy }}
+#            20_prometheus_port.yml  <- a static file to copy onto the dest
+#        ▾ volumes/                  <- a {{ sub_dir_to_copy }}
+#          ▾ nginx/certs/
+#              example.ca.cert
+#              example.server.cert
+#              example.server.key
+#          ▾ stroom/config/
+#              config.yml.j2         <- a jinja2 file to template onto the dest
+
+- name: 'Check mandatory variables are defined'
+  assert:
+    that:
+      - sub_dir_to_copy | default('') | trim != ''
+      - stack_home_dir | default('') | trim != ''
+      - files_and_templates_dir | default('') | trim != ''
+
+- debug:
+    msg:
+      - "sub_dir_to_copy: {{ sub_dir_to_copy }}"
+    verbosity: 2
+  tags:
+    - deploy
+    - configure
+
+- name: "Check if {{ sub_dir_to_copy }} exists on the Ansible controller"
+  local_action: stat path={{ files_and_templates_dir }}/{{ sub_dir_to_copy }}
+  become: false
+  register: _config_files_and_templates_dir_info
+  tags:
+    - deploy
+    - configure
+
+  # Copies any files (except *.j2 files) as they are to the remote.
+  # Will also follow symlinks on the controller
+  # Mirrors the directory structure.
+  # Will only add/update files on the remote, not delete.
+  # To make deletion happen we would need to have all of the volumes dir
+  # locally.
+  # TODO The files in the volumes dir need to be accessed by the user inside
+  # the container which may have a different uid to the host user, thus we
+  # need to open up read to g and o
+- name: "Copy static files from {{ files_and_templates_dir }}/{{ sub_dir_to_copy }} (local) to {{ stack_home_dir }}/{{ sub_dir_to_copy }}/"
+  copy:
+    src: "{{ files_and_templates_dir }}/{{ sub_dir_to_copy }}/{{ item.path }}"
+    dest: "{{ stack_home_dir }}/{{ sub_dir_to_copy }}/{{ item.path }}"
+    mode: "u=rw,g=r,o=r"
+    local_follow: true
+    backup: true
+  with_filetree: "{{ files_and_templates_dir }}/{{ sub_dir_to_copy }}/"
+  loop_control:
+    label: "{{ item.path }} (type: {{ item.state }}, source: {{ item.src | default('N/A') }})"
+  when: _config_files_and_templates_dir_info.stat.exists 
+        and (item.state == 'file' or item.state == 'link')
+        and item.path is not match('.*\.j2$')
+        and item.path is not match('.*\.gitkeep$') # Ignore .gitkeep files used to maintain empty dirs
+  tags:
+    - deploy
+    - configure
+
+  # Copies and templates any *.j2 files found in the tree, removing the .j2 extension.
+  # Will also follow symlinks on the controller
+  # Mirrors the directory structure.
+  # Will only add/update files on the remote, not delete.
+  # TODO The files in the volumes dir need to be accessed by the user inside
+  # the container which may have a different uid to the host user, thus we
+  # need to open up read to g and o
+- name: "Copy and template .j2 files from {{ files_and_templates_dir }}/{{ sub_dir_to_copy }} (local) to {{ stack_home_dir }}/{{ sub_dir_to_copy }}/"
+  template:
+    src: "{{ files_and_templates_dir }}/{{ sub_dir_to_copy }}/{{ item.path }}"
+    dest: "{{ stack_home_dir }}/{{ sub_dir_to_copy }}/{{ item.path | regex_replace('.j2$','') }}"
+    mode: "u=rw,g=r,o=r"
+    local_follow: true
+    backup: true
+  with_filetree: "{{ files_and_templates_dir }}/{{ sub_dir_to_copy }}/"
+  loop_control:
+    label: "{{ item.path }} (type: {{ item.state }}, source: {{ item.src | default('N/A') }})"
+  when: _config_files_and_templates_dir_info.stat.exists 
+        and item.state == 'file' 
+        and item.path is match('.*\.j2$')
+        and item.path is not match('.*\.gitkeep$') # Ignore .gitkeep files used to maintain empty dirs
+  tags:
+    - deploy
+    - configure

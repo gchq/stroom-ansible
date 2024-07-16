@@ -1,0 +1,5 @@
+services:
+
+  stroom-proxy-remote:
+    ports:
+      - "9101:9101"
