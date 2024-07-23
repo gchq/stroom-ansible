@@ -145,9 +145,9 @@ appConfig:
     port: "443"
   security:
     authentication:
+      openId:
+        identityProviderType: TEST_CREDENTIALS
       preventLogin: false
-    identity:
-      useDefaultOpenIdCredentials: "false"
   serviceDiscovery:
     enabled: "false"
   statistics:
