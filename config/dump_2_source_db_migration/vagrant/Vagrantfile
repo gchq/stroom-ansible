@@ -4,7 +4,7 @@ Vagrant.configure("2") do |config|
 
   def get_ip()
     @ip_counter += 1
-    "192.168.106.#{@ip_counter}"
+    "192.168.62.#{@ip_counter}"
   end
 
   # TODO Only allows a host to belong to one group, but that should
@@ -19,7 +19,7 @@ Vagrant.configure("2") do |config|
 
   servers.each do |machine|
     config.vm.define machine[:hostname] do |node|
-      node.vm.box = "centos/7"
+      node.vm.box = "rockylinux/9"
       node.vm.hostname = machine[:hostname]
       node.vm.network "private_network", ip: machine[:ip]
 
@@ -32,6 +32,7 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.provision "ansible" do |ansible|
+    ansible.compatibility_mode = "2.0"
     ansible.verbose = "v"
     # Noddy playbook so we can generate an inventory
     ansible.playbook = "vagrant_playbook.yml"
