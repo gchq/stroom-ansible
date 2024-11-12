@@ -49,4 +49,5 @@
     name: stack/systemd
   tags:
     - deploy
+    - systemd
 

@@ -39,3 +39,4 @@
     name: non_docker_stroom/systemd
   tags:
     - deploy
+    - systemd
