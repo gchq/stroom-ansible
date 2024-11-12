@@ -49,6 +49,8 @@
       - net-tools
       - unzip
       - vim  # vi is not a mustard cutter
+      - fontconfig # Needed for Stroom spreadsheet format export
+      - dejavu-fonts-all # Needed for Stroom spreadsheet format export
 
 - name: YUM install various command line tools
   when: no_firewalld is undefined
