@@ -30,7 +30,7 @@
   when: not epel_repofile_result.stat.exists
 
 # Install common command line tools
-- name: YUM install various command line tools
+- name: YUM install various command line tools and required pkgs
   become: true
   yum:
     name: "{{ packages }}"
