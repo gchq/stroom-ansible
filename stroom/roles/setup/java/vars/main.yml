@@ -51,7 +51,11 @@ _java:
     url: "{{ java_21_alt_url | default('https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.1%2B12/OpenJDK21U-jdk_x64_linux_hotspot_21.0.1_12.tar.gz') }}"
     directory: "jdk-21.0.1+12"
     home_dir: "{{ java_unarchive_dest }}/jdk-21.0.1+12"
-
+  25:
+    targz: "OpenJDK25U-jdk_x64_linux_hotspot_25.0.1_8.tar.gz"
+    url: "{{ java_25_alt_url | default('https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.1%2B8/OpenJDK25U-jdk_x64_linux_hotspot_25.0.1_8.tar.gz') }}"
+    directory: "jdk-25.0.1+8"
+    home_dir: "{{ java_unarchive_dest }}/jdk-25.0.1+8"
 
 # Java 6,7,8,11 stuff
 java_yum_package: "{{ _java[java_version | int].jre | default([]) }}"
